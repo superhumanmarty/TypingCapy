@@ -1,0 +1,117 @@
+{
+  "c": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "c#": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "c++": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "eng": {
+    "type": "human",
+    "word_lists": [500, 1000, 3000, 10000],
+    "punctuation_normal": "punctuation_normal_eng.json",
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": "symbols_always.json",
+    "numbers_expressions": "numbers_expressions.json",
+    "paragraphs": {
+      "words_only": "paragraphs_eng_words_only.json",
+      "words_punct": "paragraphs_eng_words_punct.json",
+      "words_numbers": "paragraphs_eng_words_numbers.json",
+      "words_punct_numbers": "paragraphs_eng_words_punct_numbers.json",
+      "words_punct_symbols": "paragraphs_eng_words_punct_symbols.json",
+      "words_punct_numbers_symbols": "paragraphs_eng_words_punct_numbers_symbols.json"
+    }
+  },
+  "indo": {
+    "type": "human",
+    "word_lists": [500, 1000],
+    "punctuation_normal": "punctuation_normal_indo.json",
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": "symbols_always.json",
+    "numbers_expressions": "numbers_expressions.json",
+    "paragraphs": null
+  },
+  "java": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "js": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "php": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "python": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "r": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+  "rus": {
+    "type": "human",
+    "word_lists": [500, 1000],
+    "punctuation_normal": "punctuation_normal_rus.json",
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": "symbols_always.json",
+    "numbers_expressions": "numbers_expressions.json",
+    "paragraphs": null
+  },
+  "sql": {
+    "type": "coding",
+    "word_lists": [],
+    "punctuation_normal": null,
+    "numbers_standalone": null,
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  }
+}

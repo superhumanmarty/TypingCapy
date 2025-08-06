@@ -1,0 +1,220 @@
+/* components.css */
+
+/* Settings UI */
+.settings {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+.settings span { margin-right: 0.5rem; }
+.settings label { margin-right: 1rem; cursor: pointer; }
+
+/* Typing Box - balanced sizing for 3 lines */
+#textDisplay {
+  box-sizing: border-box;
+  width: 100%;
+  background: transparent; /* Removed background */
+  padding: 0.75rem 1rem; /* Balanced padding */
+  border: none; /* Removed border */
+  border-radius: 4px;
+  line-height: 1.4em; /* More comfortable line height */
+  height: calc(3 * 1.4em + 1.5rem); /* 3 lines + 0.75rem top + 0.75rem bottom padding */
+  font-size: 1.75rem; /* Smaller, more readable size */
+  text-align: left;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  margin-bottom: 1rem;
+  white-space: normal;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+  text-rendering: optimizeSpeed; /* Disable advanced rendering for consistent widths */
+  font-kerning: none; /* Disable kerning to prevent width changes */
+  letter-spacing: 0; /* Ensure no extra spacing */
+  font-feature-settings: "kern" 0; /* Explicitly disable kerning */
+  -webkit-font-smoothing: none; /* Disable subpixel antialiasing */
+  -moz-osx-font-smoothing: unset; /* For Firefox on macOS */
+  font-smooth: never; /* Disable font smoothing for integer pixel widths */
+}
+#textDisplay::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* always show the theme dropdown, but hide the color‑picker row by default */
+.customizer {
+  margin-bottom: 1rem;
+}
+
+/* Character states */
+.char { 
+  color: var(--untyped-color); 
+  position: relative;
+  display: inline-block;
+  width: 1ch;
+  text-rendering: optimizeSpeed; /* Apply to chars too for consistency */
+  font-kerning: none;
+  letter-spacing: 0;
+  font-feature-settings: "kern" 0;
+  font-smooth: never; /* Disable smoothing on characters */
+}
+
+.char.correct  { color: var(--correct-color); }
+.char.incorrect{ color: var(--incorrect-color); }
+.char.skipped  { color: var(--skipped-color); }
+
+/* Alternative approach for newline handling */
+.char[data-word="-1"] {
+  white-space: pre;
+}
+
+/* Fix cursor to prevent skipping */
+.char.current {
+  /* Remove border-left to avoid width changes/jitter */
+  border-left: none !important;
+  /* No box-shadow */
+  box-shadow: none !important;
+  /* Ensure relative for ::before positioning */
+  position: relative;
+}
+
+
+/* Stats */
+#stats { color: var(--stats-color); font-size: 0.9rem; }
+#stats span { margin-right: 1rem; }
+
+.char.extra {
+  color: var(--incorrect-color);
+}
+
+/* Word wrapper - remove margin */
+.word-wrapper {
+  display: inline;
+  white-space: nowrap; /* Prevent word splitting across lines */
+  margin-right: 0; /* Changed from 0.35em to 0 */
+}
+
+/* Remove margin from last word wrapper */
+.word-wrapper:last-child {
+  margin-right: 0;
+}
+
+/* Spaces - add margin after space for proper word spacing */
+.char.space {
+  width: 1ch;
+  display: inline-block;
+  position: relative;
+  margin-right: 0; /* Remove margin, use fixed width */
+}
+
+/* Spaces - remove custom ::before and vertical-align (use unified) */
+.char.space.current {
+  width: 1ch;               /* Keep fixed width */
+  height: 1em;
+  display: inline-block;
+  position: relative;
+  border-left: none !important;  /* Already none */
+  /* Remove vertical-align: text-bottom to prevent dip/shift */
+  /* vertical-align: text-bottom; */ /* Commented out */
+}
+
+/* Unified caret for ALL current chars (letters, spaces, newlines) */
+.char.current::before {
+  content: '';
+  position: absolute;
+  left: -2px;               /* Offset slightly left to avoid overlapping letter edges */
+  top: 0;
+  width: 2px;
+  height: 1em;
+  background: var(--header-color);
+  animation: blink 1s steps(1) infinite;
+  z-index: 1;               /* Ensure caret is above text if needed */
+}
+
+/* For spaces and newlines, adjust left back to 0 (no offset needed) */
+.char.space.current::before,
+.char.newline.current::before {
+  left: 0;
+}
+
+/* Ensure hidden newline characters don't interfere with cursor */
+.char[style*="display: none"].current {
+  display: inline-block !important;
+  width: 2px;
+  visibility: visible;
+  color: transparent;
+}
+
+/* Ensure newline characters are typeable positions */
+.char[style*="display: none"] {
+  position: relative;
+  width: 0;
+  display: inline-block !important;
+}
+
+/* Fix newline cursor (use unified ::before instead of box-shadow) */
+.char.newline.current,
+.char[style*="display: none"].current {
+  width: 2px;
+  height: 1em;               /* Match text height */
+  display: inline-block;
+  /* Remove vertical-align to prevent any potential shift (consistent with spaces) */
+  /* vertical-align: text-bottom; */ /* Commented out */
+  visibility: visible;
+  border-left: none !important;
+  /* Remove box-shadow, rely on ::before */
+  box-shadow: none !important;
+  /* No custom animation here; uses .char.current::before */
+}
+
+/* Handle newlines properly */
+.char.newline {
+  display: none;
+}
+
+.char.newline + br {
+  display: block;
+}
+
+/* Always show the break after a newline, even when it’s current */
+.char.newline.current + br {
+  display: block;
+}
+
+/* Show line break after newline is typed */
+.char.newline.correct + br,
+.char.newline.incorrect + br {
+  display: block;
+}
+
+/* make the text box and error display side by side */
+.text-error-wrapper {
+  position: relative;       /* establish a positioning context */
+  width: 100%;              /* keep its children inside the same container width */
+}
+
+/* restyle the error display as a two-line, centered box */
+.typed-error-display {
+  position: absolute;
+  top: 0;
+  left: 100%;               /* just to the right of the text box */
+  margin-left: 1rem;        /* a little breathing room */
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin: 0;                /* remove any default margins */
+  font-size: 1.2rem;
+  color: var(--incorrect-color);
+}
+
+
+.typed-error-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.2rem;
+}
+
+.typed-error-letter {
+  font-size: 1.4rem;
+  font-weight: bold;
+}

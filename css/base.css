@@ -1,0 +1,73 @@
+/* base.css */
+:root {
+  --body-bg: #0d0d0d;
+  --header-color: #cba6f7;
+  --stats-color: #a6e3a1;
+  --box-bg: #1e1e2e;
+  --box-border: #7f1bfa;
+  --untyped-color: #aaa; /* lighter so you can see it */
+  --correct-color: #fff;
+  --incorrect-color: #f75f5f;
+  --skipped-color: #8b0000;
+  --ad-bg: #333; /* Placeholder color for ad banner */
+}
+
+/* Base layout */
+body {
+  margin: 0;
+  font-family: monospace;
+  display: flex;
+  align-items: center; /* Centers vertically */
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--body-bg);
+  color: var(--header-color);
+  overflow-y: auto;
+  padding: 0; /* No padding for full centering */
+}
+
+.container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  width: 100%; /* Full width to push ad to edge */
+  max-width: none; /* Remove max-width constraint */
+  min-height: 100vh; /* Full height to enable centering */
+}
+
+#ad-left {
+  width: 150px; /* Thicker width; adjust as needed */
+  background-color: var(--ad-bg);
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  font-size: 1.2rem;
+  align-self: stretch; /* Span full height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0; /* Ensure flush to left */
+}
+
+.settings-panel {
+  flex: 0 0 220px; /* Fixed width, no grow/shrink; reduced from 250px */
+  text-align: left;
+  align-self: flex-start; /* Stick to top */
+  margin-left: 0; /* No extra space from ad */
+}
+
+.settings-panel .settings,
+.settings-panel .customizer {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.typing-panel {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center typing content vertically */
+  align-items: center;
+  text-align: center;
+  min-height: 100vh; /* Full height for centering */
+}

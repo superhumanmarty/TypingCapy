@@ -1,0 +1,9 @@
+/* animations.css */
+
+@keyframes blink { 50% { border-color: transparent; } }
+
+/* blink between untyped grey and highlight color */
+@keyframes blink-color {
+  0%,100% { color: var(--highlight-color); }
+  50%    { color: var(--untyped-color); }
+}

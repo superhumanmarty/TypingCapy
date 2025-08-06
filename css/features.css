@@ -1,0 +1,160 @@
+/* features.css */
+
+/* Hidden word */
+.hidden-word { visibility: hidden; }
+
+/* Typed error display outside box */
+.typed-error-display {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--incorrect-color);
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
+.typed-error-display.hidden {
+  display: none;
+}
+
+.typed-error-display #typedLetter {
+  font-weight: bold;
+  font-size: 1.4rem;
+  background: var(--box-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--incorrect-color);
+}
+
+.hidden-word.current {
+  /* show caret but keep text hidden */
+  visibility: visible !important;
+  color: transparent;
+}
+
+/* Keyboard diagram styles */
+.keyboard-diagram {
+  margin: 1rem 0;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.keyboard-diagram.hidden {
+  display: none;
+}
+
+.keyboard-diagram img {
+  max-width: 100%;
+  max-height: 500px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Timer Display */
+.timer-display {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: var(--stats-color);
+  font-weight: bold;
+  min-height: 1.2em; /* Reserve space even when empty */
+}
+.timer-display.hidden {
+  visibility: hidden; /* Hide but reserve space */
+}
+
+/* Results Screen */
+.results-screen {
+  background: var(--box-bg);
+  padding: 2rem;
+  border: 2px solid var(--box-border);
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.results-screen.hidden {
+  display: none;
+}
+
+.results-screen h2 {
+  color: var(--header-color);
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-label {
+  color: var(--untyped-color);
+  font-size: 1rem;
+}
+
+.result-value {
+  color: var(--stats-color);
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.restart-button {
+  background: var(--box-border);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: monospace;
+}
+
+.restart-button:hover {
+  background: var(--header-color);
+  color: var(--box-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* — look-ahead "color" only, no background box — */
+.ahead1,
+.ahead2 {
+  background: none;
+  color: var(--highlight-color);
+}
+
+.blink {
+  /* make sure this animation always wins over any .aheadN color */
+  animation: blink-color 1s steps(1) infinite !important;
+}
+
+/* Ghost caret */
+.char.ghost::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  width: 2px;
+  height: 1em;
+  background: var(--stats-color); /* Change to different color for distinction, e.g. green */
+  opacity: 0.7; /* Slightly higher opacity */
+  animation: blink 1s steps(1) infinite;
+  z-index: 1;
+}
+
+/* Adjust for spaces/newlines */
+.char.space.ghost::before,
+.char.newline.ghost::before {
+  left: 0;
+}
