@@ -1,5 +1,5 @@
 // main.js
-
+// hi this is a change
 import { updateHighlight } from './highlight.js';
 import { calculateWPM, calculateAccuracy, getCurrentWord } from './utils.js';
 import { updateHide } from './hide.js';
