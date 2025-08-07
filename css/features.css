@@ -158,3 +158,24 @@
 .char.newline.ghost::before {
   left: 0;
 }
+
+/* Word Progress Bar */
+.word-progress {
+  width: 100%;
+  height: 10px;
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  margin-bottom: 1rem;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.word-progress-fill {
+  height: 100%;
+  background: var(--stats-color);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.word-progress.hidden {
+  visibility: hidden;
+}
