@@ -1,53 +1,40 @@
-// js/keyboard.js - Handles keyboard diagram display and state tracking
+// js/keyboard.js - checkbox-based keyboard guide + key state
 
 let shiftPressed = false;
 let capsLockOn = false;
 
 const keyboardDiagram = document.getElementById('keyboardDiagram');
-const keyboardImage = document.getElementById('keyboardImage');
+const keyboardImage   = document.getElementById('keyboardImage');
 
-// Initialize keyboard diagram visibility based on radio setting
+// Initialize keyboard diagram visibility based on the checkbox
 export function setupKeyboardDiagram() {
-  const keyboardRadios = document.querySelectorAll('input[name="keyboardDiagram"]');
-  const mode = [...keyboardRadios].find(r => r.checked).value;
+  const toggle = document.getElementById('keyboardDiagramToggle');
+  if (!toggle || !keyboardDiagram) return;
 
-  if (mode === 'on') {
-    keyboardDiagram.classList.remove('hidden');
-  } else {
-    keyboardDiagram.classList.add('hidden');
-  }
-}
+  keyboardDiagram.classList.toggle('hidden', !toggle.checked);
 
-// Watch for keyboard diagram radio changes
-export function watchKeyboardRadios() {
-  const keyboardRadios = document.querySelectorAll('input[name="keyboardDiagram"]');
-  keyboardRadios.forEach(r => {
-    r.addEventListener('change', () => {
-      setupKeyboardDiagram();
-    });
+  // keep it in sync when user clicks
+  toggle.addEventListener('change', () => {
+    keyboardDiagram.classList.toggle('hidden', !toggle.checked);
   });
 }
 
-// Update keyboard image based on shift/caps lock state
+// Update keyboard image based on shift/caps state
 function updateKeyboardImage() {
+  if (!keyboardImage) return;
   let imagePath = 'keyboard_and_hand/';
 
-  if (shiftPressed && capsLockOn) {
-    imagePath += 'shift_caps_lock.png';
-  } else if (shiftPressed) {
-    imagePath += 'shift.png';
-  } else if (capsLockOn) {
-    imagePath += 'caps_lock.png';
-  } else {
-    imagePath += 'default.png';
-  }
+  if (shiftPressed && capsLockOn) imagePath += 'shift_caps_lock.png';
+  else if (shiftPressed)          imagePath += 'shift.png';
+  else if (capsLockOn)            imagePath += 'caps_lock.png';
+  else                            imagePath += 'default.png';
 
   keyboardImage.src = imagePath;
 }
 
-// Track shift key state
+// Track shift/caps states
 export function handleKeyboardState(e) {
-  // Track shift press/release
+  // Shift
   if (e.key === 'Shift') {
     if (e.type === 'keydown' && !shiftPressed) {
       shiftPressed = true;
@@ -58,36 +45,31 @@ export function handleKeyboardState(e) {
     }
   }
 
-  // Track caps lock toggle
+  // Caps Lock
   if (e.key === 'CapsLock') {
     if (e.type === 'keydown') {
-      // Toggle our internal state immediately
       capsLockOn = !capsLockOn;
       updateKeyboardImage();
     } else if (e.type === 'keyup' && e.getModifierState) {
-      // Double-check the actual state on key up
       capsLockOn = e.getModifierState('CapsLock');
       updateKeyboardImage();
     }
   }
 
-  // Also check caps lock state on any keydown (in case it changed outside our app)
+  // Also re-check caps lock on any keydown
   if (e.type === 'keydown' && e.getModifierState) {
-    const newCapsLockState = e.getModifierState('CapsLock');
-    if (newCapsLockState !== capsLockOn) {
-      capsLockOn = newCapsLockState;
+    const newCaps = e.getModifierState('CapsLock');
+    if (newCaps !== capsLockOn) {
+      capsLockOn = newCaps;
       updateKeyboardImage();
     }
   }
 }
 
-// Reset shift state if window loses focus (user might release shift outside)
+// Reset shift if window loses focus
 window.addEventListener('blur', () => {
   if (shiftPressed) {
     shiftPressed = false;
     updateKeyboardImage();
   }
 });
-
-// Export for use in main.js
-export { shiftPressed, capsLockOn };

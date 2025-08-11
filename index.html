@@ -1,5 +1,4 @@
 <!--index.html-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,129 +15,292 @@
   <div class="container">
     <div id="ad-left">ads</div>
     <div class="settings-panel">
-      <!-- Language Setting -->
-      <div id="languageSettings" class="settings">
-        <span>Language:</span>
-        <select id="languageSelector">
-          <!-- Populated by JS -->
-        </select>
+      <div class="settings-group no-card">
+        <div id="textGenHero" class="settings-hero">
+          <img src="settings_images/lang.png" alt="" class="hero-icon" loading="lazy">
+
+          <div class="hero-content">
+            <div class="hero-title">TEXT</div>
+
+            <div id="languageSettings">
+              <select id="languageSelector"></select>
+            </div>
+
+            <div id="wordListSizeSettings" class="hidden">
+              <select id="wordListSizeSelector"></select>
+            </div>
+            <!-- hidden state checkboxes that the split-pill buttons control -->
+            <input type="checkbox" id="numbersToggle" hidden>
+            <input type="checkbox" id="numbersExprToggle" hidden>
+            <input type="checkbox" id="punctuationToggle" hidden>
+            <input type="checkbox" id="symbolsToggle" hidden>
+            <div id="togglesSettings">
+              <div id="numbersSplit" class="split-pill" aria-label="Numbers toggles">
+                <button id="numMain"  class="split-half left"  type="button" tabindex="-1">123</button>
+                <button id="numExtra" class="split-half right" type="button" tabindex="-1" aria-disabled="true">+=</button>
+              </div>
+              <div id="punctSplit" class="split-pill" aria-label="Punctuation toggles">
+                <button id="punctMain"  class="split-half left"  type="button" tabindex="-1">!?</button>
+                <button id="punctExtra" class="split-half right" type="button" tabindex="-1" aria-disabled="true">@#&</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <!-- Mode Setting -->
-      <div id="modeSettings" class="settings">
-        <span>Mode:</span>
-        <label><input type="radio" name="mode" value="random" checked> Random</label>
-        <label><input type="radio" name="mode" value="paragraphs"> Real Paragraphs</label>
+      <div class="settings-group no-card">
+        <!-- NOOB hero -->
+        <div class="settings-group no-card">
+          <div id="noobHero" class="settings-hero">
+            <img src="settings_images/noob.png" alt="Noob" class="hero-icon" loading="lazy">
+
+            <div class="hero-content">
+              <div class="hero-title">NOOB</div>
+
+              <!-- keyboard diagram -->
+              <div id="keyboardDiagramSettings" class="settings pill pill-single keyboard-pill" role="button" tabindex="-1">
+                <input type="checkbox" id="keyboardDiagramToggle" class="pill-toggle" hidden>
+                <img src="keyboard_and_hand/default.png" alt="Keyboard guide" class="keyboard-pill-img">
+              </div>
+
+              <!-- “You typed: x” pill -->
+              <div id="typedErrorsPill" class="settings pill pill-preview" role="button" aria-pressed="false" tabindex="-1">
+                <input type="checkbox" id="showTypedErrorsToggle" hidden>
+                <div class="typed-preview" aria-hidden="true">
+                  <div class="te-label">You typed:</div>
+                  <div class="te-box">x</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRO hero -->
+        <div class="settings-group no-card">
+          <div id="proHero" class="settings-hero">
+            <img src="settings_images/pro.png" alt="Pro" class="hero-icon" loading="lazy">
+
+            <div class="hero-content">
+              <div class="hero-title">PRO</div>
+
+              <!-- Hide -->
+              <div id="hidePillRow" class="pill-row">
+                <div id="hidePill" class="settings pill pill-wide transparent-text" role="button" tabindex="-1">
+                  <div class="pill-title"><span class="muted">Hide</span></div>
+                  <div id="hideChoiceLabel"></div>
+                </div>
+                <div id="hideOptions" class="pill-options replace hidden">
+                  <button class="pill option" id="hideOff" type="button" tabindex="-1">Off</button>
+                  <button class="pill option" id="hideCurrent" type="button" tabindex="-1">Current</button>
+                  <button class="pill option" id="hideCurrentNext" type="button" tabindex="-1">Current &amp; Next</button>
+                </div>
+              </div>
+
+              <!-- Highlight -->
+              <div id="highlightPillRow" class="pill-row">
+                <div id="highlightPill" class="settings pill pill-wide neon-green-text" role="button" tabindex="-1">
+                  <div class="pill-title"><span class="neon">Highlight</span></div>
+                  <div id="highlightChoiceLabel"></div>
+                </div>
+                <div id="highlightOptions" class="pill-options replace hidden">
+                  <button class="pill option" id="hlOff" type="button" tabindex="-1">Off</button>
+                  <button class="pill option" id="hlNext" type="button" tabindex="-1">Next</button>
+                  <button class="pill option" id="hlNext2" type="button" tabindex="-1">2nd</button>
+                </div>
+              </div>
+
+              <!-- Ghost -->
+              <div id="ghostCursorSettings" class="settings pill" role="button" aria-pressed="false" tabindex="-1">
+                <input type="checkbox" id="ghostModeToggle" hidden>
+                <div class="ghost-title">
+                  <span class="ghost-word">Ghost</span>
+                  <span class="cursor ghost-cursor" aria-hidden="true"></span>
+                  <span class="cursor real-cursor" aria-hidden="true"></span>
+                </div>
+                <div id="ghostWpmWrapper" class="pill-input below hidden">
+                  <label for="customGhostWPM" class="sr-only">Ghost WPM</label>
+                  <input type="number" id="customGhostWPM" value="60" min="10" max="300" />
+                </div>
+              </div>
+
+              <!-- End-if pills -->
+              <div id="minWPMSettings" class="settings pill pill-split" role="button" aria-controls="endWpmWrapper">
+                <input type="checkbox" id="endWpmToggle" class="pill-toggle" hidden>
+                <div class="pill-name">End if WPM &lt;</div>
+                <div id="endWpmWrapper" class="pill-input hidden">
+                  <input type="number" id="endWpmValue" value="50" min="10" max="300" style="width: 4em;">
+                </div>
+              </div>
+
+              <div id="minAccuracySettings" class="settings pill pill-split" role="button" aria-controls="endAccWrapper">
+                <input type="checkbox" id="endAccToggle" class="pill-toggle" hidden>
+                <div class="pill-name">End if Accuracy &lt;</div>
+                <div id="endAccWrapper" class="pill-input hidden">
+                  <input type="number" id="endAccValue" value="95" min="50" max="100" style="width: 4em;"> %
+                </div>
+              </div>
+
+              <!-- Strict mode -->
+              <div id="strictModeSettings" class="settings pill pill-single" role="button">
+                <input type="checkbox" id="endOnMistakeCheckbox" class="pill-toggle" hidden>
+                <div class="pill-name">End on Any Mistake</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Hidden mirrors for logic (do NOT show in UI) -->
+        <div id="hideWordsSettings" class="settings hidden">
+          <span>🙈</span>
+          <select id="hideWordsSelector">
+            <option value="off" selected>Off</option>
+            <option value="current">Current</option>
+            <option value="currentNext">Current & Next</option>
+          </select>
+        </div>
+
+        <div id="highlightAheadSettings" class="settings hidden">
+          <span>🔦</span>
+          <select id="highlightAheadSelector">
+            <option value="off" selected>Off</option>
+            <option value="next">Next Word</option>
+            <option value="next2">2nd Word</option>
+          </select>
+        </div>
+
+        <!-- GAME LIMITS hero — 3 buttons: Endless | Timer | Words -->
+        <div class="settings-group no-card">
+          <div id="limitsHero" class="settings-hero">
+            <div class="hero-content">
+              <div class="hero-title">GAME LIMITS</div>
+
+              <!-- 3-button grid -->
+              <div id="limitsButtons" class="limits-grid">
+                <!-- ENDLESS -->
+                <button id="btnEndless" class="limit-btn active" type="button" aria-pressed="true">
+                  <img src="settings_images/endless.png" alt="Endless">
+                  <div class="btn-label">Endless</div>
+                </button>
+
+                <!-- TIMER -->
+                <button id="btnTimer" class="limit-btn" type="button" aria-pressed="false">
+                  <img src="settings_images/timer.png" alt="Timer">
+                  <div class="btn-label">Timer</div>
+                  <div id="timerInline" class="btn-dropdown hidden">
+                    <select id="timerInlineSelect" aria-label="Timer length">
+                      <option value="15">15s</option>
+                      <option value="30">30s</option>
+                      <option value="60">1 min</option>
+                      <option value="120">2 min</option>
+                      <option value="300">5 min</option>
+                    </select>
+                  </div>
+                </button>
+
+                <!-- WORD LIMIT -->
+                <button id="btnWord" class="limit-btn" type="button" aria-pressed="false">
+                  <img src="settings_images/word_limit.png" alt="Word limit">
+                  <div class="btn-label">Words</div>
+                  <div id="wordInline" class="btn-dropdown hidden">
+                    <select id="wordLimitInlineSelect" aria-label="Word limit">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="20">20</option>
+                      <option value="25">25</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="200">200</option>
+                    </select>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Hidden mirrors for logic (keep IDs so existing code keeps working) -->
+              <div class="hidden">
+                <div id="timerSettings" class="settings inline-setting">
+                  <label for="timerSelector">⏱️</label>
+                  <select id="timerSelector">
+                    <option value="off" selected>Off</option>
+                    <option value="15">15s</option>
+                    <option value="30">30s</option>
+                    <option value="60">1 min</option>
+                    <option value="120">2 min</option>
+                    <option value="300">5 min</option>
+                  </select>
+                </div>
+
+                <div id="wordLimitSettings" class="settings inline-setting">
+                  <label for="wordLimitSelector">#️⃣</label>
+                  <select id="wordLimitSelector">
+                    <option value="off" selected>Off</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                  </select>
+                </div>
+              </div>
+              <!-- /Hidden mirrors -->
+            </div>
+          </div>
+        </div>
+
       </div>
-      <!-- Word List Size Setting -->
-      <div id="wordListSizeSettings" class="settings hidden">
-        <span>Word List Size:</span>
-        <!-- Radios populated by JS -->
+      <!-- THEME pill -->
+      <div class="settings-group no-card">
+        <div id="themeHero" class="settings-hero">
+          <img src="settings_images/theme.png" alt="Theme" class="hero-icon" loading="lazy">
+
+          <div class="hero-content">
+            <div class="hero-title">THEME</div>
+
+            <div id="themeSettings">
+              <div class="select-pill">
+                <select id="themeSelector" class="ui-select">
+                  <option value="capyparadise" selected>Capy Paradise</option>
+                  <option value="cyberpunk">Cyberpunk</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <!-- Toggles Setting -->
-      <div id="togglesSettings" class="settings hidden">
-        <label><input type="checkbox" id="punctuationToggle"> Punctuation</label>
-        <label><input type="checkbox" id="numbersToggle"> Numbers</label>
-        <label><input type="checkbox" id="advancedSymbolsToggle"> Advanced Symbols</label>
-      </div>
-      <!-- Hide‑Words Setting -->
-      <div id="hideWordsSettings" class="settings">
-        <span>Hide Words:</span>
-        <label><input type="radio" name="hideWords" value="off" checked> Off</label>
-        <label><input type="radio" name="hideWords" value="current"> Hide Current Word</label>
-        <label><input type="radio" name="hideWords" value="currentNext"> Hide Current &amp; Next Word</label>
-      </div>
-      <!-- Highlight-Ahead Setting -->
-      <div id="highlightAheadSettings" class="settings">
-        <span>Highlight Ahead:</span>
-        <label><input type="radio" name="highlightAhead" value="off" checked> Off</label>
-        <label><input type="radio" name="highlightAhead" value="next"> Next Word</label>
-        <label><input type="radio" name="highlightAhead" value="next2"> 2nd Word</label>
-      </div>
-      <!-- Keyboard Diagram Setting -->
-      <div id="keyboardDiagramSettings" class="settings">
-        <span>Show Keyboard Guide:</span>
-        <label><input type="radio" name="keyboardDiagram" value="off" checked> Off</label>
-        <label><input type="radio" name="keyboardDiagram" value="on"> On</label>
-      </div>
-      <!-- Timer Setting -->
-      <div id="timerSettings" class="settings">
-        <span>Timer:</span>
-        <label><input type="radio" name="timer" value="off"> Off</label>
-        <label><input type="radio" name="timer" value="15" checked> 15s</label>
-        <label><input type="radio" name="timer" value="30"> 30s</label>
-        <label><input type="radio" name="timer" value="60"> 1 min</label>
-        <label><input type="radio" name="timer" value="120"> 2 min</label>
-        <label><input type="radio" name="timer" value="300"> 5 min</label>
-      </div>
-      <!-- Word Limit Setting -->
-      <div id="wordLimitSettings" class="settings">
-        <span>Word Limit:</span>
-        <label><input type="radio" name="wordLimit" value="off" checked> Off</label>
-        <label><input type="radio" name="wordLimit" value="5"> 5</label>
-        <label><input type="radio" name="wordLimit" value="10"> 10</label>
-        <label><input type="radio" name="wordLimit" value="15"> 15</label>
-        <label><input type="radio" name="wordLimit" value="20"> 20</label>
-        <label><input type="radio" name="wordLimit" value="25"> 25</label>
-        <label><input type="radio" name="wordLimit" value="30"> 30</label>
-        <label><input type="radio" name="wordLimit" value="50"> 50</label>
-        <label><input type="radio" name="wordLimit" value="100"> 100</label>
-        <label><input type="radio" name="wordLimit" value="200"> 200</label>
-      </div>
-      <!-- Ghost Cursor Setting -->
-      <div id="ghostCursorSettings" class="settings">
-        <span>Ghost Cursor:</span>
-        <label><input type="radio" name="ghostMode" value="off" checked> Off</label>
-        <label><input type="radio" name="ghostMode" value="last"> Last Speed</label>
-        <label><input type="radio" name="ghostMode" value="highest"> Highest Speed</label>
-        <label><input type="radio" name="ghostMode" value="custom"> Custom</label>
-        <input type="number" id="customGhostWPM" value="60" min="10" max="300" style="width: 4em; margin-left: 0.5rem;">
-      </div>
-      <!-- Show Typed Errors Setting -->
-      <div id="showTypedErrorsSettings" class="settings">
-        <span>Show Typed Errors:</span>
-        <label><input type="radio" name="showTypedErrors" value="off" checked> Off</label>
-        <label><input type="radio" name="showTypedErrors" value="on"> On</label>
-      </div>
-      <!-- Min WPM Setting -->
-      <div id="minWPMSettings" class="settings">
-        <span>End if WPM <</span>
-        <label><input type="radio" name="minWPM" value="off" checked> Off</label>
-        <label><input type="radio" name="minWPM" value="on"> On</label>
-        <input type="number" id="minWPMThreshold" value="50" min="10" max="300" style="width: 4em; margin-left: 0.5rem;">
-      </div>
-      <!-- Min Accuracy Setting -->
-      <div id="minAccuracySettings" class="settings">
-        <span>End if Accuracy <</span>
-        <label><input type="radio" name="minAccuracy" value="off" checked> Off</label>
-        <label><input type="radio" name="minAccuracy" value="on"> On</label>
-        <input type="number" id="minAccuracyThreshold" value="95" min="50" max="100" style="width: 4em; margin-left: 0.5rem;"> %
-      </div>
-      <!-- Strict Mode Setting -->
-      <div id="strictModeSettings" class="settings">
-        <span>End on Any Mistake:</span>
-        <label><input type="radio" name="strictMode" value="off" checked> Off</label>
-        <label><input type="radio" name="strictMode" value="on"> On</label>
-      </div>
-      <!-- Theme / customizer -->
-      <div class="customizer">
-        <label for="themeSelector">Theme:</label>
-        <select id="themeSelector">
-          <option value="capyparadise" selected>Capy Paradise</option>
-          <option value="cyberpunk"> Cyberpunk</option>
-        </select>
-      </div>
-      <div id="soundSettings" class="settings">
-        <span>Type Sound:</span>
-        <label><input type="radio" name="soundMode" value="off" checked> Off</label>
-        <label><input type="radio" name="soundMode" value="pentatonic"> Pentatonic</label>
-        <label><input type="radio" name="soundMode" value="blip"> Blip</label>
-        <label><input type="radio" name="soundMode" value="click"> Click</label>
+
+      <!-- SOUND pill -->
+      <div class="settings-group no-card">
+        <div id="soundHero" class="settings-hero">
+          <img src="settings_images/sound.png" alt="Sound" class="hero-icon" loading="lazy">
+
+          <div class="hero-content">
+            <div class="hero-title">SOUND</div>
+
+            <div id="soundSettings" class="plain">
+              <div class="select-pill">
+                <select id="soundSelector" class="ui-select">
+                  <option value="off" selected>Off</option>
+                  <option value="pentatonic">Pentatonic</option>
+                  <option value="blip">Blip</option>
+                  <option value="click">Click</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="typing-panel">
       <!-- Timer Display -->
       <div id="timerDisplay" class="timer-display hidden">
         <span id="timeRemaining"></span>
+      </div>
+      <div id="wordProgress" class="word-progress hidden">
+        <div id="wordProgressFill" class="word-progress-fill"></div>
       </div>
       <div id="stats">
         <span id="wpm">WPM: 0</span>
@@ -177,3 +339,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+

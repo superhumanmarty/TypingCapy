@@ -1,4 +1,4 @@
-// js/ghost.js - Handles ghost cursor logic
+// js/ghost.js - Handles ghost cursor logic (checkbox + custom WPM)
 import { chars } from './engine.js';
 
 let ghostIndex = 0;
@@ -7,63 +7,69 @@ let ghostStartTime = 0;
 let ghostWPM = 0;
 
 export function setupGhost() {
-  const ghostRadios = document.querySelectorAll('input[name="ghostMode"]');
-  const customInput = document.getElementById('customGhostWPM');
-  const updateGhostVisibility = () => {
-    customInput.style.display = [...ghostRadios].find(r => r.checked).value === 'custom' ? 'inline' : 'none';
+  // Keep WPM field visibility in sync on load (main.js also handles this)
+  const toggle  = document.getElementById('ghostModeToggle');
+  const wrapper = document.getElementById('ghostWpmWrapper');
+
+  const apply = () => {
+    wrapper?.classList.toggle('hidden', !toggle?.checked);
   };
-  updateGhostVisibility();
-  ghostRadios.forEach(r => r.addEventListener('change', updateGhostVisibility));
+
+  apply();
+  toggle?.addEventListener('change', apply);
 }
 
 export function startGhost() {
-  const mode = document.querySelector('input[name="ghostMode"]:checked').value;
-  if (mode === 'off') return;
+  // Only run ghost if the checkbox is on
+  if (!document.getElementById('ghostModeToggle')?.checked) return;
 
   ghostIndex = 0;
   ghostStartTime = Date.now();
 
-  if (mode === 'last') {
-    ghostWPM = parseInt(localStorage.getItem('lastWPM') || '0');
-  } else if (mode === 'highest') {
-    ghostWPM = parseInt(localStorage.getItem('highestWPM') || '0');
-  } else if (mode === 'custom') {
-    ghostWPM = parseInt(document.getElementById('customGhostWPM').value) || 60;
-  }
+  // Read WPM, clamp to a sensible range
+  const raw = parseInt(document.getElementById('customGhostWPM')?.value || '60', 10);
+  ghostWPM = Number.isFinite(raw) ? Math.max(10, Math.min(300, raw)) : 60;
 
-  if (ghostWPM <= 0) ghostWPM = 60; // Default to 60 if no saved speed
-
-  updateGhostCursor();
+  // Reset any prior loop and start a new one
+  if (ghostAnimationFrame) cancelAnimationFrame(ghostAnimationFrame);
+  ghostAnimationFrame = requestAnimationFrame(updateGhostCursor);
 }
 
 function updateGhostCursor() {
-  // Remove old ghost
+  // Clear prior ghost highlight
   chars.forEach(c => c.classList.remove('ghost'));
 
-  if (ghostIndex >= chars.length) {
-    cancelAnimationFrame(ghostAnimationFrame);
+  // If ghost was turned off mid-run, stop cleanly
+  if (!document.getElementById('ghostModeToggle')?.checked) {
+    ghostAnimationFrame = null;
     return;
   }
 
-  // Calculate progress
-  const elapsed = (Date.now() - ghostStartTime) / 1000 / 60; // minutes
-  const targetChars = ghostWPM * 5 * elapsed;
+  if (ghostIndex >= chars.length) {
+    ghostAnimationFrame = null;
+    return;
+  }
+
+  // Progress based on time and target WPM (5 chars/word)
+  const elapsedMinutes = (Date.now() - ghostStartTime) / 1000 / 60;
+  const targetChars = ghostWPM * 5 * elapsedMinutes;
   ghostIndex = Math.min(Math.floor(targetChars), chars.length - 1);
 
-  // Add ghost class
   chars[ghostIndex]?.classList.add('ghost');
 
   ghostAnimationFrame = requestAnimationFrame(updateGhostCursor);
 }
 
 export function stopGhost() {
-  cancelAnimationFrame(ghostAnimationFrame);
+  if (ghostAnimationFrame) cancelAnimationFrame(ghostAnimationFrame);
+  ghostAnimationFrame = null;
   chars.forEach(c => c.classList.remove('ghost'));
 }
 
+// Keep saveSpeed (used by timer/results)
 export function saveSpeed(wpm) {
   localStorage.setItem('lastWPM', wpm);
-  const highest = parseInt(localStorage.getItem('highestWPM') || '0');
+  const highest = parseInt(localStorage.getItem('highestWPM') || '0', 10);
   if (wpm > highest) {
     localStorage.setItem('highestWPM', wpm);
   }

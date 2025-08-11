@@ -1,13 +1,5 @@
 /* components.css */
 
-/* Settings UI */
-.settings {
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-}
-.settings span { margin-right: 0.5rem; }
-.settings label { margin-right: 1rem; cursor: pointer; }
-
 /* Typing Box - balanced sizing for 3 lines */
 #textDisplay {
   box-sizing: border-box;

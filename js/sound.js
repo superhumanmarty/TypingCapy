@@ -21,9 +21,9 @@ export function playBlip() {
   const osc = ctx.createOscillator();
   const g   = ctx.createGain();
   osc.type = 'square';
-  osc.frequency.value = 200;      // lower pitch for bloop
+  osc.frequency.value = 200;
   osc.connect(g).connect(ctx.destination);
-  g.gain.setValueAtTime(0.15, ctx.currentTime);  // slight lower volume
+  g.gain.setValueAtTime(0.15, ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
   osc.start(); osc.stop(ctx.currentTime + 0.1);
 }
@@ -38,12 +38,12 @@ export function playClick() {
   const f   = ctx.createBiquadFilter();
   f.type = 'highpass'; f.frequency.value = 1200;
   const g   = ctx.createGain();
-  g.gain.setValueAtTime(0.1, ctx.currentTime); // lower volume
+  g.gain.setValueAtTime(0.1, ctx.currentTime);
   src.connect(f).connect(g).connect(ctx.destination);
   src.start(); src.stop(ctx.currentTime + 0.01);
 }
 
-// add at bottom of js/sound.js
+// — Error buzz —
 export function playErrorBuzz() {
   const osc = ctx.createOscillator();
   const g   = ctx.createGain();
@@ -51,15 +51,17 @@ export function playErrorBuzz() {
   osc.frequency.setValueAtTime(300, ctx.currentTime);
   osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
   osc.connect(g).connect(ctx.destination);
-
   g.gain.setValueAtTime(0.2, ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-
-  osc.start();
-  osc.stop(ctx.currentTime + 0.15);
+  osc.start(); osc.stop(ctx.currentTime + 0.15);
 }
 
+// Updated to support <select id="soundSelector"> with fallback to legacy radios
 export function getSoundMode() {
-  return [...document.querySelectorAll('input[name="soundMode"]')]
-    .find(r => r.checked).value;
+  const sel = document.getElementById('soundSelector');
+  if (sel && typeof sel.value === 'string') return sel.value;
+
+  const radios = document.querySelectorAll('input[name="soundMode"]');
+  const checked = [...radios].find(r => r.checked);
+  return checked ? checked.value : 'off';
 }

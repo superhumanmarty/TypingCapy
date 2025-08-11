@@ -39,7 +39,10 @@
       "words_numbers": "paragraphs_eng_words_numbers.json",
       "words_punct_numbers": "paragraphs_eng_words_punct_numbers.json",
       "words_punct_symbols": "paragraphs_eng_words_punct_symbols.json",
-      "words_punct_numbers_symbols": "paragraphs_eng_words_punct_numbers_symbols.json"
+      "words_punct_numbers_symbols": "paragraphs_eng_words_punct_numbers_symbols.json",
+      "words_numbers_symbols": "paragraphs_eng_words_numbers_symbols.json",
+      "paragraphs_eng_words_punct_numbers_math": "paragraphs_eng_words_punct_numbers_math.json",
+      "paragraphs_eng_words_punct_numbers_symbols_no_math": "paragraphs_eng_words_punct_numbers_symbols_no_math.json"
     }
   },
   "indo": {

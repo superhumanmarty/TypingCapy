@@ -49,17 +49,61 @@ body {
   margin-left: 0; /* Ensure flush to left */
 }
 
-.settings-panel {
-  flex: 0 0 220px; /* Fixed width, no grow/shrink; reduced from 250px */
-  text-align: left;
-  align-self: flex-start; /* Stick to top */
-  margin-left: 0; /* No extra space from ad */
+/* Settings Groups for cleaner organization */
+
+.settings {
+  display: flex;
+  flex-direction: column; /* Stack labels vertically if needed */
+  gap: 0.25rem; /* Tighter internal spacing */
+  font-size: 0.85rem; /* Slightly smaller for simplicity */
 }
+
+.settings-panel {
+  overflow-y: auto; /* Make scrollable if too tall */
+  max-height: 100vh; /* Prevent overflowing the viewport */
+  padding: 1rem; /* Add some internal padding for sleekness */
+  background: var(--box-bg); /* Subtle background */
+  border-right: 1px solid var(--box-border); /* Visual separation from typing area */
+  border-radius: 8px; /* Rounded corners for modern look */
+}
+
+.settings-group {
+  margin-bottom: 1.5rem; /* More space between groups */
+  padding: 1rem; /* Internal padding */
+  background: rgba(255, 255, 255, 0.05); /* Very subtle highlight */
+  border-radius: 6px; /* Sleek rounding */
+  border: 1px solid var(--box-border); /* Light border for definition */
+}
+
+.settings-group h4 {
+  margin: 0 0 0.75rem 0; /* Tight spacing under heading */
+  font-size: 1rem; /* Not too large */
+  font-weight: bold;
+  color: var(--header-color); /* Match theme */
+  text-transform: uppercase; /* Sleek, modern feel */
+  letter-spacing: 0.5px; /* Subtle spacing */
+}
+
+.settings label {
+  margin-right: 0.75rem; /* Reduce horizontal spacing */
+  white-space: nowrap; /* Prevent wrapping for sleekness */
+}
+
+.settings span { margin-right: 0.5rem; }
 
 .settings-panel .settings,
 .settings-panel .customizer {
   text-align: left;
   margin-bottom: 0.5rem;
+}
+
+/* Ensure custom inputs (like numbers) align nicely */
+.settings input[type="number"] {
+  background: var(--body-bg);
+  border: 1px solid var(--untyped-color);
+  border-radius: 4px;
+  color: var(--correct-color);
+  padding: 0.2rem 0.4rem;
 }
 
 .typing-panel {
@@ -71,3 +115,15 @@ body {
   text-align: center;
   min-height: 100vh; /* Full height for centering */
 }
+
+.settings select {
+  background: var(--body-bg);
+  border: 1px solid var(--untyped-color);
+  border-radius: 4px;
+  color: var(--correct-color);
+  padding: 0.2rem 0.4rem;
+  font-family: monospace;
+}
+
+.subtoggle.hidden { display: none; }
+.subtoggle { opacity: 0.9; }

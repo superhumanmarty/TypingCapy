@@ -57,6 +57,7 @@
   font-size: 1.2rem;
   color: var(--stats-color);
   font-weight: bold;
+  text-align: center;
   min-height: 1.2em; /* Reserve space even when empty */
 }
 .timer-display.hidden {
@@ -161,14 +162,14 @@
 
 /* Word Progress Bar */
 .word-progress {
-  width: 100%;
-  height: 10px;
-  background: var(--box-bg);
-  border: 1px solid var(--box-border);
   margin-bottom: 1rem;
-  position: relative;
+  width: 200px; /* Smaller width for "little bar" */
+  height: 20px; /* Thicker to avoid line look */
+  background: var(--box-bg);
   border-radius: 4px;
   overflow: hidden;
+  margin: 0 auto; /* Center it */
+  min-height: 20px; /* Reserve space */
 }
 .word-progress-fill {
   height: 100%;
@@ -177,5 +178,1226 @@
   transition: width 0.3s ease;
 }
 .word-progress.hidden {
-  visibility: hidden;
+  visibility: hidden; /* Hide but reserve space */
 }
+
+/* Progress Wrapper */
+.progress-wrapper {
+  position: relative;
+  height: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Keep "End if WPM <" and "End if Accuracy <" on one line */
+#minWPMSettings,
+#minAccuracySettings {
+  display: flex;
+  flex-direction: row;      /* override base.css column */
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;        /* change to wrap if you want small screens to break */
+}
+
+#minWPMSettings > label,
+#minAccuracySettings > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;             /* checkbox ↔ text spacing */
+  margin: 0;
+  white-space: nowrap;      /* keep the label text on one line */
+}
+
+#endWpmWrapper,
+#endAccWrapper {
+  display: inline-flex;     /* number box sits to the right, not below */
+  align-items: center;
+}
+
+/* Ghost pill — same size/shape as the preview/typed-errors pill */
+#ghostCursorSettings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  padding: .9rem 1rem;
+  min-height: 84px;                         /* match other tall pills */
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+}
+
+#ghostCursorSettings.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Title line (keeps your ghost/real cursors) */
+#ghostCursorSettings .ghost-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+#ghostCursorSettings > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;          /* checkbox ↔ text spacing */
+  margin: 0;
+  white-space: nowrap;   /* keep label text on one line */
+}
+
+#ghostWpmWrapper {
+  display: inline-flex;  /* sit to the right, not below */
+  align-items: center;
+}
+
+/* Put the number input under the title, centered */
+#ghostWpmWrapper.below {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .25rem .45rem;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--body-bg);
+}
+#ghostWpmWrapper.below input[type="number"] {
+  width: 4.2em;
+  background: transparent;
+  border: none;
+  color: var(--correct-color);
+  text-align: right;
+  outline: none;
+}
+
+/* utility */
+.sr-only {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* Keep 🙈 and 🔦 on a single row */
+#hideWordsSettings,
+#highlightAheadSettings {
+  display: flex;            /* override the .settings default */
+  flex-direction: row;      /* <-- this was missing */
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;        /* don't wrap to a new line */
+}
+
+/* Let the dropdown size itself and not stretch weirdly */
+#hideWordsSettings select,
+#highlightAheadSettings select {
+  flex: 0 1 auto;           /* don't grow to full width */
+  max-width: 220px;         /* tweak if you want it narrower/wider */
+}
+
+/* Make emoji + dropdown sit on one line */
+.settings.inline-setting {
+  display: flex;
+  flex-direction: row;   /* <-- forces row, overrides .settings column */
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings.inline-setting label {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+/* --- pill settings UI --- */
+.settings.pill {
+  display: flex;               /* already there */
+  align-items: center;         /* keeps vertical centering */
+  justify-content: space-between; /* pushes option text to the far right */
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  margin: 0.25rem auto;
+}
+
+
+.settings.pill:focus-within,
+.settings.pill:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--header-color) 40%, transparent);
+}
+
+.settings.pill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+.pill-name {
+  flex: 1 1 auto;
+  color: var(--correct-color);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.pill-input {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--body-bg);
+}
+
+.pill-input input[type="number"] {
+  width: 4.2em;
+  background: transparent;
+  border: none;
+  color: var(--correct-color);
+  text-align: right;
+  outline: none;
+}
+
+/* single pill (strict mode) doesn’t split */
+.pill-single .pill-input { display: none; }
+
+/* Ghost pill cursors */
+.ghost-label { position: relative; display: inline-flex; align-items: center; gap: 2px; }
+.cursor {
+  display: inline-block;
+  width: 1ch;
+  height: 1em;
+  position: relative;
+}
+.cursor::after {
+  content: "";
+  position: absolute;
+  left: 0.35ch;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  animation: blink 1s step-start infinite;
+}
+
+/* semi-transparent “ghost” text cursor between G and h */
+.ghost-cursor::after { opacity: 0.35; }
+
+/* opaque “real” text cursor after the ‘t’ */
+.real-cursor::after { opacity: 1; }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* pill visuals already exist; we just ensure the right half looks compact */
+#ghostWpmWrapper input[type="number"] {
+  width: 4em;
+}
+
+/* Pills for Hide/Highlight */
+.pill-row { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+
+.pill.wide { width: 100%; justify-content: space-between; display: flex; align-items: center; gap: 0.5rem; }
+.pill.option { display: inline-block; padding: 0.4rem 0.7rem; }
+.pill-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.pill-options.hidden { display: none; }
+
+.choice-label { margin-left: auto; opacity: 0.8; font-style: italic; }
+.muted { opacity: 0.35; }
+.neon { color: var(--highlight-color); }
+
+/* make the pill row keep its height when swapping */
+.pill-row { position: relative; }
+
+/* big pill spans column like your other pills */
+.pill-wide { width: 100%; }
+
+/* when showing choices, replace the big pill in-place */
+.pill-options.replace {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.pill-options.replace.hidden { display: none; }
+
+/* make the small options look like mini pills */
+.pill.option {
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  padding: 0.55rem 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.pill.option:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+}
+
+/* Shorter pills for Hide / Highlight */
+.pill-wide {
+  padding: 0.4rem 0.75rem; /* smaller height */
+  line-height: 1.2;
+}
+
+/* Transparent text for Hide */
+.transparent-text {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Neon green text for Highlight */
+.neon-green-text {
+  color: #00ff40;
+}
+
+.pill-value {
+  margin-left: auto;  /* pushes right without breaking line */
+  opacity: 0.85;
+  font-style: italic;
+  white-space: nowrap; /* keeps it on one line */
+}
+
+
+/* keep the old .hidden override strong */
+.hidden { display: none !important; }
+
+/* ==== Display pills (Hide / Highlight) — final overrides ==== */
+
+/* Main display pills — centered & taller */
+#hidePill,
+#highlightPill {
+  --display-pill-height: 84px;        /* control total height here */
+  display: flex;
+  flex-direction: column;             /* stack title over selected option */
+  align-items: center;                 /* center horizontally */
+  justify-content: center;             /* center vertically */
+  gap: 0.35rem;                        /* space between lines */
+  padding: 0.9rem 1rem;
+  min-height: var(--display-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  line-height: 1.15;
+  text-align: center;                  /* center text lines */
+}
+
+
+
+/* Title bits */
+
+#hidePill .pill-title,
+#highlightPill .pill-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+#hidePill .muted { opacity: .45; }
+#highlightPill .neon { color: #39ff14; }
+
+/* Selected option shown directly under the title, centered */
+#hideChoiceLabel,
+#highlightChoiceLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: .9;
+  margin: 0;
+  line-height: 1;     /* prevents vertical misalignment */
+  white-space: nowrap;
+}
+
+
+/* keep the title and the selected value perfectly inline */
+#hidePill .pill-title,
+#highlightPill .pill-title,
+#hideChoiceLabel,
+#highlightChoiceLabel {
+  font-size: 1rem;
+  line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+
+/* When pill is active, give a subtle glow */
+#hidePill.active,
+#highlightPill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Option rows occupy the exact same area as the pill they replace */
+#hideOptions,
+#highlightOptions {
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  min-height: 84px;        /* must match --display-pill-height */
+  box-sizing: border-box;  /* add this */
+}
+
+
+/* Each option = exactly 1/3 of the row */
+#hideOptions button,
+#highlightOptions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;                             /* fill grid cell vertically */
+  text-align: center;
+  padding: .55rem .6rem;                    /* a bit taller to match pill */
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  line-height: 1.1;
+  white-space: nowrap;                      /* keep labels on one line */
+  font-size: 0.9rem;                        /* smaller so all fit cleanly */
+  font-weight: 600;
+}
+
+#hideOptions button:hover,
+#highlightOptions button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+}
+
+
+/* Hide: 2 columns, 2 rows. Last option spans full width on row 2 */
+#hideOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;                       /* rows share the height */
+  gap: .5rem;
+}
+
+#hideOptions button {
+  padding: .62rem .6rem;   /* taller to match the main pill */
+  font-size: .9rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Highlight: 3 equal columns in one row */
+#highlightOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: .5rem;
+}
+
+#highlightOptions button {
+  padding: .62rem .6rem;   /* match Hide option height */
+  font-size: .9rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Make "Current & Next" span both columns on the Hide grid */
+#hideCurrentNext { grid-column: 1 / span 2; }
+
+/* --- "Show typed errors" pill ----------------------------------- */
+#typedErrorsPill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;            /* label above box */
+  gap: .45rem;
+  padding: .9rem 1rem;
+  min-height: 84px;                  /* matches your display pills */
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+}
+#typedErrorsPill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+#typedErrorsPill .typed-preview {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  transform: scale(.98);
+}
+
+#typedErrorsPill .te-label {
+  color: var(--incorrect-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: .02em;
+}
+
+#typedErrorsPill .te-box {
+  color: var(--incorrect-color);
+  font-weight: 800;
+  font-size: 1.15rem;
+  padding: .2rem .5rem;
+  border: 2px solid var(--incorrect-color);
+  border-radius: 8px;
+  background: var(--body-bg);
+  line-height: 1;
+  box-shadow: 0 0 0 3px var(--body-bg) inset; /* matches your screenshot vibe */
+}
+
+/* anything inside each group (the pill boxes) won’t exceed the cap */
+.settings-group > *:not(h4) {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* Keyboard image pill */
+.keyboard-pill {
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  justify-content: center; /* center image */
+}
+
+.keyboard-pill-img {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: 84px;              /* same height as pill */
+  object-fit: contain;       /* show whole image */
+  border-radius: 8px;
+  pointer-events: none;
+  background-color: var(--bg-color); /* optional, fills empty space */
+}
+
+/* “on” state matches other active pills */
+.keyboard-pill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Reusable tall “display” pill (same height/shape as your other big pills) */
+.display-pill {
+  --display-pill-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.9rem 1rem;
+  min-height: var(--display-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  font-weight: 700;
+}
+
+/* Two-option layout that exactly replaces the big pill area */
+.options-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: .5rem;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  min-height: var(--display-pill-height);
+}
+.options-2 .option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--box-bg);
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.options-2 .option.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Tall split pills (same footprint as your big display pills) */
+.split-pill {
+  --split-pill-height: 84px;
+  display: flex;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  min-height: var(--split-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  overflow: hidden;                 /* keeps corners crisp */
+  margin: .6rem auto 0;
+}
+
+/* halves */
+.split-half {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .9rem 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+  background: transparent;
+  border: 0;
+  color: var(--correct-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* vertical divider between halves */
+.split-half.right {
+  border-left: 1px solid var(--box-border);
+}
+
+/* hover only when enabled */
+.split-half:not([aria-disabled="true"]):hover {
+  background: rgba(255,255,255,0.07);
+}
+
+/* active (ON) */
+.split-half.is-on {
+  background: rgba(255,255,255,0.10);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+  border-color: var(--header-color);
+}
+
+/* disabled (can’t be pressed) */
+.split-half[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+  pointer-events: none; /* makes it truly unclickable */
+}
+
+.split-half.is-on {
+  color: #39ff14; /* match your neon highlight vibe */
+  font-weight: 800;
+}
+
+/* === Themed pill selects === */
+.select-pill {
+  --h: 56px;                /* height */
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  min-height: var(--h);
+  margin: .6rem auto 0;
+  padding: 0;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+.select-pill.small {
+  --h: 44px;                /* compact for inline settings */
+  max-width: 360px;
+  margin: .4rem 0 0;
+}
+
+.select-pill:focus-within {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* native select reset + make it fill the pill */
+.select-pill select.ui-select {
+  position: absolute;
+  inset: 0;                     /* cover the whole pill */
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0 2.2rem 0 .9rem;    /* left padding + space for chevron */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--correct-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: normal;
+  cursor: pointer;
+}
+
+
+/* placeholder-ish dim for disabled */
+.select-pill select.ui-select:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Chevron (pure CSS, no data URI) */
+.select-pill::after {
+  content: "";
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  transform: translateY(-35%);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;  
+  border-left: .36rem solid transparent;
+  border-right: .36rem solid transparent;
+  border-top: .42rem solid #a3ffa3; /* matches your neon-ish accent */
+  opacity: .9;
+}
+
+/* Options text size (some browsers ignore this; native popup styling is limited on macOS) */
+.select-pill select.ui-select option {
+  font-size: 1.05rem;
+}
+
+/* Put these where selects live in “inline-setting” rows */
+.settings.inline-setting .select-pill {
+  margin: 0;                /* sit flush with label */
+}
+
+/* Make sure inline rows never cover their pill */
+.settings.inline-setting { 
+  position: relative;
+  overflow: visible;
+}
+
+/* In inline rows, keep the label in its lane */
+.settings.inline-setting label {
+  position: relative;
+  z-index: 1;           /* below the pill + select */
+  flex: 0 0 auto;       /* don't stretch over the pill */
+}
+
+/* Raise the pill above the label */
+.settings.inline-setting .select-pill {
+  position: relative;
+  z-index: 3;           /* sits above the label */
+  flex: 1 1 auto;       /* let it take the remaining width */
+}
+
+/* Chevron stays visually above pill bg but click-through */
+.select-pill::after {
+  z-index: 2;           /* below the actual <select> */
+  pointer-events: none; /* never block clicks */
+}
+
+/* --- Text Generation hero pill ---------------------------------- */
+.settings-hero {
+  display: grid;
+  grid-template-columns: 72px 1fr;  /* icon | content */
+  align-items: center;
+  gap: .9rem;
+  padding: .9rem 1rem;
+  min-height: 84px;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  width: calc(100% - 2rem);
+  max-width: 780px;
+  margin: .6rem auto 0;
+}
+
+.settings-hero .hero-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-left: .2rem;
+  pointer-events: none;
+  opacity: .95;
+}
+
+.settings-hero .split-half { padding: .6rem .8rem; font-size: .96rem; }
+
+
+/* === Settings column sizing ========================================= */
+.settings-panel {
+  max-width: 360px;
+  width: min(92%, 360px);
+  margin: 0 auto;
+}
+
+/* Big pills fill & center within the column */
+.settings-group > *:not(h4),
+.settings-hero,
+#hidePill, #highlightPill, #typedErrorsPill, #ghostCursorSettings,
+.keyboard-pill, .select-pill, .split-pill {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Layout for the four split pills */
+#togglesSettings { display: grid; grid-template-columns: 1fr; gap: .5rem; }
+@media (min-width: 420px) { #togglesSettings { grid-template-columns: 1fr 1fr; } }
+
+#languageSettings select,
+#wordListSizeSettings select {
+  width: 100%;
+  height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  color: var(--correct-color);
+  font-weight: 700;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.select-pill,
+.split-pill,
+.settings-hero {
+  box-sizing: border-box;
+}
+
+
+/* 1) Make every pill-size container include borders/padding in width */
+#hidePill,
+#highlightPill,
+#typedErrorsPill,
+#ghostCursorSettings,
+.keyboard-pill,
+.display-pill,
+.options-2,
+#hideOptions,
+#highlightOptions,
+.split-pill,
+.select-pill,
+.settings-hero,
+.settings.pill {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* 2) Flex/grid children are allowed to shrink (prevents right overflow) */
+#hidePill > *,
+#highlightPill > *,
+#typedErrorsPill > *,
+#ghostCursorSettings > *,
+.settings-hero .hero-content,
+.options-2 > *,
+#hideOptions > *,
+#highlightOptions > *,
+.split-pill > *,
+.select-pill > *,
+.settings.inline-setting > * {
+  min-width: 0; /* critical for Safari/Chrome flexbox overflow */
+}
+
+/* 3) Buttons inside option grids never grow past the lane */
+#hideOptions button,
+#highlightOptions button,
+.options-2 .option,
+.split-half {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* 4) Long labels don’t push containers wider on tiny screens */
+#hideOptions button,
+#highlightOptions button,
+.options-2 .option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 5) Inline setting rows: let the select actually shrink */
+.settings.inline-setting .select-pill {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 6) Last resort guard (only if you still see a tiny horizontal scroll) */
+html, body { overflow-x: hidden; }
+
+/* place children */
+.settings-hero .hero-icon { grid-column: 1; }
+
+/* Make every first-level child in the hero (except the icon) plain */
+.settings-hero > :not(.hero-icon) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Make the hero’s group a plain container (no inner card) */
+.settings-group.no-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;         /* remove any card padding */
+}
+
+/* keep a little breathing room between the icon and controls */
+.settings-group.no-card > .settings-hero {
+  margin-top: .6rem;             /* optional, for spacing parity */
+}
+
+/* Also shrink the individual halves proportionally */
+#togglesSettings .split-half {
+  padding: 0.4rem 0.8rem;      /* smaller padding inside */
+  font-size: 0.9rem;           /* slightly smaller text */
+}
+
+
+/* 1) 50/50 halves for both split pills (perfect center divider) */
+#numbersSplit .split-half,
+#punctSplit .split-half {
+  box-sizing: border-box !important;
+  flex: 0 0 50% !important;   /* exactly half */
+  max-width: 50% !important;
+  width: 50% !important;
+  min-width: 0 !important;
+  padding: .5rem .6rem !important; /* consistent padding */
+  text-align: center;
+}
+
+/* keep the middle line; it will now sit dead-center */
+#numbersSplit .split-half.right,
+#punctSplit .split-half.right {
+  border-left: 1px solid var(--box-border) !important;
+}
+
+/* === TextGen hero (final, simple) ================================== */
+.settings-hero .hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  width: 100%;
+}
+
+.settings-hero .hero-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  line-height: 1.15;
+  color: var(--correct-color);
+  margin: 0 0 .25rem 0;
+}
+
+/* inside the big pill, make controls fill its width */
+.settings-hero #languageSettings select,
+.settings-hero #wordListSizeSettings select {
+  width: 100%;
+  height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  color: var(--correct-color);
+  font-weight: 700;
+  box-sizing: border-box;
+  appearance: none;
+}
+
+/* split pills inside the hero should also fill the pill width */
+.settings-hero .split-pill {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;              /* kill the auto margins used elsewhere */
+}
+
+/* === TEXT hero: put lang.png next to the "TEXT" title only === */
+#textGenHero {
+  display: grid;                  /* already grid, but restate safely */
+  grid-template-columns: 72px 1fr;/* icon | title/controls */
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .9rem;
+}
+
+/* Let the children of .hero-content participate in #textGenHero's grid */
+#textGenHero .hero-content { display: contents; }
+
+/* Row 1: icon | title */
+#textGenHero .hero-icon  { grid-column: 1; grid-row: 1; }
+#textGenHero .hero-title { grid-column: 2; grid-row: 1; align-self: center; }
+
+/* Rows 2..: controls span full width below the title row */
+#textGenHero #languageSettings,
+#textGenHero #wordListSizeSettings,
+#textGenHero #togglesSettings {
+  grid-column: 1 / -1;
+}
+
+/* Optional explicit ordering */
+#textGenHero #languageSettings     { grid-row: 2; }
+#textGenHero #wordListSizeSettings { grid-row: 3; }
+#textGenHero #togglesSettings      { grid-row: 4; }
+
+
+/* === Make 123 and !? clickable (beat any overlapping select) === */
+#textGenHero .select-pill { position: relative; z-index: 0; }
+#textGenHero .select-pill select.ui-select { z-index: 1; }
+
+#textGenHero #togglesSettings,
+#textGenHero .split-pill,
+#textGenHero .split-half {
+  position: relative;
+  z-index: 3;              /* sits above the selects */
+  pointer-events: auto;    /* belt + suspenders */
+}
+
+/* (Accessibility) Allow keyboard focus if you want: remove tabindex="-1" from the buttons */
+
+/* --- Make sure the split pills sit ABOVE the select pills in the TEXT hero --- */
+#textGenHero { position: relative; }
+
+#textGenHero #togglesSettings {
+  position: relative;
+  z-index: 5;            /* new stacking context for the buttons */
+  isolation: isolate;    /* guarantees children paint above earlier rows */
+}
+
+#textGenHero .split-pill,
+#textGenHero .split-half { position: relative; z-index: 5; }
+
+/* Lower the language/word selects just within this hero */
+#textGenHero .select-pill { position: relative; z-index: 0; }
+#textGenHero .select-pill select.ui-select { z-index: 0 !important; } /* beats the global z-index:4 */
+
+
+/* Center the TEXT title between the icon and the pill's right edge */
+#textGenHero .hero-title {
+  grid-column: 2;     /* stays in the right column */
+  grid-row: 1;
+  align-self: center; /* you already had this */
+  justify-self: center;  /* <- this is the key */
+  text-align: center;    /* keeps the text centered inside itself */
+}
+
+/* THEME hero: icon left of title; dropdown spans full width below */
+#themeHero {
+  display: grid;
+  grid-template-columns: 72px 1fr;  /* icon | title/controls */
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .9rem;
+}
+
+#themeHero .hero-content { display: contents; }
+
+#themeHero .hero-icon  { grid-column: 1; grid-row: 1; }
+#themeHero .hero-title { grid-column: 2; grid-row: 1; align-self: center; }
+
+/* Controls row spans entire pill below the title */
+#themeHero #themeSettings { grid-column: 1 / -1; grid-row: 2; }
+
+/* Make select-pill fill the pill width when inside any hero */
+.settings-hero .select-pill {
+  width: 100%;
+  max-width: 100%;
+  margin: 0; /* remove inner pill margin */
+}
+/* Revert TEXT title to sit near the icon (like THEME) */
+#textGenHero .hero-title {
+  justify-self: start;   /* was centered */
+  margin-left: 0;        /* kill any previous offset */
+  text-align: left;
+}
+
+/* SOUND hero: icon | title on the first row, dropdown below spanning full width */
+#soundHero {
+  display: grid;
+  grid-template-columns: 72px 1fr;  /* icon | title/controls */
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .9rem;
+}
+
+#soundHero .hero-content { display: contents; }
+
+#soundHero .hero-icon  { grid-column: 1; grid-row: 1; }
+#soundHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; text-align: left; }
+
+#soundHero #soundSettings { grid-column: 1 / -1; grid-row: 2; }
+
+/* ==== NOOB hero (icon + title on row 1, controls below) ==== */
+#noobHero {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .9rem;
+}
+#noobHero .hero-content { display: contents; }
+#noobHero .hero-icon  { grid-column: 1; grid-row: 1; }
+#noobHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; }
+#noobHero #keyboardDiagramSettings { grid-column: 1 / -1; grid-row: 2; }
+#noobHero #typedErrorsPill        { grid-column: 1 / -1; grid-row: 3; }
+
+/* ==== PRO hero ==== */
+#proHero {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .9rem;
+}
+#proHero .hero-content { display: contents; }
+#proHero .hero-icon  { grid-column: 1; grid-row: 1; }
+#proHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; }
+
+/* stack all PRO controls under the title, full width */
+#proHero #hidePillRow          { grid-column: 1 / -1; grid-row: 2; }
+#proHero #highlightPillRow     { grid-column: 1 / -1; grid-row: 3; }
+#proHero #ghostCursorSettings  { grid-column: 1 / -1; grid-row: 4; }
+#proHero #minWPMSettings       { grid-column: 1 / -1; grid-row: 5; }
+#proHero #minAccuracySettings  { grid-column: 1 / -1; grid-row: 6; }
+#proHero #strictModeSettings   { grid-column: 1 / -1; grid-row: 7; }
+
+/* ==== GAME LIMITS hero (no icon) ==== */
+#limitsHero {
+  display: grid;
+  grid-template-columns: 1fr;   /* no left icon column */
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .6rem;
+}
+#limitsHero .hero-content { display: contents; }
+#limitsHero .hero-title { grid-column: 1; grid-row: 1; justify-self: start; }
+#limitsHero #timerSettings      { grid-column: 1; grid-row: 2; }
+#limitsHero #wordLimitSettings  { grid-column: 1; grid-row: 3; }
+
+
+/* === GAME LIMITS: 3-button switch ============================= */
+#limitsHero .limits-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+  margin-top: .4rem;
+}
+
+.limit-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 110px;                /* enough room for dropdown when shown */
+  padding: .7rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .05s ease;
+}
+
+.limit-btn:active { transform: translateY(1px); }
+
+.limit-btn img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.limit-btn .btn-label {
+  font-weight: 700;
+  color: var(--correct-color);
+  line-height: 1.1;
+}
+
+.limit-btn.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+.btn-dropdown {
+  position: absolute;
+  left: .6rem;
+  right: .6rem;
+  bottom: .6rem;
+}
+
+.btn-dropdown.hidden { display: none; }
+
+.btn-dropdown select {
+  width: 100%;
+  height: 36px;
+  padding: 0 .6rem;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--body-bg);
+  color: var(--correct-color);
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+/* make the active button reserve room for the dropdown nicely */
+.limit-btn.show-dropdown { padding-bottom: 3.2rem; }
+
+
+
+
+
