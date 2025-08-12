@@ -177,28 +177,6 @@
   display: block;
 }
 
-/* make the text box and error display side by side */
-.text-error-wrapper {
-  position: relative;       /* establish a positioning context */
-  width: 100%;              /* keep its children inside the same container width */
-}
-
-/* restyle the error display as a two-line, centered box */
-.typed-error-display {
-  position: absolute;
-  top: 0;
-  left: 100%;               /* just to the right of the text box */
-  margin-left: 1rem;        /* a little breathing room */
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  margin: 0;                /* remove any default margins */
-  font-size: 1.2rem;
-  color: var(--incorrect-color);
-}
-
 
 .typed-error-label {
   font-size: 0.9rem;
@@ -206,7 +184,63 @@
   margin-bottom: 0.2rem;
 }
 
+/* place error bubble above the typing box */
+.text-error-wrapper {
+  width: 100%;
+}
+
+/* Pin the error bubble at the very top of the typing panel */
+.typed-error-display {
+  position: absolute;
+  top: 9rem;                        /* a little breathing room from the top */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;                     /* above timer/word bar/stats/text */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;                       /* no flow margin */
+  padding: 0.35rem 0.6rem;
+  text-align: center;
+
+  background: var(--box-bg);
+  border: 1px solid var(--incorrect-color);
+  border-radius: 8px;
+}
+
+/* keep your existing hidden rule; this line is optional since .hidden already exists */
+.typed-error-display.hidden { display: none; }
+
+
+/* inner letter box keeps its look */
 .typed-error-letter {
   font-size: 1.4rem;
   font-weight: bold;
 }
+
+/* --- GAME LIMITS inline dropdowns --- */
+.limits-grid { /* if you don't already have it */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.limit-cell {
+  position: relative;              /* anchor for absolute dropdown */
+}
+
+/* reveal when the corresponding button is “active” */
+.limit-btn.show-dropdown + .btn-dropdown { display: block; }
+
+
+#timerInlineSelect,
+#wordLimitInlineSelect {
+  position: static !important;
+  inset: auto !important;
+  width: 100%;      /* fill the 160px overlay */
+  max-width: 100%;
+}
+

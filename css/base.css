@@ -114,6 +114,7 @@ body {
   align-items: center;
   text-align: center;
   min-height: 100vh; /* Full height for centering */
+  position: relative;
 }
 
 .settings select {

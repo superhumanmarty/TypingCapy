@@ -122,6 +122,7 @@ export async function initializeTyping(textDisplay, hideControl) {
         span.textContent = ch;
         span.className = 'char';
         span.dataset.word = widx;
+        span.dataset.required = '1';
         wordSpan.appendChild(span);
         chars.push(span);
       }
@@ -203,6 +204,7 @@ export async function appendTyping(textDisplay, hideControl) {
         span.textContent = ch;
         span.className = 'char';
         span.dataset.word = widx;
+        span.dataset.required = '1';
         wordSpan.appendChild(span);
         chars.push(span);
       }

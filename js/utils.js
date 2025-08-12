@@ -38,3 +38,10 @@ export function calculateWPM(startTime, correctChars) {
 export function calculateAccuracy(totalAttempted, correctChars) {
   return totalAttempted > 0 ? Math.round((correctChars / totalAttempted) * 100) : 100;
 }
+
+export function clearTypedErrorBubble() {
+  const ted = document.getElementById('typedErrorDisplay');
+  const tl  = document.getElementById('typedLetter');
+  if (ted) ted.classList.add('hidden');
+  if (tl)  tl.textContent = '';
+}

@@ -1,6 +1,6 @@
 // js/handlers/space.js
 import { chars, setCurrentIndex } from '../engine.js';
-import { getCurrentWord, scrollToCurrent } from '../utils.js';
+import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { playErrorBuzz, getSoundMode } from '../sound.js';
 import { handleChar } from './char.js';
@@ -19,6 +19,7 @@ function getCurrent() {
 }
 
 export async function handleSpace(textDisplay, hideControl) {
+  clearTypedErrorBubble();
   const currentIndex = await getCurrent();
   const current = chars[currentIndex];
 

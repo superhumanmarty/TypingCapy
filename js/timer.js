@@ -52,6 +52,13 @@ function updateTimerDisplay() {
 
 // Show initial progress (timer or word bar based on settings)
 export function showInitialProgress() {
+  // If results overlay is up, never show either bar.
+  if (document.body.classList.contains('game-ended')) {
+    timerDisplay.classList.add('hidden');
+    wordProgress.classList.add('hidden');
+    wordProgressFill.style.width = '0%';
+    return;
+  }
   const timerOn = getTimerDuration() > 0;
   const wordLimitOn = getWordLimit() > 0;
 
@@ -95,6 +102,13 @@ export function endTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
   gameEnded = true;
+
+  document.body.classList.add('game-ended');               // ← add this
+  const wlBar  = document.getElementById('wordProgress');
+  const wlFill = document.getElementById('wordProgressFill');
+  wlBar?.classList.add('hidden');                          // ← belt
+  if (wlFill) wlFill.style.width = '0%';                   // ← suspenders
+
   stopGhost();
 
   // Hide game elements
@@ -127,6 +141,7 @@ export function resetTimer() {
 // Handle restart
 export function setupRestartButton(initializeTypingFn, hideControl) {
   restartButton.addEventListener('click', async () => {
+    document.body.classList.remove('game-ended');   // <-- add this
     resultsScreen.classList.add('hidden');
 
     textDisplay.classList.remove('hidden');

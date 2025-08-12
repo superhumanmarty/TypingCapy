@@ -47,6 +47,142 @@
           </div>
         </div>
       </div>
+      <!-- GAME LIMITS hero — 3 buttons: Endless | Timer | Words -->
+      <div class="settings-group no-card">
+        <div id="limitsHero" class="settings-hero">
+          <div class="hero-content">
+            <div class="hero-title">GAME LIMITS</div>
+
+            <!-- 3-button grid -->
+            <div id="limitsButtons" class="limits-grid">
+              <!-- ENDLESS -->
+              <div class="limit-cell">
+                <button id="btnEndless" class="limit-btn active" type="button" aria-pressed="true">
+                  <img src="settings_images/endless.png" alt="Endless">
+                  <div class="btn-label">Endless</div>
+                </button>
+              </div>
+
+              <!-- TIMER -->
+              <div class="limit-cell">
+                <button id="btnTimer" class="limit-btn" type="button" aria-pressed="false">
+                  <img src="settings_images/timer.png" alt="Timer">
+                  <div class="btn-label">Timer</div>
+                </button>
+                <!-- moved OUTSIDE the button -->
+                <div id="timerInline" class="btn-dropdown hidden">
+                  <label for="timerInlineSelect" class="sr-only">Timer length</label>
+                  <select id="timerInlineSelect" aria-label="Timer length">
+                    <option value="15">15s</option>
+                    <option value="30">30s</option>
+                    <option value="60">1 min</option>
+                    <option value="120">2 min</option>
+                    <option value="300">5 min</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- WORD LIMIT -->
+              <div class="limit-cell">
+                <button id="btnWord" class="limit-btn" type="button" aria-pressed="false">
+                  <img src="settings_images/word_limit.png" alt="Word limit">
+                  <div class="btn-label">Words</div>
+                </button>
+                <!-- moved OUTSIDE the button -->
+                <div id="wordInline" class="btn-dropdown hidden">
+                  <label for="wordLimitInlineSelect" class="sr-only">Word limit</label>
+                  <select id="wordLimitInlineSelect" aria-label="Word limit">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Hidden mirrors for logic (keep IDs so existing code keeps working) -->
+            <div class="hidden">
+              <div id="timerSettings" class="settings inline-setting">
+                <label for="timerSelector">⏱️</label>
+                <select id="timerSelector">
+                  <option value="off" selected>Off</option>
+                  <option value="15">15s</option>
+                  <option value="30">30s</option>
+                  <option value="60">1 min</option>
+                  <option value="120">2 min</option>
+                  <option value="300">5 min</option>
+                </select>
+              </div>
+
+              <div id="wordLimitSettings" class="settings inline-setting">
+                <label for="wordLimitSelector">#️⃣</label>
+                <select id="wordLimitSelector">
+                  <option value="off" selected>Off</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="25">25</option>
+                  <option value="30">30</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                </select>
+              </div>
+            </div>
+            <!-- /Hidden mirrors -->
+          </div>
+        </div>
+      </div>
+      <!-- THEME pill -->
+      <div class="settings-group no-card">
+        <div id="themeHero" class="settings-hero">
+          <img src="settings_images/theme.png" alt="Theme" class="hero-icon" loading="lazy">
+
+          <div class="hero-content">
+            <div class="hero-title">THEME</div>
+
+            <div id="themeSettings">
+              <div class="select-pill">
+                <select id="themeSelector" class="ui-select">
+                  <option value="capyparadise" selected>Capy Paradise</option>
+                  <option value="cyberpunk">Cyberpunk</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SOUND pill -->
+      <div class="settings-group no-card">
+        <div id="soundHero" class="settings-hero">
+          <img src="settings_images/sound.png" alt="Sound" class="hero-icon" loading="lazy">
+
+          <div class="hero-content">
+            <div class="hero-title">SOUND</div>
+
+            <div id="soundSettings" class="plain">
+              <div class="select-pill">
+                <select id="soundSelector" class="ui-select">
+                  <option value="off" selected>Off</option>
+                  <option value="pentatonic">Pentatonic</option>
+                  <option value="blip">Blip</option>
+                  <option value="click">Click</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="settings-group no-card">
         <!-- NOOB hero -->
         <div class="settings-group no-card">
@@ -166,135 +302,15 @@
           </select>
         </div>
 
-        <!-- GAME LIMITS hero — 3 buttons: Endless | Timer | Words -->
-        <div class="settings-group no-card">
-          <div id="limitsHero" class="settings-hero">
-            <div class="hero-content">
-              <div class="hero-title">GAME LIMITS</div>
-
-              <!-- 3-button grid -->
-              <div id="limitsButtons" class="limits-grid">
-                <!-- ENDLESS -->
-                <button id="btnEndless" class="limit-btn active" type="button" aria-pressed="true">
-                  <img src="settings_images/endless.png" alt="Endless">
-                  <div class="btn-label">Endless</div>
-                </button>
-
-                <!-- TIMER -->
-                <button id="btnTimer" class="limit-btn" type="button" aria-pressed="false">
-                  <img src="settings_images/timer.png" alt="Timer">
-                  <div class="btn-label">Timer</div>
-                  <div id="timerInline" class="btn-dropdown hidden">
-                    <select id="timerInlineSelect" aria-label="Timer length">
-                      <option value="15">15s</option>
-                      <option value="30">30s</option>
-                      <option value="60">1 min</option>
-                      <option value="120">2 min</option>
-                      <option value="300">5 min</option>
-                    </select>
-                  </div>
-                </button>
-
-                <!-- WORD LIMIT -->
-                <button id="btnWord" class="limit-btn" type="button" aria-pressed="false">
-                  <img src="settings_images/word_limit.png" alt="Word limit">
-                  <div class="btn-label">Words</div>
-                  <div id="wordInline" class="btn-dropdown hidden">
-                    <select id="wordLimitInlineSelect" aria-label="Word limit">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                      <option value="25">25</option>
-                      <option value="30">30</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                      <option value="200">200</option>
-                    </select>
-                  </div>
-                </button>
-              </div>
-
-              <!-- Hidden mirrors for logic (keep IDs so existing code keeps working) -->
-              <div class="hidden">
-                <div id="timerSettings" class="settings inline-setting">
-                  <label for="timerSelector">⏱️</label>
-                  <select id="timerSelector">
-                    <option value="off" selected>Off</option>
-                    <option value="15">15s</option>
-                    <option value="30">30s</option>
-                    <option value="60">1 min</option>
-                    <option value="120">2 min</option>
-                    <option value="300">5 min</option>
-                  </select>
-                </div>
-
-                <div id="wordLimitSettings" class="settings inline-setting">
-                  <label for="wordLimitSelector">#️⃣</label>
-                  <select id="wordLimitSelector">
-                    <option value="off" selected>Off</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                    <option value="25">25</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                  </select>
-                </div>
-              </div>
-              <!-- /Hidden mirrors -->
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <!-- THEME pill -->
-      <div class="settings-group no-card">
-        <div id="themeHero" class="settings-hero">
-          <img src="settings_images/theme.png" alt="Theme" class="hero-icon" loading="lazy">
-
-          <div class="hero-content">
-            <div class="hero-title">THEME</div>
-
-            <div id="themeSettings">
-              <div class="select-pill">
-                <select id="themeSelector" class="ui-select">
-                  <option value="capyparadise" selected>Capy Paradise</option>
-                  <option value="cyberpunk">Cyberpunk</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- SOUND pill -->
-      <div class="settings-group no-card">
-        <div id="soundHero" class="settings-hero">
-          <img src="settings_images/sound.png" alt="Sound" class="hero-icon" loading="lazy">
-
-          <div class="hero-content">
-            <div class="hero-title">SOUND</div>
-
-            <div id="soundSettings" class="plain">
-              <div class="select-pill">
-                <select id="soundSelector" class="ui-select">
-                  <option value="off" selected>Off</option>
-                  <option value="pentatonic">Pentatonic</option>
-                  <option value="blip">Blip</option>
-                  <option value="click">Click</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="typing-panel">
+      <!-- Error bubble (shown only on incorrect key when toggle is ON) -->
+      <div id="typedErrorDisplay" class="typed-error-display hidden" aria-live="polite">
+        <div class="typed-error-label">You typed:</div>
+        <div id="typedLetter" class="typed-error-letter"></div>
+      </div>
+
       <!-- Timer Display -->
       <div id="timerDisplay" class="timer-display hidden">
         <span id="timeRemaining"></span>
@@ -306,13 +322,9 @@
         <span id="wpm">WPM: 0</span>
         <span id="accuracy">Accuracy: 100%</span>
       </div>
-      <!-- text + error side by side -->
+      <!-- Typing box -->
       <div class="text-error-wrapper">
         <div id="textDisplay"></div>
-        <div id="typedErrorDisplay" class="typed-error-display hidden">
-          <div class="typed-error-label">You typed:</div>
-          <div id="typedLetter" class="typed-error-letter"></div>
-        </div>
       </div>
       <!-- Results Screen -->
       <div id="resultsScreen" class="results-screen hidden">

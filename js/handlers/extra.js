@@ -1,15 +1,17 @@
 // js/handlers/extra.js
 import { chars, setCurrentIndex } from '../engine.js';
-import { getCurrentWord, scrollToCurrent } from '../utils.js';
+import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { playErrorBuzz, getSoundMode } from '../sound.js';
 import { getHideMode } from '../settings.js';
+
 
 function getCurrent() {
   return import('../engine.js').then(m => m.currentIndex);
 }
 
 export async function handleExtra(k, textDisplay, hideControl) {
+  clearTypedErrorBubble();
   if (getSoundMode() !== 'off') playErrorBuzz();
 
   const currentIndex = await getCurrent();

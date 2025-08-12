@@ -29,6 +29,50 @@ const colorPickers = [...document.querySelectorAll('input[type="color"]')];
 const wpmSpan = document.getElementById('wpm');
 const accSpan = document.getElementById('accuracy');
 
+// --- lock so post-finish keystrokes do nothing & WL bar stays gone ---
+let gameLocked = false;
+
+function endGame() {
+  gameLocked = true;
+  document.body.classList.add('game-ended');
+
+  const wlBar = document.getElementById('wordProgress');
+  if (wlBar) wlBar.classList.add('hidden');
+
+  // NEW: nuke any remaining fill + stop ghost
+  const wlFill = document.getElementById('wordProgressFill');
+  if (wlFill) wlFill.style.width = '0%';
+  stopGhost?.();
+
+  endTimer();
+}
+
+
+function resetGameLock() {
+  gameLocked = false;
+  document.body.classList.remove('game-ended');
+
+  // NEW: ensure no stale fill on a fresh run
+  const wlFill = document.getElementById('wordProgressFill');
+  if (wlFill) wlFill.style.width = '0%';
+
+  enforceWordLimitAvailability();
+}
+
+
+
+// Overlay the keyboard diagram just under #textDisplay (no layout shift)
+function positionKeyboardDiagram() {
+  const panel = document.querySelector('.typing-panel');
+  const text  = document.getElementById('textDisplay');
+  const kd    = document.getElementById('keyboardDiagram');
+  if (!panel || !text || !kd || kd.classList.contains('hidden')) return;
+
+  const panelRect = panel.getBoundingClientRect();
+  const textRect  = text.getBoundingClientRect();
+  const top = (textRect.bottom - panelRect.top) + 12; // 12px gap
+  kd.style.top = `${top}px`;
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
   const configs = await fetch('./data/language_configs.json').then(res => res.json());
@@ -129,8 +173,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 }
 
 
-  updateUIForLanguage();
-  enforceWordLimitAvailability(); // <-- add this line
+updateUIForLanguage();
+enforceWordLimitAvailability(); // <-- add this line
+// Mouse-only selects: block key handling & refocus to the game
+wireMouseOnlySelects();
+
+
+// Wire once: auto-unselect settings so typing goes to the game immediately
+const settingsRoot = document.querySelector('.settings-panel');
+if (settingsRoot && !settingsRoot.dataset.refocusWired) {
+  settingsRoot.dataset.refocusWired = '1';
+
+  settingsRoot.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.matches('select') || t.matches('input[type="checkbox"]')) {
+      refocusToGame();
+    }
+  });
+
+  settingsRoot.addEventListener('click', (e) => {
+    if (e.target.closest('#ghostWpmWrapper, #endWpmWrapper, #endAccWrapper')) return;
+    if (e.target.closest('.select-pill')) return;
+    if (e.target.closest('.btn-dropdown')) return;
+    if (e.target.closest('button, [role="button"], .pill.option, .split-half, #hidePill, #highlightPill, #typedErrorsPill, #ghostCursorSettings')) {
+      refocusToGame();
+    }
+  });
+}
 
 
 
@@ -138,11 +207,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     updateUIForLanguage();
     enforceWordLimitAvailability();
     await initializeTyping(textDisplay, hideControl);
+    positionKeyboardDiagram();
     showInitialProgress();
+
 
     // Re-apply highlight for the new text based on current selection
     const widx = getCurrentWord(chars, 0);
     updateHighlight(getHighlightMode(highlightControl), widx, chars);
+
+    resetGameLock();
   });
 
   const wordListSizeSelector = document.getElementById('wordListSizeSelector');
@@ -151,9 +224,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       enforceWordLimitAvailability();
       
       await initializeTyping(textDisplay, hideControl);
+      positionKeyboardDiagram();
       showInitialProgress();
       const widx = getCurrentWord(chars, 0);
       updateHighlight(getHighlightMode(highlightControl), widx, chars);
+      resetGameLock();
     });
   }
 
@@ -166,9 +241,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         setupSubtoggleVisibility();
 
         await initializeTyping(textDisplay, hideControl);
+        positionKeyboardDiagram();
         showInitialProgress();
         const widx = getCurrentWord(chars, 0);
         updateHighlight(getHighlightMode(highlightControl), widx, chars);
+        resetGameLock();
       });
     }
   });
@@ -176,7 +253,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Initial setup
   await initializeTyping(textDisplay, hideControl);
+  positionKeyboardDiagram();
   setupHide(hideControl, chars, textDisplay, currentIndex);
+  resetGameLock();
+
 
   // Wire hide mode watcher (select or radios)
   if (hideControl && typeof hideControl.value === 'string') {
@@ -208,10 +288,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   function applyKeyboardVisibility() {
     const keyboardToggle = document.getElementById('keyboardDiagramToggle');
     const keyboardPanel  = document.getElementById('keyboardDiagram');
-    if (keyboardToggle && keyboardPanel) {
-      keyboardPanel.classList.toggle('hidden', !keyboardToggle.checked);
+    if (!keyboardToggle || !keyboardPanel) return;
+
+    const show = keyboardToggle.checked;
+    keyboardPanel.classList.toggle('hidden', !show);
+    if (show) {
+      // place it right under the typing box
+      positionKeyboardDiagram();
     }
   }
+
 
   // wire checkbox -> visibility
   const keyboardToggle = document.getElementById('keyboardDiagramToggle');
@@ -219,19 +305,31 @@ window.addEventListener('DOMContentLoaded', async () => {
     keyboardToggle.addEventListener('change', applyKeyboardVisibility);
   }
   applyKeyboardVisibility();
+  window.addEventListener('resize', positionKeyboardDiagram);
+
 
   // NEW: checkbox handling for typed errors visibility
   const showTypedErrorsToggle = document.getElementById('showTypedErrorsToggle');
   const typedErrorDisplay     = document.getElementById('typedErrorDisplay');
-  if (showTypedErrorsToggle && typedErrorDisplay) {
+  const typedLetterBox        = document.getElementById('typedLetter');
+
+  if (showTypedErrorsToggle && typedErrorDisplay && typedLetterBox) {
     const applyTypedErrorsVisibility = () => {
-      typedErrorDisplay.classList.toggle('hidden', !showTypedErrorsToggle.checked);
+      if (!showTypedErrorsToggle.checked) {
+        // Turning OFF -> hide bubble + clear
+        typedErrorDisplay.classList.add('hidden');
+        typedLetterBox.textContent = '';
+      } else {
+        // Turning ON -> keep hidden until the next incorrect key
+        typedErrorDisplay.classList.add('hidden');
+        typedLetterBox.textContent = '';
+      }
     };
     showTypedErrorsToggle.addEventListener('change', applyTypedErrorsVisibility);
-    applyTypedErrorsVisibility(); // set initial state
+    applyTypedErrorsVisibility(); // initialize
   }
 
-  watchTimerControl(hideControl);
+
   setupRestartButton(initializeTyping, hideControl);
 
   // Re-apply keyboard guide visibility after a restart
@@ -242,12 +340,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     const tl = document.getElementById('typedLetter');
     if (tl) tl.textContent = '';
 
+    resetGameLock();
+
     // let initializeTyping finish first
     setTimeout(applyKeyboardVisibility, 0);
   });
 
 
-  watchWordLimitRadios();
   setupGhost();
   showInitialProgress();
   setupSubtoggleVisibility();
@@ -317,7 +416,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       setStartTime(0);
       setCurrentIndex(0);
       await initializeTyping(textDisplay, hideControl);
+      positionKeyboardDiagram();
       showInitialProgress();
+      
+      resetGameLock();
+
 
       // reset HUD + effects
       const widx = getCurrentWord(chars, 0);
@@ -500,6 +603,7 @@ function watchWordLimitRadios() {
     }
 
     await initializeTyping(textDisplay, hideControl);
+    positionKeyboardDiagram();
     resetTimer();
     setStartTime(0);
     setCurrentIndex(0);
@@ -513,6 +617,7 @@ function watchWordLimitRadios() {
     document.getElementById('wpm').textContent = 'WPM: 0';
     document.getElementById('accuracy').textContent = 'Accuracy: 100%';
     showInitialProgress();
+    resetGameLock();
   };
 
   if (wlSel) {
@@ -645,6 +750,13 @@ function wireSinglePill(pillId, checkboxId) {
 
 
 function enforceWordLimitAvailability() {
+
+  // NEW: if results overlay is up, always hide and bail
+  if (document.body.classList.contains('game-ended')) {
+    document.getElementById('wordProgress')?.classList.add('hidden');
+    return;
+  }
+
   const wlsSel = document.getElementById('wordListSizeSelector');
   const wlSel  = document.getElementById('wordLimitSelector');
   const progress = document.getElementById('wordProgress');
@@ -844,21 +956,84 @@ function enhanceSelect(id, { small = false } = {}) {
   });
 }
 
+// === Settings: force mouse-only on SELECTs & bounce focus back to the game ===
+const SETTINGS_SELECTS = [
+  '#limitsHero .btn-dropdown select',
+  '.select-pill select.ui-select',
+  '#languageSelector',
+  '#wordListSizeSelector',
+  '#timerInlineSelect',
+  '#wordLimitInlineSelect',
+  '#timerSelector',
+  '#wordLimitSelector',
+  '#themeSelector',
+  '#soundSelector',
+  '#hideWordsSelector',
+  '#highlightAheadSelector'
+].join(', ');
+
+function wireMouseOnlySelects(root = document) {
+  root.querySelectorAll(SETTINGS_SELECTS).forEach(sel => {
+    if (sel.dataset.mouseOnlyWired) return;
+    sel.dataset.mouseOnlyWired = '1';
+
+    // keep selects out of tab order (mouse only)
+    sel.setAttribute('tabindex', '-1');
+
+    // when a value is chosen or the menu closes, return focus to the game
+    ['change','blur'].forEach(evt =>
+      sel.addEventListener(evt, () => setTimeout(refocusToGame, 0))
+    );
+
+    // if user types while a select is focused, hijack it and replay for the game
+    sel.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return; // allow OS shortcuts
+      // Block the select's own keyboard behavior, but let the event bubble
+      e.preventDefault();
+      // Hand focus back to the game for the *next* keystroke
+      requestAnimationFrame(refocusToGame);
+    });
+  });
+}
+
+
+// Put keyboard focus back on the game immediately after a settings action
+function refocusToGame() {
+  // let the UI toggle/paint first, then steal focus back
+  requestAnimationFrame(() => {
+    const ae = document.activeElement;
+    if (ae && ae !== document.body && typeof ae.blur === 'function') ae.blur();
+    document.body.focus({ preventScroll: true });
+  });
+}
+
 
 // Unified key handler
 async function onKey(e) {
 
+  // Hard stop if overlay is up or game is ended/locked
+  if (document.body.classList.contains('game-ended') || isGameEnded() || gameLocked) return;
+
+
+
   // Ignore typing while user is editing a control
   const ae = document.activeElement;
+  const aeIsMouseOnlySelect =
+    ae && ae.tagName === 'SELECT' && ae.dataset.mouseOnlyWired === '1';
+
   if (
-    ae &&
+    ae && !aeIsMouseOnlySelect &&
     (ae.tagName === 'INPUT' ||
-     ae.tagName === 'SELECT' ||
-     ae.tagName === 'TEXTAREA' ||
-     ae.isContentEditable)
+    ae.tagName === 'SELECT' ||
+    ae.tagName === 'TEXTAREA' ||
+    ae.tagName === 'BUTTON' ||
+    ae.closest('[role="button"]') ||
+    (ae.tagName === 'A' && ae.hasAttribute('href')) ||
+    ae.isContentEditable)
   ) {
     return;
   }
+
 
   handleKeyboardState(e);
   if (isGameEnded()) return;
@@ -915,60 +1090,50 @@ async function onKey(e) {
   const newErrors = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
   const strictMode = document.getElementById('endOnMistakeCheckbox')?.checked === true;
 
-  if (strictMode && newErrors > oldErrors) endTimer();
+  if (strictMode && newErrors > oldErrors) endGame();
 
   // End if WPM <
   if (document.getElementById('endWpmToggle')?.checked && totalAttempted > 0) {
     const minWPM = parseInt(document.getElementById('endWpmValue').value, 10);
     const currentWPM = parseInt(wpmSpan.textContent.replace('WPM: ', ''), 10);
-    if (!isNaN(minWPM) && currentWPM < minWPM) endTimer();
+    if (!isNaN(minWPM) && currentWPM < minWPM) endGame();
   }
 
   // End if Accuracy <
   if (document.getElementById('endAccToggle')?.checked && totalAttempted > 0) {
     const minAccuracy = parseFloat(document.getElementById('endAccValue').value);
     const currentAccuracy = parseFloat(accSpan.textContent.replace('Accuracy: ', '').replace('%', ''));
-    if (!isNaN(minAccuracy) && currentAccuracy < minAccuracy) endTimer();
+    if (!isNaN(minAccuracy) && currentAccuracy < minAccuracy) endGame();
   }
 
   const wordLimit = getWordLimit();
   if (wordLimit > 0) {
-    // Only consider originally generated characters
-    const totalAll = originalLength || chars.length;
+    // Only original, required chars (letters/punct in words), not spaces/newlines/extras
+    const requiredNodes = chars.filter(n => n?.dataset?.required === '1');
+    const totalRequired = requiredNodes.length;
 
-    // Find the last *required* index (ignore trailing space/newline/sentinels)
-    let lastRequiredIndex = -1;
-    for (let i = totalAll - 1; i >= 0; i--) {
-      const node = chars[i];
-      if (!node) continue;
-      const t = node.textContent;
-      // skip trailing whitespace and hidden newline placeholders
-      const isHiddenNewline = node.classList.contains('newline');
-      if (t === ' ' || t === '\n' || isHiddenNewline) continue;
-      lastRequiredIndex = i;
-      break;
-    }
-    const totalRequired = (lastRequiredIndex >= 0) ? (lastRequiredIndex + 1) : 0;
-
-    // Count required chars that have been attempted in any way
     let attemptedRequired = 0;
-    for (let i = 0; i < totalRequired; i++) {
-      const cl = chars[i].classList;
+    for (const n of requiredNodes) {
+      const cl = n.classList;
       if (cl.contains('correct') || cl.contains('incorrect') || cl.contains('skipped')) {
         attemptedRequired++;
       }
     }
 
-    // Progress bar based on attempts, capped at 100%
+    // Progress bar
     const progress = totalRequired ? (attemptedRequired / totalRequired) : 0;
-    document.getElementById('wordProgressFill').style.width =
-      Math.min(progress * 100, 100) + '%';
+    const fill = document.getElementById('wordProgressFill');
+    if (fill) {
+      fill.style.width = Math.min(progress * 100, 100) + '%';
+    }
 
-    // Finish if ALL required are attempted OR caret moved past the last required char
-    if (attemptedRequired >= totalRequired || currentIndex > lastRequiredIndex) {
-      endTimer();
+
+    // Finish only when all required chars are attempted (extras don't help)
+    if (attemptedRequired >= totalRequired) {
+      endGame();
     }
   }
+
 
 
 
@@ -993,4 +1158,7 @@ async function onKey(e) {
 }
 
 document.addEventListener('keydown', onKey);
-document.addEventListener('keyup', (e) => handleKeyboardState(e));
+document.addEventListener('keyup', (e) => {
+  if (document.body.classList.contains('game-ended') || isGameEnded()) return;
+  handleKeyboardState(e);
+});

@@ -32,37 +32,27 @@
   color: transparent;
 }
 
-/* Keyboard diagram styles */
-.keyboard-diagram {
-  margin: 1rem 0;
-  text-align: center;
-  transition: opacity 0.3s ease;
-}
-
 .keyboard-diagram.hidden {
   display: none;
 }
 
-.keyboard-diagram img {
-  max-width: 100%;
-  max-height: 500px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Timer Display */
+/* Timer Display — overlay above stats/words (no layout shift) */
 .timer-display {
-  margin-bottom: 1rem;
+  position: absolute;
+  top: 15rem;                 /* sits below your error bubble at 9rem */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 18;                  /* under the error bubble (z:20), above stats/text */
+  margin: 0;                    /* no flow margin */
   font-size: 1.2rem;
   color: var(--stats-color);
   font-weight: bold;
   text-align: center;
-  min-height: 1.2em; /* Reserve space even when empty */
 }
 .timer-display.hidden {
-  visibility: hidden; /* Hide but reserve space */
+  display: none;                /* fully remove overlay when hidden */
 }
+
 
 /* Results Screen */
 .results-screen {
@@ -180,6 +170,7 @@
 .word-progress.hidden {
   visibility: hidden; /* Hide but reserve space */
 }
+
 
 /* Progress Wrapper */
 .progress-wrapper {
@@ -1334,23 +1325,6 @@ html, body { overflow-x: hidden; }
   margin-top: .4rem;
 }
 
-.limit-btn {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: .4rem;
-  min-height: 110px;                /* enough room for dropdown when shown */
-  padding: .7rem;
-  border: 1px solid var(--box-border);
-  border-radius: 12px;
-  background: rgba(255,255,255,0.05);
-  cursor: pointer;
-  user-select: none;
-  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .05s ease;
-}
-
 .limit-btn:active { transform: translateY(1px); }
 
 .limit-btn img {
@@ -1372,16 +1346,10 @@ html, body { overflow-x: hidden; }
   box-shadow: inset 0 0 0 1px var(--header-color);
 }
 
-.btn-dropdown {
-  position: absolute;
-  left: .6rem;
-  right: .6rem;
-  bottom: .6rem;
-}
 
-.btn-dropdown.hidden { display: none; }
 
-.btn-dropdown select {
+/* Keep base styling everywhere EXCEPT inside #limitsHero, which has its own sizing */
+:not(#limitsHero) .btn-dropdown select {
   width: 100%;
   height: 36px;
   padding: 0 .6rem;
@@ -1394,8 +1362,199 @@ html, body { overflow-x: hidden; }
   cursor: pointer;
 }
 
-/* make the active button reserve room for the dropdown nicely */
-.limit-btn.show-dropdown { padding-bottom: 3.2rem; }
+
+/* Bigger keyboard diagram (overlay, no layout shift) */
+.typing-panel { position: relative; } /* if not already */
+
+.keyboard-diagram {
+  position: absolute;                 /* already overlayed */
+  left: 50%;
+  transform: translateX(-50%);        /* center under text */
+  width: clamp(520px, 84vw, 980px);   /* <-- bigger, responsive */
+  max-height: 30vh;                   /* keep it from eating the screen */
+  pointer-events: none;               /* never block typing/clicks */
+  z-index: 12;                        /* below bubbles/timer, above background */
+}
+
+.keyboard-diagram img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.keyboard-diagram {
+  width: clamp(320px, 64vw, 686px); /* ~70% of the big one */
+  max-height: 21vh;                 /* ~70% of previous 30vh */
+}
+
+.keyboard-diagram img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  max-width: none;
+  max-height: none;
+}
+
+.keyboard-diagram {
+  width: clamp(260px, 55vw, 686px); /* shrink earlier on narrow viewports */
+  max-height: 21vh;
+}
+
+@media (max-width: 1100px) {
+  .keyboard-diagram {
+    width: clamp(240px, 48vw, 600px); /* tighter clamp when browser is smaller */
+  }
+}
+
+@media (max-width: 900px) {
+  .keyboard-diagram {
+    width: clamp(220px, 44vw, 520px); /* even smaller for narrow windows */
+  }
+}
+
+/* Never spill into the settings column — size to the typing panel */
+.typing-panel { position: relative; } /* keep this */
+
+.keyboard-diagram {
+  position: absolute;
+  /* center horizontally within the typing column */
+  left: 12px;               /* small gutter */
+  right: 12px;              /* small gutter */
+  margin-left: auto;
+  margin-right: auto;
+
+  /* max it out, but never wider than the column */
+  width: min(686px, calc(100% - 24px));   /* 686px ≈ your 70% size cap */
+  max-width: 100%;
+  max-height: 21vh;
+
+  transform: none;          /* no translateX needed now */
+  pointer-events: none;
+  z-index: 12;
+}
+
+.keyboard-diagram img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Optional: when the column gets really small, ease down a bit more */
+@media (max-width: 900px) {
+  .keyboard-diagram { width: min(600px, calc(100% - 24px)); }
+}
+@media (max-width: 700px) {
+  .keyboard-diagram { width: min(520px, calc(100% - 24px)); }
+}
+
+/* Never show the word-limit bar once the game is ended */
+body.game-ended #wordProgress,
+body.game-ended #wordProgressFill {
+  display: none !important;
+}
+
+/* GAME LIMITS: card lives on the cell, not the button */
+#limitsHero .limit-cell{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .45rem;
+  padding: .7rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* The button becomes a clean, stackable header area */
+#limitsHero .limit-btn{
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  min-height: 90px;      /* can grow; just a comfy minimum */
+  padding: .4rem 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Dropdown sits in normal flow and is shown only for the active mode */
+#limitsHero .btn-dropdown{
+  position: static;
+  display: none;
+  width: 100%;         /* was 72% */
+  max-width: 240px;    /* was 160px */
+  margin-top: .25rem;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+
+/* JS already toggles `.show-dropdown` on the button; use that to reveal the sibling */
+#limitsHero .limit-btn.show-dropdown + .btn-dropdown{ display: block; }
+
+#limitsHero .limit-cell { box-sizing: border-box; }
+#limitsHero .btn-dropdown select { max-width: 100%; } /* belt & suspenders */
+
+
+
+/* --- GAME LIMITS: dropdown sizing --- */
+#limitsHero .btn-dropdown select{
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;      /* ensures touch target */
+  height: auto;          /* lets padding define height */
+  line-height: normal;   /* avoids clipping on Safari/macOS */
+  padding: .4rem .6rem;  /* comfortable vertical space */
+  font-size: 0.70rem;    /* a touch smaller so long text fits */
+  max-width: 100%;
+}
+
+
+/* --- GAME LIMITS: remove boxes around the image on active/focus --- */
+#limitsHero .limit-btn.active{
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+#limitsHero .limit-btn:focus,
+#limitsHero .limit-btn:focus-visible{
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* make sure the icon never gets a border/outline */
+#limitsHero .limit-btn img{
+  display: block;
+  border: 0;
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* keep the highlight only on the card */
+#limitsHero .limit-cell:has(.limit-btn.active){
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+#limitsHero .limit-cell { align-items: stretch; }          /* let children fill width */
+#limitsHero .limit-btn  { width: 100%; align-items: center; }  /* keep contents centered */
+
+#limitsHero .limit-btn{
+  outline: none;
+  -webkit-tap-highlight-color: transparent; /* remove mobile tap glow */
+}
+
+
+
+
+
 
 
 
