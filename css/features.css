@@ -32,6 +32,13 @@
   color: transparent;
 }
 
+/* Show ghost caret on hidden words without revealing the text */
+.hidden-word.ghost {
+  visibility: visible !important;
+  color: transparent; /* keep letters invisible */
+}
+
+
 .keyboard-diagram.hidden {
   display: none;
 }
@@ -1069,7 +1076,9 @@ html, body { overflow-x: hidden; }
 .settings-hero .hero-icon { grid-column: 1; }
 
 /* Make every first-level child in the hero (except the icon) plain */
-.settings-hero > :not(.hero-icon) {
+#textGenHero  > :not(.hero-icon),
+#themeHero    > :not(.hero-icon),
+#soundHero    > :not(.hero-icon) {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -1551,6 +1560,96 @@ body.game-ended #wordProgressFill {
   -webkit-tap-highlight-color: transparent; /* remove mobile tap glow */
 }
 
+/* === GAME LIMITS: make the whole card clickable (lower halves too) === */
+#limitsHero .limit-cell {
+  align-items: stretch;   /* let children fill width */
+  cursor: pointer;        /* signal clickability */
+  isolation: isolate;     /* keep any z-index scoped to this card */
+}
+
+#limitsHero .limit-btn {
+  flex: 1 1 auto;         /* stretch button to fill the full card height */
+  width: 100%;
+}
+
+/* Keep the dropdown interactive but not “owning” neighboring hit areas */
+#limitsHero .btn-dropdown {
+  position: static;       /* in-flow, no overlay */
+  z-index: 0;
+}
+
+#limitsHero .btn-dropdown,
+#limitsHero .btn-dropdown * {
+  cursor: auto;           /* normal cursor inside the dropdown */
+}
+
+
+#proHero #minWPMSettings,
+#proHero #minAccuracySettings,
+#proHero #strictModeSettings {
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  box-sizing: border-box;
+}
+
+/* Center the labels when their number box is hidden */
+#minWPMSettings:has(#endWpmWrapper.hidden),
+#minAccuracySettings:has(#endAccWrapper.hidden) {
+  justify-content: center;     /* overrides the pill's space-between */
+}
+
+/* Center the text itself */
+#minWPMSettings .pill-name,
+#minAccuracySettings .pill-name {
+  text-align: center;
+}
+
+/* Settings summary chips inside the Time's Up box */
+.results-screen .run-settings {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: center;
+}
+
+.results-screen .run-settings .badge {
+  padding: .28rem .6rem;
+  border: 1px solid var(--box-border);
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.06);
+  color: var(--correct-color);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+/* Speed graph inside results */
+.run-graph {
+  margin: 1rem auto 0;
+  width: min(720px, 92%);
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  padding: .75rem .75rem 1rem;
+}
+
+.run-graph .title {
+  font-weight: 700;
+  margin-bottom: .5rem;
+  color: var(--correct-color);
+  text-align: left;
+  font-size: 1.0rem;
+  opacity: .95;
+}
+
+.run-graph canvas {
+  display: block;
+  width: 100%;
+  height: 160px;   /* CSS height, real pixels set via DPR in JS */
+  border-radius: 6px;
+}
 
 
 

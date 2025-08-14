@@ -1,6 +1,8 @@
 // js/timer.js - Handles timer and word progress functionality
 import { stopGhost, saveSpeed } from './ghost.js';
-import { initializeTyping } from './engine.js';
+import { startTime } from './engine.js';
+import { initializeTyping } from './engine.js'
+import { calculateWPM } from './utils.js';
 
 let timerInterval = null;
 let timeRemaining = 0;
@@ -119,7 +121,8 @@ export function endTimer() {
   keyboardDiagram.classList.add('hidden');
 
   // Final stats
-  const finalWPM = document.getElementById('wpm').textContent.replace('WPM: ', '');
+  const correctCount = document.querySelectorAll('.char.correct').length;
+  const finalWPM = calculateWPM(startTime, correctCount); // average over the run
   const finalAccuracy = document.getElementById('accuracy').textContent.replace('Accuracy: ', '');
   saveSpeed(parseInt(finalWPM));
   document.getElementById('finalWPM').textContent = finalWPM;
@@ -146,7 +149,7 @@ export function setupRestartButton(initializeTypingFn, hideControl) {
 
     textDisplay.classList.remove('hidden');
     statsDiv.classList.remove('hidden');
-    const keyboardEnabled = document.querySelector('input[name="keyboardDiagram"]:checked')?.value === 'on';
+    const keyboardEnabled = document.getElementById('keyboardDiagramToggle')?.checked;
     if (keyboardEnabled) keyboardDiagram.classList.remove('hidden');
 
     resetTimer();

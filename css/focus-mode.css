@@ -1,0 +1,97 @@
+/* focus-mode.css */
+/* Focus Mode — slide settings/ad out, center the game, show hints */
+
+:root {
+  /* tweakable timing */
+  --focus-transition: 320ms;
+}
+
+/* Smooth transitions for the three columns */
+#ad-left,
+.settings-panel,
+.typing-panel {
+  transition:
+    width var(--focus-transition) ease,
+    max-width var(--focus-transition) ease,
+    margin var(--focus-transition) ease,
+    padding var(--focus-transition) ease,
+    border-color var(--focus-transition) ease,
+    opacity var(--focus-transition) ease,
+    transform var(--focus-transition) ease;
+}
+
+/* Start: normal layout already defined by your existing CSS */
+
+/* Focus mode on <body> toggles the layout */
+body.focus-mode .container {
+  gap: 0.25rem; /* slightly tighter, reads as “focused” */
+}
+
+/* Slide the ad + settings out to the left and collapse their width */
+body.focus-mode #ad-left,
+body.focus-mode .settings-panel {
+  transform: translateX(-40px);
+  opacity: 0;
+  width: 0 !important;
+  max-width: 0 !important;
+  padding: 0 !important;
+  border-width: 0 !important;
+  margin: 0 !important;
+  pointer-events: none;
+}
+
+/* Let the typing area expand and feel centered */
+.typing-panel {
+  transition:
+    transform var(--focus-transition) ease,
+    max-width var(--focus-transition) ease;
+}
+
+/* Give it a little “snap to center” feel */
+body.focus-mode .typing-panel {
+  max-width: min(980px, 94vw);
+  margin-left: auto;
+  margin-right: auto;
+  transform: translateX(0);
+}
+
+/* Focus mode hints (top-left/top-right) */
+.focus-hint {
+  position: fixed;
+  top: 12px;
+  z-index: 50;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid var(--box-border);
+  background: color-mix(in srgb, var(--box-bg) 85%, transparent);
+  color: var(--correct-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none; /* purely informational */
+}
+.focus-hint.left  { left: 12px; }
+.focus-hint.right { right: 12px; }
+
+body.focus-mode .focus-hint {
+  opacity: 0.92;
+  transform: translateY(0);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #ad-left,
+  .settings-panel,
+  .typing-panel,
+  .focus-hint {
+    transition: none !important;
+  }
+}
+
+/* Hide the top ESC/TAB hints when the results overlay is up */
+body.game-ended .focus-hint {
+  display: none !important;
+}
+

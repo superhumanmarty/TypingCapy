@@ -86,12 +86,36 @@ function pickEnglishParagraphKey() {
   return null;
 }
 
+export function sanitizeExistingText(textDisplay) {
+  if (!textDisplay) return;
+
+  // Remove any extra chars added during the last run
+  textDisplay.querySelectorAll('.char.extra').forEach(n => n.remove());
+
+  // Rebuild the chars array from DOM (fresh order)
+  chars = Array.from(textDisplay.querySelectorAll('.char'));
+  originalLength = chars.length;
+
+  // Clear correctness/state classes
+  for (const n of chars) {
+    n.classList.remove('correct', 'incorrect', 'skipped', 'extra', 'current');
+  }
+
+  // Reset indices/timer and set fresh cursor
+  currentIndex = 0;
+  startTime = 0;
+  chars[0]?.classList.add('current');
+}
+
 /* ---------- INITIALIZE ---------- */
 export async function initializeTyping(textDisplay, hideControl) {
   // clear any old content
   textDisplay.innerHTML = '';
   chars = [];
   
+  // NEW: tell metrics a fresh run is starting
+  window.dispatchEvent(new Event('capy:runReset'));
+
   const { lang, wordSizeOrMode, punctOn, numbersOn, numbersExp, symbolsOn, wordLimit } = readGenerationControls();
 
   let mode = 'random';
@@ -161,6 +185,10 @@ export async function initializeTyping(textDisplay, hideControl) {
   const hideMode = getHideMode(hideControl);
   const w = getCurrentWord(chars, 0);
   updateHide(hideMode, w, chars, textDisplay);
+
+
+  // notify listeners (e.g., main.js) that fresh text is ready
+  window.dispatchEvent(new Event('capy:textReady'));
 }
 
 /* ---------- APPEND MORE TEXT ---------- */

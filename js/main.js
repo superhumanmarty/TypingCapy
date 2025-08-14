@@ -1,8 +1,8 @@
 // js/main.js
 import { updateHighlight } from './highlight.js';
-import { calculateWPM, calculateAccuracy, getCurrentWord } from './utils.js';
+import { calculateAccuracy, getCurrentWord } from './utils.js';
 import { updateHide } from './hide.js';
-import { initializeTyping, appendTyping, chars, currentIndex, startTime, setCurrentIndex, setStartTime, originalLength } from './engine.js';
+import { initializeTyping, appendTyping, chars, currentIndex, startTime, setCurrentIndex, setStartTime, originalLength, sanitizeExistingText } from './engine.js';
 import { setupHide, watchHideRadios, watchHideSelector, getHideMode, getHighlightMode, watchHighlightSelector, watchHighlightRadios } from './settings.js';
 import { bindThemeSelectors } from './theme.js';
 import { handleChar } from './handlers/char.js';
@@ -10,8 +10,20 @@ import { handleSpace } from './handlers/space.js';
 import { handleBackspace } from './handlers/backspace.js';
 import { handleExtra } from './handlers/extra.js';
 import { setupKeyboardDiagram, handleKeyboardState } from './keyboard.js';
-import { startTimer, resetTimer, setupRestartButton, watchTimerControl, isGameEnded, endTimer, getTimerDuration, showInitialProgress, getWordLimit } from './timer.js';
-import { setupGhost, startGhost, stopGhost, saveSpeed } from './ghost.js';
+import { startTimer, resetTimer, setupRestartButton, isGameEnded, endTimer, getTimerDuration, showInitialProgress, getWordLimit } from './timer.js';
+import { setupGhost, startGhost, stopGhost } from './ghost.js';
+import {
+  resetMetrics, startMetrics, noteMetrics, renderRunGraph, getLiveWPM,
+  setAvgOverrideForRun
+} from './metrics.js';
+
+import {
+  resetHistory, logCorrect, logIncorrect, logExtra, logBackspace,
+  logSpace, logEnter, logSkipped, renderTypingHistory,
+  setTargetWordsForRun
+} from './history.js';
+import { setupCertificate } from './certificate.js';
+
 
 const textDisplay = document.getElementById('textDisplay');
 
@@ -29,8 +41,199 @@ const colorPickers = [...document.querySelectorAll('input[type="color"]')];
 const wpmSpan = document.getElementById('wpm');
 const accSpan = document.getElementById('accuracy');
 
+const WARMUP_MS = 2000; // 2s warmup: hide WPM and ignore WPM threshold
+
 // --- lock so post-finish keystrokes do nothing & WL bar stays gone ---
 let gameLocked = false;
+
+// — first-keystroke gating for the WPM graph —
+let firstKeySeen = false;
+let firstKeyMistake = false;
+
+// Listen for focusMode's "unlock" (ESC at results or TAB restart)
+window.addEventListener('capy:unlock', () => {
+  // reset first-key flags for the next run
+  firstKeySeen = false;
+  firstKeyMistake = false;
+
+  resetGameLock();                 // clears gameLocked + removes body.game-ended
+  enforceWordLimitAvailability();  // re-show/hide the WL bar correctly
+  enforceTimerVisibility();
+
+  // scrub extras & correctness from the existing text so "same words" are clean
+  sanitizeExistingText(textDisplay);
+  setWordsForHistoryFromChars();
+
+  // Re-apply hide/highlight for word 0 after the scrub
+  const widx0 = getCurrentWord(chars, 0);
+  updateHide(getHideMode(hideControl), widx0, chars, textDisplay);
+  updateHighlight(getHighlightMode(highlightControl), widx0, chars);
+
+  const stats = document.getElementById('stats');
+  if (stats) {
+    stats.classList.remove('hidden');
+    stats.style.removeProperty('display');
+    stats.style.removeProperty('visibility');
+  }
+  // If the keyboard diagram is ON, make sure it’s visible again.
+  const kdToggle = document.getElementById('keyboardDiagramToggle');
+  const kdPanel  = document.getElementById('keyboardDiagram');
+  if (kdToggle?.checked) kdPanel?.classList.remove('hidden');
+
+  // Put focus back on the game so the next key types.
+  refocusToGame();
+});
+
+// Failsafe: whenever TAB is used to restart, scrub the DOM first.
+// Capture=true so we run before other Tab handlers.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab' && !document.body.classList.contains('focus-mode')) {
+    e.preventDefault(); // don't let focused controls or the page swallow it
+
+    // clean the existing DOM so "same words" are pristine
+    sanitizeExistingText(textDisplay);
+    setWordsForHistoryFromChars();
+
+    // re-apply hide/highlight for word 0
+    const widx0 = getCurrentWord(chars, 0);
+    updateHide(getHideMode(hideControl), widx0, chars, textDisplay);
+    updateHighlight(getHighlightMode(highlightControl), widx0, chars);
+
+    // optional: reset HUD immediately
+    resetMetrics();
+    resetTimer();
+    setTimerLabelToFull?.();
+    wpmSpan.textContent = 'WPM: 0';
+    accSpan.textContent = 'Accuracy: 100%';
+
+    // let your existing restart logic continue (e.g., focus-mode unlock)
+    window.dispatchEvent(new Event('capy:unlock'));
+  }
+}, true);
+
+
+// when the engine regenerates text, reset graph data
+window.addEventListener('capy:runReset', () => {
+  resetMetrics();
+  resetHistory();
+  firstKeySeen = false;
+  firstKeyMistake = false;
+  setAvgOverrideForRun(null);      // <— clear any override between runs
+  const host = document.getElementById('runGraph');
+  if (host) host.innerHTML = '';   // clear old graph if any
+});
+
+// Anytime initializeTyping/appendTyping finishes, rebuild target words for history
+window.addEventListener('capy:textReady', () => {
+  setWordsForHistoryFromChars();
+});
+
+
+
+// --- RESULTS: show active settings in the Time's Up box --------------------
+function buildResultsSettingsSummary() {
+  const rs = document.getElementById('resultsScreen');
+  if (!rs) return;
+
+  // current language + whether it’s a human language
+  const langKey  = document.getElementById('languageSelector')?.value;
+  const langConf = window.configs?.[langKey];
+  const isHuman  = langConf?.type === 'human';
+
+  // create/locate the container just under the stats row
+  let wrap = rs.querySelector('#runSettings');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'runSettings';
+    wrap.className = 'run-settings';
+    const after = rs.querySelector('.results-stats');
+    (after?.parentNode)?.insertBefore(wrap, after.nextSibling);
+  }
+  wrap.innerHTML = '';
+
+  const add = (label) => {
+    const chip = document.createElement('span');
+    chip.className = 'badge';
+    chip.textContent = label;
+    wrap.appendChild(chip);
+  };
+
+  // Language (always)
+  const langLabel = document.querySelector('#languageSelector option:checked')?.textContent?.trim();
+  if (langLabel) add(`Language: ${langLabel}`);
+
+  // Word list size / paragraphs — ONLY for human languages
+  const wls = document.getElementById('wordListSizeSelector');
+  if (isHuman && wls && wls.options?.length > 0) {
+    if (wls.value === 'paragraphs') add('Real paragraphs');
+    else if (wls.value && !isNaN(parseInt(wls.value, 10))) add(`${wls.value} words`);
+  }
+
+  // Toggles: 123, !?, +=, @#& — ONLY for human languages (and only if that row is visible)
+  const togglesVisible = isHuman && !document.getElementById('togglesSettings')?.classList.contains('hidden');
+  if (togglesVisible) {
+    if (document.getElementById('numbersToggle')?.checked)      add('123');
+    if (document.getElementById('numbersExprToggle')?.checked)  add('+=');
+    if (document.getElementById('punctuationToggle')?.checked)  add('!?');
+    if (document.getElementById('symbolsToggle')?.checked)      add('@#&');
+  }
+
+  // Timer vs Word limit (these are game limits, keep showing if set)
+  const tSel = document.getElementById('timerSelector');
+  if (tSel && tSel.value !== 'off') {
+    const sec = parseInt(tSel.value, 10);
+    const label = Number.isFinite(sec) ? (sec % 60 ? `${sec}s` : `${sec/60} min`) : tSel.value;
+    add(`Timer: ${label}`);
+  }
+  const wlSel = document.getElementById('wordLimitSelector');
+  if (wlSel && wlSel.value !== 'off') add(`Word limit: ${wlSel.value}`);
+
+  // Keyboard diagram
+  if (document.getElementById('keyboardDiagramToggle')?.checked) add('Keyboard guide');
+
+  // Hide
+  const hideVal = document.getElementById('hideWordsSelector')?.value;
+  if (hideVal === 'current')     add('Hide: current');
+  if (hideVal === 'currentNext') add('Hide: current & next');
+
+  // Highlight
+  const hlVal = document.getElementById('highlightAheadSelector')?.value;
+  if (hlVal === 'next')  add('Highlight: next');
+  if (hlVal === 'next2') add('Highlight: 2nd');
+
+  // End-if rules
+  if (document.getElementById('endWpmToggle')?.checked) {
+    const v = document.getElementById('endWpmValue')?.value;
+    if (v) add(`End if WPM < ${v}`);
+  }
+  if (document.getElementById('endAccToggle')?.checked) {
+    const v = document.getElementById('endAccValue')?.value;
+    if (v) add(`End if Accuracy < ${v}%`);
+  }
+  if (document.getElementById('endOnMistakeCheckbox')?.checked) add('End on any mistake');
+
+  // ---- render speed graph ----
+  const host = document.getElementById('runGraph');
+  if (host) {
+    host.innerHTML = ''; // always clear first
+
+  // Pipe the exact Final WPM from the UI straight into the graph
+  const finalWpm = readFinalWpm();
+  setAvgOverrideForRun(Number.isFinite(finalWpm) ? finalWpm : null);
+
+  // Always show the graph, even if the first key was a mistake
+  const ms = getTimerDuration() > 0
+    ? getTimerDuration() * 1000
+    : (Date.now() - startTime);
+  renderRunGraph(host, ms);
+  }
+
+
+
+
+
+}
+
 
 function endGame() {
   gameLocked = true;
@@ -44,7 +247,48 @@ function endGame() {
   if (wlFill) wlFill.style.width = '0%';
   stopGhost?.();
 
+  buildResultsSettingsSummary();
+  renderTypingHistory();
   endTimer();
+
+  // === CERTIFICATE: guaranteed button ===
+  if (!document.getElementById('downloadCertificateButton')) {
+    const inlineHost =
+      document.querySelector('.results-actions') ||
+      document.querySelector('.results-buttons') ||
+      document.querySelector('.results-stats')?.parentElement;
+
+    const btn = document.createElement('button');
+    btn.id = 'downloadCertificateButton';
+    btn.type = 'button';
+    btn.className = 'btn btn-primary certificate-btn';
+    btn.textContent = 'CERTIFICATE';
+    (inlineHost || document.body).appendChild(btn);
+
+    if (!inlineHost) {
+      // make it a floating FAB if no obvious inline host
+      btn.setAttribute('style',
+        'position:fixed;right:16px;bottom:16px;z-index:99999;padding:12px 16px;' +
+        'border-radius:12px;border:none;font-weight:700;cursor:pointer;' +
+        'box-shadow:0 6px 18px rgba(0,0,0,.25);background:#1f63ff;color:#fff;'
+      );
+    }
+
+    btn.addEventListener('click', async () => {
+      const fullName = (window.prompt('Enter your first and last name for the certificate:', '') || '').trim();
+      if (!fullName) return;
+      const gen = window.capyGenerateCertificate;
+      if (typeof gen === 'function') await gen(fullName);
+      else {
+        // ESM fallback (shouldn’t be needed, but safe)
+        const { generateCertificate } = await import('./certificate.js');
+        await generateCertificate(fullName);
+      }
+    });
+  }
+
+  // Let listeners know results just painted
+  window.dispatchEvent(new Event('capy:resultsPainted'));
 }
 
 
@@ -73,6 +317,26 @@ function positionKeyboardDiagram() {
   const top = (textRect.bottom - panelRect.top) + 12; // 12px gap
   kd.style.top = `${top}px`;
 }
+
+function readFinalWpm() {
+  const rs = document.getElementById('resultsScreen');
+  if (!rs) return null;
+
+  // Prefer explicit hooks if you have them:
+  const el =
+    rs.querySelector('[data-final-wpm]') ||
+    rs.querySelector('#finalWpmValue, #finalWpm, .final-wpm .value, .result-wpm .value');
+
+  if (el) {
+    const n = parseInt((el.textContent || '').replace(/[^\d]/g, ''), 10);
+    if (Number.isFinite(n)) return n;
+  }
+
+  // Fallback: parse "Final WPM: 72" style text
+  const m = (rs.textContent || '').match(/Final\s*WPM:\s*(\d+)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
 
 window.addEventListener('DOMContentLoaded', async () => {
   const configs = await fetch('./data/language_configs.json').then(res => res.json());
@@ -173,6 +437,34 @@ window.addEventListener('DOMContentLoaded', async () => {
 }
 
 
+function watchResultsScreenForSettings() {
+  const rs = document.getElementById('resultsScreen');
+  if (!rs) return;
+
+  const renderIfShown = () => {
+    // Wait a tick so the box/values finish painting, then rebuild chips + history
+    requestAnimationFrame(() => {
+      buildResultsSettingsSummary();
+      renderTypingHistory(); // <-- also render history whenever the box opens
+      tagTargetTextBoxForCertificate();
+    });
+  };
+
+  // Rebuild whenever the hidden class toggles off
+  const mo = new MutationObserver(() => {
+    if (!rs.classList.contains('hidden')) renderIfShown();
+  });
+  mo.observe(rs, { attributes: true, attributeFilter: ['class', 'style'] });
+
+  // Timer “time’s up” → render settings AND history
+  window.addEventListener('capy:timeup', renderIfShown);
+}
+
+
+// call it once during init (after the DOM exists)
+watchResultsScreenForSettings();
+setupCertificate();
+
 updateUIForLanguage();
 enforceWordLimitAvailability(); // <-- add this line
 // Mouse-only selects: block key handling & refocus to the game
@@ -207,6 +499,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
     updateUIForLanguage();
     enforceWordLimitAvailability();
     await initializeTyping(textDisplay, hideControl);
+    setWordsForHistoryFromChars();
     positionKeyboardDiagram();
     showInitialProgress();
 
@@ -224,6 +517,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
       enforceWordLimitAvailability();
       
       await initializeTyping(textDisplay, hideControl);
+      setWordsForHistoryFromChars();
       positionKeyboardDiagram();
       showInitialProgress();
       const widx = getCurrentWord(chars, 0);
@@ -241,6 +535,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
         setupSubtoggleVisibility();
 
         await initializeTyping(textDisplay, hideControl);
+        setWordsForHistoryFromChars();
         positionKeyboardDiagram();
         showInitialProgress();
         const widx = getCurrentWord(chars, 0);
@@ -253,6 +548,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
   // Initial setup
   await initializeTyping(textDisplay, hideControl);
+  setWordsForHistoryFromChars();
   positionKeyboardDiagram();
   setupHide(hideControl, chars, textDisplay, currentIndex);
   resetGameLock();
@@ -332,8 +628,13 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
   setupRestartButton(initializeTyping, hideControl);
 
-  // Re-apply keyboard guide visibility after a restart
   document.getElementById('restartButton')?.addEventListener('click', () => {
+    resetHistory(); // <— keep history scoped to each run
+    firstKeySeen = false;
+    firstKeyMistake = false;
+    setAvgOverrideForRun(null); // <— clear any prior avg override
+
+
     // Hide "You typed" bubble and clear last letter
     const ted = document.getElementById('typedErrorDisplay');
     if (ted) ted.classList.add('hidden');
@@ -342,9 +643,26 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
     resetGameLock();
 
-    // let initializeTyping finish first
+    // ⬇️ scrub extras so "same words" are clean
+    sanitizeExistingText(textDisplay);
+    setWordsForHistoryFromChars();
+
+    // re-apply hide/highlight for word 0
+    const widx0 = getCurrentWord(chars, 0);
+    updateHide(getHideMode(hideControl), widx0, chars, textDisplay);
+    updateHighlight(getHighlightMode(highlightControl), widx0, chars);
+
+    // optional HUD reset
+    resetMetrics();
+    resetTimer();
+    setTimerLabelToFull?.();
+    wpmSpan.textContent = 'WPM: 0';
+    accSpan.textContent = 'Accuracy: 100%';
+
+    // let initializeTyping finish first then restore keyboard guide
     setTimeout(applyKeyboardVisibility, 0);
   });
+
 
 
   setupGhost();
@@ -376,74 +694,95 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
     if (!btnEndless || !btnTimer || !btnWord || !timerSel || !wordSel) return;
 
-    async function setActive(mode) {
-      const isEndless = mode === 'endless';
-      const isTimer   = mode === 'timer';
-      const isWord    = mode === 'word';
-
-      // visual state
-      btnEndless.classList.toggle('active', isEndless);
-      btnTimer.classList.toggle('active',   isTimer);
-      btnWord.classList.toggle('active',    isWord);
-
-      btnEndless.setAttribute('aria-pressed', String(isEndless));
-      btnTimer.setAttribute('aria-pressed',   String(isTimer));
-      btnWord.setAttribute('aria-pressed',    String(isWord));
-
-      // dropdown visibility + spacing
-      timerInline.classList.toggle('hidden', !isTimer);
-      wordInline.classList.toggle('hidden',  !isWord);
-      btnTimer.classList.toggle('show-dropdown', isTimer);
-      btnWord.classList.toggle('show-dropdown',  isWord);
-
-      // ---- set hidden mirrors WITHOUT dispatching change events ----
-      if (isEndless) {
-        timerSel.value = 'off';
-        wordSel.value  = 'off';
-      } else if (isTimer) {
-        wordSel.value  = 'off';
-        timerSel.value = timerInlineSelect.value;   // e.g. "60"
-      } else if (isWord) {
-        timerSel.value = 'off';
-        wordSel.value  = wordInlineSelect.value;    // e.g. "5"
-      }
-
-      // keep the progress bar / availability in sync
-      enforceWordLimitAvailability();
-
-      // full reset & re-render exactly once (no races)
-      resetTimer();
-      setStartTime(0);
-      setCurrentIndex(0);
-      await initializeTyping(textDisplay, hideControl);
-      positionKeyboardDiagram();
-      showInitialProgress();
-      
-      resetGameLock();
-
-
-      // reset HUD + effects
-      const widx = getCurrentWord(chars, 0);
-      updateHide(getHideMode(hideControl), widx, chars, textDisplay);
-      updateHighlight(getHighlightMode(highlightControl), widx, chars);
-      document.getElementById('wpm').textContent = 'WPM: 0';
-      document.getElementById('accuracy').textContent = 'Accuracy: 100%';
+    // add this helper near the top of setupGameLimitsButtons()
+    function isParagraphsMode() {
+      const wlsSel = document.getElementById('wordListSizeSelector');
+      return !!wlsSel && wlsSel.value === 'paragraphs';
     }
 
+  async function setActive(mode) {
+    // Normalize first: Real Paragraphs cannot use Word limit
+    if (mode === 'word' && isParagraphsMode()) {
+      mode = 'endless';
+    }
+
+    const isEndless = mode === 'endless';
+    const isTimer   = mode === 'timer';
+    const isWord    = mode === 'word';
+
+    // visual state
+    btnEndless.classList.toggle('active', isEndless);
+    btnTimer.classList.toggle('active',   isTimer);
+    btnWord.classList.toggle('active',    isWord);
+
+    btnEndless.setAttribute('aria-pressed', String(isEndless));
+    btnTimer.setAttribute('aria-pressed',   String(isTimer));
+    btnWord.setAttribute('aria-pressed',    String(isWord));
+
+    // dropdown visibility + spacing
+    timerInline.classList.toggle('hidden', !isTimer);
+    wordInline.classList.toggle('hidden',  !isWord);
+    btnTimer.classList.toggle('show-dropdown', isTimer);
+    btnWord.classList.toggle('show-dropdown',  isWord);
+
+    // ---- set hidden mirrors WITHOUT dispatching change events ----
+    if (isEndless) {
+      timerSel.value = 'off';
+      wordSel.value  = 'off';
+    } else if (isTimer) {
+      wordSel.value  = 'off';
+      timerSel.value = timerInlineSelect.value;   // e.g. "60"
+    } else if (isWord) {
+      timerSel.value = 'off';
+      wordSel.value  = wordInlineSelect.value;    // e.g. "5"
+    }
+
+    // NEW: make the HUD’s timer visibility/label match the chosen mode
+    enforceTimerVisibility();
+    setTimerLabelToFull?.();
+
+    // keep the progress bar / availability in sync
+    enforceWordLimitAvailability();
+
+    // full reset & re-render exactly once (no races)
+    resetTimer();
+    setStartTime(0);
+    setCurrentIndex(0);
+    await initializeTyping(textDisplay, hideControl);
+    setWordsForHistoryFromChars();
+    positionKeyboardDiagram();
+    showInitialProgress();
+
+    resetGameLock();
+
+    // reset HUD + effects
+    const widx = getCurrentWord(chars, 0);
+    updateHide(getHideMode(hideControl), widx, chars, textDisplay);
+    updateHighlight(getHighlightMode(highlightControl), widx, chars);
+    document.getElementById('wpm').textContent = 'WPM: 0';
+    document.getElementById('accuracy').textContent = 'Accuracy: 100%';
+  }
 
 
-    // button clicks
-    btnEndless.addEventListener('click', () => setActive('endless'));
-    btnTimer  .addEventListener('click', () => setActive('timer'));
-    btnWord   .addEventListener('click', () => setActive('word'));
 
-    timerInlineSelect.addEventListener('change', () => {
-      setActive('timer');   // always route through setActive
-    });
 
-    wordInlineSelect.addEventListener('change', () => {
-      setActive('word');    // always route through setActive
-    });
+  // button clicks
+  btnEndless.addEventListener('click', () => setActive('endless'));
+  btnTimer  .addEventListener('click', () => setActive('timer'));
+  btnWord   .addEventListener('click', () => {
+    if (btnWord.disabled || btnWord.getAttribute('aria-disabled') === 'true' || isParagraphsMode()) return;
+    setActive('word');
+  });
+
+  // dropdown changes
+  timerInlineSelect.addEventListener('change', () => {
+    setActive('timer');   // always route through setActive
+  });
+  wordInlineSelect.addEventListener('change', () => {
+    if (btnWord.disabled || btnWord.getAttribute('aria-disabled') === 'true' || isParagraphsMode()) return;
+    setActive('word');    // always route through setActive
+  });
+
 
 
     // default to Endless on load
@@ -584,7 +923,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
 
 
-
+  window.dispatchEvent(new Event('capy:ready'));
   document.body.tabIndex = 0;
   document.body.focus();
 });
@@ -603,6 +942,7 @@ function watchWordLimitRadios() {
     }
 
     await initializeTyping(textDisplay, hideControl);
+    setWordsForHistoryFromChars();
     positionKeyboardDiagram();
     resetTimer();
     setStartTime(0);
@@ -751,33 +1091,89 @@ function wireSinglePill(pillId, checkboxId) {
 
 function enforceWordLimitAvailability() {
 
-  // NEW: if results overlay is up, always hide and bail
+  // If results overlay is up, always hide progress and bail
   if (document.body.classList.contains('game-ended')) {
     document.getElementById('wordProgress')?.classList.add('hidden');
     return;
   }
 
-  const wlsSel = document.getElementById('wordListSizeSelector');
-  const wlSel  = document.getElementById('wordLimitSelector');
-  const progress = document.getElementById('wordProgress');
+  const wlsSel    = document.getElementById('wordListSizeSelector');
+  const wlSel     = document.getElementById('wordLimitSelector');
+  const progress  = document.getElementById('wordProgress');
+
+  // 3-button UI bits
+  const btnEndless        = document.getElementById('btnEndless');
+  const btnTimer          = document.getElementById('btnTimer');
+  const btnWord           = document.getElementById('btnWord');
+  const wordInline        = document.getElementById('wordInline');
+  const wordInlineSelect  = document.getElementById('wordLimitInlineSelect');
 
   const isParagraphs = wlsSel && wlsSel.value === 'paragraphs';
 
-  if (wlSel) {
-    if (isParagraphs) {
+  if (isParagraphs) {
+    // Force Word Limit OFF & disable the selector
+    if (wlSel) {
       wlSel.value = 'off';
       wlSel.disabled = true;
-      progress?.classList.add('hidden');
-    } else {
-      wlSel.disabled = false;
-      // only show progress bar when WL is not off
-      if (progress) {
-        if (wlSel.value === 'off') progress.classList.add('hidden');
-        else progress.classList.remove('hidden');
-      }
+    }
+
+    // Hide the progress bar (WL bar is irrelevant)
+    progress?.classList.add('hidden');
+
+    // Disable the "Word" button & inline dropdown
+    if (btnWord) {
+      btnWord.setAttribute('aria-disabled', 'true');
+      btnWord.disabled = true;
+      btnWord.classList.remove('active', 'show-dropdown');
+      btnWord.setAttribute('aria-pressed', 'false');
+    }
+    if (wordInline) wordInline.classList.add('hidden');
+    if (wordInlineSelect) wordInlineSelect.disabled = true;
+
+  } else {
+    // Re-enable Word Limit controls outside of paragraphs mode
+    if (wlSel) wlSel.disabled = false;
+
+    if (btnWord) {
+      btnWord.removeAttribute('aria-disabled');
+      btnWord.disabled = false;
+    }
+    if (wordInlineSelect) wordInlineSelect.disabled = false;
+
+    // Show/hide WL progress bar only when Word Limit is actually on
+    if (progress) {
+      if (wlSel && wlSel.value === 'off') progress.classList.add('hidden');
+      else progress.classList.remove('hidden');
     }
   }
 }
+
+
+// Build the exact target words from the current run's required chars
+function setWordsForHistoryFromChars() {
+  const out = [];
+  let buf = '';
+
+  for (const n of chars) {
+    const ch = n.textContent;
+
+    // treat actual spaces/newlines as separators even though they aren't "required"
+    if (ch === ' ' || ch === '\n') {
+      if (buf) { out.push(buf); buf = ''; }
+      continue;
+    }
+
+    // only add characters that are original/required (ignore any extras the player might add later)
+    if (n?.dataset?.required === '1') {
+      buf += ch;
+    }
+  }
+
+  if (buf) out.push(buf);
+  setTargetWordsForRun(out);
+}
+
+
 
 function setHideOff() {
   const sel = document.getElementById('hideWordsSelector');
@@ -1007,6 +1403,51 @@ function refocusToGame() {
   });
 }
 
+function enforceTimerVisibility() {
+  const td = document.getElementById('timerDisplay');
+  const tSel = document.getElementById('timerSelector');
+  if (!td || !tSel) return;
+
+  if (tSel.value !== 'off') {
+    td.classList.remove('hidden');
+    // If a new run (no start time yet), show full duration instead of 0:00
+    if (!startTime) setTimerLabelToFull();
+  } else {
+    td.classList.add('hidden');
+  }
+}
+
+
+function setTimerLabelToFull() {
+  const tSel = document.getElementById('timerSelector');
+  const td   = document.getElementById('timerDisplay');
+  const tr   = document.getElementById('timeRemaining');
+  if (!tSel || !td || !tr) return;
+
+  const sec = parseInt(tSel.value, 10);
+  if (!sec || isNaN(sec) || tSel.value === 'off') {
+    tr.textContent = '';
+    return;
+  }
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  tr.textContent = `Time: ${m}:${String(s).padStart(2, '0')}`;  // e.g., 0:15
+}
+
+function tagTargetTextBoxForCertificate() {
+  const el = document.querySelector(
+    '[data-cert-capture="target"], ' +
+    '#supposedText, ' +                       // ⬅ include the pill we render
+    '[data-target-text], ' +
+    '#resultsTargetText, #targetTextBlock, #targetText, #targetTextDisplay, ' +
+    '.target-text, .targetText, .target-words, .results-target'
+  );
+  if (el && !el.hasAttribute('data-cert-capture')) {
+    el.setAttribute('data-cert-capture', 'target');
+  }
+}
+
+
 
 // Unified key handler
 async function onKey(e) {
@@ -1043,17 +1484,27 @@ async function onKey(e) {
   e.preventDefault();
 
   if (!startTime) {
-    setStartTime(Date.now());
+    resetHistory(); // <-- start a fresh buffer for this run
+    setWordsForHistoryFromChars(); // ensure _targetWords is populated for this run
+    const now = Date.now();
+    setStartTime(now);
     if (document.getElementById('ghostModeToggle')?.checked) startGhost();
+    startMetrics(now);
   }
+
+
 
   if (getTimerDuration() > 0) startTimer();
 
-  const oldErrors = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
+  const prevCorrect = document.querySelectorAll('.char.correct').length;
+  const prevErrors  = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
 
   if (k === 'Backspace') {
+    logBackspace();
     await handleBackspace(textDisplay, hideControl);
   } else if (k === 'Enter') {
+    const prevSkipped = new Set([...document.querySelectorAll('.char.skipped')]);
+    logEnter();
     const cur = chars[currentIndex];
     const nxt = chars[currentIndex + 1];
     if (cur?.textContent === '\n') {
@@ -1064,14 +1515,23 @@ async function onKey(e) {
     } else {
       await handleSpace(textDisplay, hideControl);
     }
+    const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
+    if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
   } else if (k === ' ') {
+    const prevSkipped = new Set([...document.querySelectorAll('.char.skipped')]);
+    logSpace();
     await handleSpace(textDisplay, hideControl);
+    const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
+    if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
   } else {
     const idx = currentIndex;
     const cur = idx < chars.length ? chars[idx] : null;
     if (!cur || cur.textContent === ' ' || cur.textContent === '\n' || cur.classList.contains('correct')) {
+      logExtra(k);
       await handleExtra(k, textDisplay, hideControl);
     } else {
+      if (k === cur.textContent) logCorrect(k);
+      else                        logIncorrect(k);
       await handleChar(k, textDisplay, hideControl);
     }
   }
@@ -1083,21 +1543,42 @@ async function onKey(e) {
   const totalErrors = incorrectCount + skippedCount + extraCount;
   const totalAttempted = correctCount + totalErrors;
 
-  wpmSpan.textContent = `WPM: ${calculateWPM(startTime, correctCount)}`;
+  const newErrors    = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
+  const strictMode   = document.getElementById('endOnMistakeCheckbox')?.checked === true;
+  const addedCorrect = Math.max(0, correctCount - prevCorrect);
+  const addedError   = newErrors > prevErrors;
+  noteMetrics(Date.now(), addedCorrect, addedError);
+
+  // --- live WPM (time-gated) ---
+  const elapsedMs = startTime ? (Date.now() - startTime) : 0;
+
+  let liveWpm = null;
+  if (elapsedMs < WARMUP_MS) {
+    wpmSpan.textContent = 'WPM: ...';
+  } else {
+    liveWpm = getLiveWPM(2000); // 2s rolling window
+    wpmSpan.textContent = `WPM: ${liveWpm}`;
+  }
+
+  // accuracy stays live as before
   accSpan.textContent = `Accuracy: ${calculateAccuracy(totalAttempted, correctCount)}%`;
+  
+  // latch the very-first key outcome for this run
+  if (!firstKeySeen) {
+    firstKeyMistake = addedError && addedCorrect === 0;
+    firstKeySeen = true;
+  }
 
+  if (strictMode && newErrors > prevErrors) endGame();
 
-  const newErrors = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
-  const strictMode = document.getElementById('endOnMistakeCheckbox')?.checked === true;
-
-  if (strictMode && newErrors > oldErrors) endGame();
-
-  // End if WPM <
-  if (document.getElementById('endWpmToggle')?.checked && totalAttempted > 0) {
+  // --- End if WPM < (time-gated) ---
+  if (document.getElementById('endWpmToggle')?.checked && elapsedMs >= WARMUP_MS) {
     const minWPM = parseInt(document.getElementById('endWpmValue').value, 10);
-    const currentWPM = parseInt(wpmSpan.textContent.replace('WPM: ', ''), 10);
+    const currentWPM = liveWpm ?? getLiveWPM(2000);
     if (!isNaN(minWPM) && currentWPM < minWPM) endGame();
   }
+
+
 
   // End if Accuracy <
   if (document.getElementById('endAccToggle')?.checked && totalAttempted > 0) {
@@ -1144,10 +1625,12 @@ async function onKey(e) {
   if (isParagraphs) {
     if (currentIndex >= originalLength - 50) {
       await appendTyping(textDisplay, hideControl);
+      setWordsForHistoryFromChars();
     }
   } else {
     if (wordLimit === 0 && currentIndex >= originalLength - 50) {
       await appendTyping(textDisplay, hideControl);
+      setWordsForHistoryFromChars();
     }
   }
 
