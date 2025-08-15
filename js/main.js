@@ -221,17 +221,41 @@ function buildResultsSettingsSummary() {
   const finalWpm = readFinalWpm();
   setAvgOverrideForRun(Number.isFinite(finalWpm) ? finalWpm : null);
 
-  // Always show the graph, even if the first key was a mistake
-  const ms = getTimerDuration() > 0
-    ? getTimerDuration() * 1000
-    : (Date.now() - startTime);
-  renderRunGraph(host, ms);
+  // Always show the graph. Let metrics use the last sample time so the X-axis
+  // stops where the run actually ended (early cutoffs included).
+  renderRunGraph(host, null);
   }
 
+}
 
+// --- Remove legacy ESC/TAB lines in the results screen (old copy) ---
+function removeLegacyResultsHints() {
+  const rs = document.getElementById('resultsScreen');
+  if (!rs) return;
 
+  // Old DOM hooks from previous builds
+  rs.querySelectorAll(
+    '#resultsEscTip, #resultsTabTip, .results-esc-hint, .results-tab-hint, .legacy-results-hint, .esc-tip, .tab-tip'
+  ).forEach(n => n.remove());
 
-
+  // Text-node fallback: match the exact old sentences
+  const patterns = [
+    /ESC\s+to\s+go\s+back\s+to\s+settings\s+and\s+change\s+stuff/i,
+    /TAB\s+to\s+play\s+the\s+same\s+game/i
+  ];
+  const walker = document.createTreeWalker(rs, NodeFilter.SHOW_TEXT);
+  const toRemove = [];
+  while (walker.nextNode()) {
+    const txt = walker.currentNode.nodeValue || '';
+    if (patterns.some(re => re.test(txt))) toRemove.push(walker.currentNode);
+  }
+  toRemove.forEach(node => {
+    const p = node.parentNode;
+    if (!p) return;
+    p.removeChild(node);
+    // If that wrapper is now empty, remove it too
+    if (!p.textContent.trim() && !p.children.length) p.remove();
+  });
 }
 
 
@@ -289,6 +313,8 @@ function endGame() {
 
   // Let listeners know results just painted
   window.dispatchEvent(new Event('capy:resultsPainted'));
+  removeLegacyResultsHints();
+
 }
 
 
@@ -445,9 +471,11 @@ function watchResultsScreenForSettings() {
     // Wait a tick so the box/values finish painting, then rebuild chips + history
     requestAnimationFrame(() => {
       buildResultsSettingsSummary();
-      renderTypingHistory(); // <-- also render history whenever the box opens
+      renderTypingHistory();                 // keep history fresh
       tagTargetTextBoxForCertificate();
+      removeLegacyResultsHints();            // <-- kill the old ESC/TAB lines
     });
+
   };
 
   // Rebuild whenever the hidden class toggles off

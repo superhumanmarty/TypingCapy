@@ -1651,6 +1651,174 @@ body.game-ended #wordProgressFill {
   border-radius: 6px;
 }
 
+/* Big, bold keycaps for shortcuts */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .12rem .5rem;
+  border-radius: 8px;
+  border: 1px solid var(--box-border);
+  background: color-mix(in srgb, var(--box-bg) 82%, transparent);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
+  font-weight: 900;
+  letter-spacing: .03em;
+  line-height: 1;
+}
+
+/* Make ESC and TAB pop using theme colors */
+.keycap.esc { color: var(--header-color); border-color: var(--header-color); }
+.keycap.tab { color: var(--stats-color);  border-color: var(--stats-color);  }
+
+/* Layout for the hints inside the results screen */
+.results-screen .results-hints{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.results-screen .results-hints .hint{
+  color: var(--correct-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.results-screen .results-hints .keycap{
+  margin-right: .5rem;
+  font-size: 1.05rem;
+}
+
+/* === GAME LIMITS: hide title & captions; maximize icons === */
+#limitsHero .hero-title { 
+  display: none !important; 
+}
+
+#limitsHero .limit-btn .btn-label { 
+  display: none !important; 
+}
+
+/* shrink card padding so the icon can grow */
+#limitsHero .limit-cell{
+  padding: .25rem !important;
+}
+
+/* let the image control the height */
+#limitsHero .limit-btn{
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+/* make the icon fill the card width */
+#limitsHero .limit-btn img{
+  display: block;
+  width: 100% !important;     /* fill the button/card */
+  height: auto !important;    /* keep aspect ratio */
+  max-height: 180px;          /* tweak if you want taller */
+  object-fit: contain;
+}
+
+/* --- Tiny-width containment: keep content inside the big pills --- */
+
+/* Clip children to the pill/card borders (no visual spillover) */
+#hidePill,
+#highlightPill,
+#typedErrorsPill,
+#ghostCursorSettings,
+.keyboard-pill,
+.display-pill,
+.options-2,
+#hideOptions,
+#highlightOptions,
+.split-pill,
+.select-pill,
+.settings-hero,
+#limitsHero .limit-cell {
+  position: relative;
+  overflow: hidden;           /* key line: contain contents */
+  border-radius: 12px;        /* ensure clipping respects corners */
+}
+
+/* Make immediate children shrink rather than overflow */
+#hidePill > *,
+#highlightPill > *,
+#typedErrorsPill > *,
+#ghostCursorSettings > *
+.keyboard-pill > *,
+.display-pill > *,
+.options-2 > *,
+#hideOptions > *,
+#highlightOptions > *,
+.split-pill > *,
+.select-pill > *,
+.settings-hero > *,
+#limitsHero .limit-cell > * {
+  min-width: 0;               /* flex/grid overflow fix */
+  max-width: 100%;
+}
+
+/* Allow long labels/titles to wrap instead of pushing out */
+.pill-name,
+.hero-title,
+.limit-btn .btn-label {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Grids can shrink on very narrow screens */
+#limitsHero .limits-grid,
+#togglesSettings {
+  min-width: 0;
+}
+
+/* == Compact settings (no horizontal scroll) + hide ads on narrow == */
+
+/*  A) Kill any leftover sideways scroll and track widths */
+.settings-panel {
+  overflow-x: hidden !important;
+}
+.settings-panel .settings-group,
+.settings-panel .settings-hero {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  transform: none !important; /* override older scale-from-scroll rules */
+}
+
+/*  B) When the viewport gets narrower, drop the ad column */
+@media (max-width: 1100px) {
+  #ad-left { display: none !important; }
+}
+
+/*  C) Gentle shrink of the settings contents on small viewports
+      (keeps everything visible without sideways scrolling) */
+.settings-panel { --ui-scale: 1; }
+
+@media (max-width: 900px) {  .settings-panel { --ui-scale: .97; } }  /* tiny shrink */
+@media (max-width: 760px) {  .settings-panel { --ui-scale: .94; } }  /* a hair more */
+
+/* Prefer zoom when the engine supports it (Chrome/Edge/Safari) */
+@supports (zoom: 1) {
+  .settings-panel { zoom: var(--ui-scale); }
+}
+
+/* Firefox fallback: scale the panel’s children (not the panel box) */
+@supports not (zoom: 1) {
+  .settings-panel > * {
+    transform: scale(var(--ui-scale)) !important; /* <-- add !important */
+    transform-origin: left top;
+  }
+  .settings-panel {
+    padding-right: calc((1 - var(--ui-scale)) * 24px);
+  }
+}
+
+
+
+
+
 
 
 

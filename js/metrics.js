@@ -104,6 +104,9 @@ export function renderRunGraph(hostEl, durationMs) {
 
   // compute domain
   const T = Math.max(1000, durationMs || (samples.at(-1)?.t ?? 0)); // >= 1s
+  const tooShort = T < 4000; // < 4s → force flat-top at final/avg WPM
+
+
 
   // Top of the plot is the actual peak speed (fallback to 1 to avoid /0)
   const maxReached = samples.reduce((m, s) => Math.max(m, s.wpm), 0);
@@ -161,41 +164,36 @@ export function renderRunGraph(hostEl, durationMs) {
   maxWpm = Math.max(maxWpm, avgWpm || 0);
 
 
-  // Keep these separate so flat-top only happens when Final > sampled peak
   const finalBeatsPeak = (_avgOverride != null) && (_avgOverride > maxReached);
 
-  // Hide the MAX label if it's only a little above avg/final (<= 3 WPM)
   const CLOSE_DIFF = 3;
   const closeToAvg =
     (avgWpm || 0) > 0 &&
     maxReached >= (avgWpm || 0) &&
     (maxReached - (avgWpm || 0)) <= CLOSE_DIFF;
 
-  const suppressMaxLabel = finalBeatsPeak || closeToAvg;
+  // If the run was < 3s, always show a flat line at the top using final/avg WPM,
+  // and don’t show a separate MAX label.
+  const forceFlatTopLine = finalBeatsPeak || tooShort;
+  const suppressMaxLabel = finalBeatsPeak || closeToAvg || tooShort;
 
-  // Only do flat-top when Final beats sampled peak (not for the <=3 rule)
-  const forceFlatTopLine = finalBeatsPeak;
 
   // Lock the scale so y(avgWpm) sits exactly at the top
   if (forceFlatTopLine) {
     maxWpm = Math.max(1, avgWpm);
   }
   
-  // Always add a little headroom so labels/lines never touch the top
+  // Add headroom unless we’re intentionally drawing a flat-top at the very top
   const HEADROOM_FRAC = 0.06;   // 6% extra space
   const HEADROOM_MIN_PX = 8;    // or at least 8px visually
 
-  {
-    // base includes either sampled peak or the avg/final if that was higher
+  if (!forceFlatTopLine) {
     const domainBase = Math.max(maxWpm, avgWpm || 0);
-
-    // convert a few pixels of padding to "WPM units" at this canvas height
-    const pxToWpm = domainBase / (H - P.t - P.b);      // innerH
-    const extraWpm = Math.max(domainBase * HEADROOM_FRAC,
-                              pxToWpm * HEADROOM_MIN_PX);
-
-    maxWpm = domainBase + extraWpm;  // final y-scale with headroom
+    const pxToWpm = domainBase / (H - P.t - P.b); // innerH
+    const extraWpm = Math.max(domainBase * HEADROOM_FRAC, pxToWpm * HEADROOM_MIN_PX);
+    maxWpm = domainBase + extraWpm;
   }
+
 
   // Precompute the avg label Y (text baseline)
   let yAvgPx = null;

@@ -342,6 +342,11 @@
           </div>
         </div>
         <button id="restartButton" class="restart-button">Start New Session</button>
+        <!-- Shortcut hints inside the results box -->
+        <div class="results-hints" id="resultsHints">
+          <div class="hint"><span class="keycap esc">ESC</span> for new game</div>
+          <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
+        </div>
         <div id="runGraph" class="run-graph"></div>
       </div>
       <!-- Keyboard Diagram -->
@@ -352,8 +357,9 @@
   </div>
 
   <!-- Focus-mode hint labels (visible only in focus mode) -->
-  <div class="focus-hint left" id="hintEsc">ESC to end and go back and change stuff</div>
-  <div class="focus-hint right" id="hintTab">TAB to restart</div>
+  <div class="focus-hint left"  id="hintEsc"><span class="keycap esc">ESC</span> for new game</div>
+  <div class="focus-hint right" id="hintTab"><span class="keycap tab">TAB</span> to retry</div>
+
 
   <script type="module" src="./js/focusMode.js"></script>
   <script type="module" src="./js/main.js"></script>

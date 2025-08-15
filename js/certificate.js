@@ -105,6 +105,57 @@ function sanitizeFilePart(s) {
   return (s || 'typist').replace(/[^\w\-]+/g, '_').slice(0, 40);
 }
 
+// --- styles for the CERTIFICATE button ---
+function ensureCertificateButtonStyles() {
+  if (document.getElementById('certificate-btn-style')) return;
+  const s = document.createElement('style');
+  s.id = 'certificate-btn-style';
+  s.textContent = `
+  /* Make the CERTIFICATE button a big pill and match theme */
+  #downloadCertificateButton.certificate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    padding: 12px 18px;
+    border-radius: 9999px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1;
+    border: 1px solid rgba(255,255,255,.16);
+    background: var(--accent, var(--primary, #1f63ff));
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+    transition: transform .06s ease, box-shadow .12s ease, filter .12s ease;
+  }
+  #downloadCertificateButton.certificate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.08);
+    filter: brightness(1.02);
+  }
+  #downloadCertificateButton.certificate-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 14px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  /* Keep spacing consistent in the results actions row */
+  .results-actions #downloadCertificateButton.certificate-btn { margin-left: .5rem; }
+  #downloadCertificateButton.certificate-btn .icon { font-size: 1.05rem; opacity: .95; }
+  @media (max-width: 520px) {
+    /* Allow it to stretch and look good on narrow screens */
+    #downloadCertificateButton.certificate-btn { width: 100%; justify-content: center; }
+    .results-actions #downloadCertificateButton.certificate-btn { margin-left: 0; margin-top: .5rem; }
+  }
+  /* Floating fallback positioning */
+  #downloadCertificateButton.certificate-fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 99999;
+  }
+  `;
+  document.head.appendChild(s);
+}
+
+
 // Tries the explicit tag first, then common ids/classes, then a heading fallback.
 function findTargetSection(rs) {
   if (!rs) return null;
@@ -228,9 +279,145 @@ export async function generateCertificate(fullName) {
 // Also put it on window as a safety rope for inline callers
 window.capyGenerateCertificate = generateCertificate;
 
+
+// --- nice in-game name dialog ----------------------------------------------
+function ensureCertificateNameDialogStyles() {
+  if (document.getElementById('cert-name-style')) return;
+  const s = document.createElement('style');
+  s.id = 'cert-name-style';
+  s.textContent = `
+  /* overlay */
+  .capy-cert-overlay {
+    position: fixed; inset: 0; z-index: 100000;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(3px);
+    animation: capyFadeIn .12s ease-out;
+  }
+  @keyframes capyFadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+  /* card */
+  .capy-cert-card {
+    width: min(520px, 92vw);
+    background: var(--panel-bg, #0d1117);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .capy-cert-title {
+    font-weight: 800; font-size: 1.05rem; margin-bottom: .5rem;
+  }
+  .capy-cert-help {
+    opacity: .8; font-size: .9rem; margin-bottom: .9rem;
+  }
+
+  .capy-cert-input {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;          /* <— fixes the overflow */
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #0b1220;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.18);
+    outline: none;
+    font-size: 1rem;
+    -webkit-appearance: none;        /* Safari: consistent sizing */
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  .capy-cert-input:focus {
+    border-color: var(--accent, var(--primary, #1f63ff));
+    box-shadow: 0 0 0 3px rgba(31,99,255,.25);
+  }
+  .capy-cert-input.invalid {
+    border-color: #f75f5f;
+    box-shadow: 0 0 0 3px rgba(247,95,95,.25);
+  }
+
+  .capy-cert-actions {
+    display: flex; gap: .5rem; justify-content: flex-end; margin-top: 14px;
+  }
+
+  /* buttons (fallback styles in case your global .btn styles aren’t present) */
+  .capy-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 14px; border-radius: 9999px; border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06); color: #fff; font-weight: 700; cursor: pointer;
+  }
+  .capy-btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
+  .capy-btn.primary {
+    background: var(--accent, var(--primary, #1f63ff));
+    box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+  `;
+  document.head.appendChild(s);
+}
+
+/** Opens a pretty modal asking for the name. Resolves string or null. */
+function askNameForCertificate() {
+  ensureCertificateNameDialogStyles();
+
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'capy-cert-overlay';
+    overlay.innerHTML = `
+      <div class="capy-cert-card" role="dialog" aria-modal="true" aria-labelledby="certTitle">
+        <div id="certTitle" class="capy-cert-title">Enter your first and last name</div>
+        <div class="capy-cert-help">This will be printed on your certificate.</div>
+        <input id="certNameInput" class="capy-cert-input" type="text" placeholder="ex: Michael Jordan" maxlength="80" />
+        <div class="capy-cert-actions">
+          <button class="capy-btn" id="certCancelBtn" type="button">Cancel</button>
+          <button class="capy-btn primary" id="certOkBtn" type="button">Continue</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('#certNameInput');
+    const btnOk = overlay.querySelector('#certOkBtn');
+    const btnCancel = overlay.querySelector('#certCancelBtn');
+
+    const close = (val) => {
+      overlay.remove();
+      resolve(val);
+    };
+
+    const submit = () => {
+      const v = (input.value || '').trim();
+      if (!v) {
+        input.classList.add('invalid');
+        input.focus();
+        return;
+      }
+      close(v);
+    };
+
+    btnOk.addEventListener('click', submit);
+    btnCancel.addEventListener('click', () => close(null));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close(null); // click outside to cancel
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit();
+      if (e.key === 'Escape') close(null);
+      if (input.classList.contains('invalid')) input.classList.remove('invalid');
+    });
+
+    // focus after paint
+    setTimeout(() => { input.focus(); input.select(); }, 0);
+  });
+}
+
 // ---------- button wiring ----------
 
 export function setupCertificate() {
+  // load styles once
+  ensureCertificateButtonStyles();
+
   // Find an existing results container if present (but don't depend on it)
   const findResultsRoot = () =>
     document.querySelector('#resultsScreen, .results-screen, .results, [data-results]') ||
@@ -238,7 +425,7 @@ export function setupCertificate() {
 
   const tagTargetGlobally = () => {
     const el = document.querySelector(
-      '[data-cert-capture="target"], ' + // already tagged?
+      '[data-cert-capture="target"], ' +
       '[data-target-text], ' +
       '#resultsTargetText, #targetTextBlock, #targetText, #targetTextDisplay, ' +
       '.target-text, .targetText, .target-words, .results-target'
@@ -248,6 +435,7 @@ export function setupCertificate() {
     }
   };
 
+  // Try to inject the button inside the results panel
   const ensureInlineButtonIfPossible = () => {
     const rs = findResultsRoot();
     if (!rs) return false;
@@ -257,7 +445,8 @@ export function setupCertificate() {
     btn.id = 'downloadCertificateButton';
     btn.type = 'button';
     btn.className = 'btn btn-primary certificate-btn';
-    btn.textContent = 'CERTIFICATE';
+    btn.innerHTML = '<span class="icon" aria-hidden="true">🏅</span><span>CERTIFICATE</span>';
+    btn.setAttribute('aria-label', 'Download certificate as PDF');
 
     (rs.querySelector('.results-actions') ||
      rs.querySelector('.results-buttons') ||
@@ -266,7 +455,9 @@ export function setupCertificate() {
     ).appendChild(btn);
 
     btn.addEventListener('click', async () => {
-      const fullName = (window.prompt('Enter your first and last name for the certificate:', '') || '').trim();
+      const fullName = await askNameForCertificate();
+      if (!fullName) return;
+      await generateCertificate(fullName);
       if (!fullName) return;
       await generateCertificate(fullName);
     });
@@ -275,23 +466,27 @@ export function setupCertificate() {
     return true;
   };
 
+  // Floating fallback button if we can't place inline
   const ensureFloatingButton = () => {
     if (document.getElementById('downloadCertificateButton')) return;
+
     const btn = document.createElement('button');
     btn.id = 'downloadCertificateButton';
     btn.type = 'button';
-    btn.textContent = 'CERTIFICATE';
-    btn.setAttribute('style',
-      'position:fixed;right:16px;bottom:16px;z-index:99999;padding:12px 16px;' +
-      'border-radius:12px;border:none;font-weight:700;cursor:pointer;' +
-      'box-shadow:0 6px 18px rgba(0,0,0,.25);background:#1f63ff;color:#fff;'
-    );
+    btn.className = 'btn btn-primary certificate-btn certificate-fab';
+    btn.innerHTML = '<span class="icon" aria-hidden="true">🏅</span><span>CERTIFICATE</span>';
+    btn.setAttribute('aria-label', 'Download certificate as PDF');
+
     document.body.appendChild(btn);
+
     btn.addEventListener('click', async () => {
-      const fullName = (window.prompt('Enter your first and last name for the certificate:', '') || '').trim();
+      const fullName = await askNameForCertificate();
+      if (!fullName) return;
+      await generateCertificate(fullName);
       if (!fullName) return;
       await generateCertificate(fullName);
     });
+
     tagTargetGlobally();
   };
 
@@ -319,3 +514,4 @@ export function setupCertificate() {
   const iv = setInterval(tryWire, 400);
   setTimeout(() => clearInterval(iv), 10000);
 }
+
