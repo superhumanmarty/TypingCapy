@@ -1,0 +1,51 @@
+/* --- "Show typed errors" pill ----------------------------------- */
+#typedErrorsPill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;            /* label above box */
+  gap: .45rem;
+  padding: .9rem 1rem;
+  min-height: 84px;                  /* matches your display pills */
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+}
+#typedErrorsPill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+#typedErrorsPill .typed-preview {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  transform: scale(.98);
+}
+
+#typedErrorsPill .te-label {
+  color: var(--incorrect-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: .02em;
+}
+
+#typedErrorsPill .te-box {
+  color: var(--incorrect-color);
+  font-weight: 800;
+  font-size: 1.15rem;
+  padding: .2rem .5rem;
+  border: 2px solid var(--incorrect-color);
+  border-radius: 8px;
+  background: var(--body-bg);
+  line-height: 1;
+  box-shadow: 0 0 0 3px var(--body-bg) inset; /* matches your screenshot vibe */
+}

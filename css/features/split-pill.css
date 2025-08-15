@@ -1,0 +1,77 @@
+/* Tall split pills (same footprint as your big display pills) */
+.split-pill {
+  --split-pill-height: 84px;
+  display: flex;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  min-height: var(--split-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  overflow: hidden;                 /* keeps corners crisp */
+  margin: .6rem auto 0;
+}
+
+/* halves */
+.split-half {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .9rem 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+  background: transparent;
+  border: 0;
+  color: var(--correct-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* vertical divider between halves */
+.split-half.right {
+  border-left: 1px solid var(--box-border);
+}
+
+/* hover only when enabled */
+.split-half:not([aria-disabled="true"]):hover {
+  background: rgba(255,255,255,0.07);
+}
+
+/* active (ON) */
+.split-half.is-on {
+  background: rgba(255,255,255,0.10);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+  border-color: var(--header-color);
+}
+
+/* disabled (can’t be pressed) */
+.split-half[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+  pointer-events: none; /* makes it truly unclickable */
+}
+
+.split-half.is-on {
+  color: #39ff14; /* match your neon highlight vibe */
+  font-weight: 800;
+}
+
+/* 1) 50/50 halves for both split pills (perfect center divider) */
+#numbersSplit .split-half,
+#punctSplit .split-half {
+  box-sizing: border-box !important;
+  flex: 0 0 50% !important;   /* exactly half */
+  max-width: 50% !important;
+  width: 50% !important;
+  min-width: 0 !important;
+  padding: .5rem .6rem !important; /* consistent padding */
+  text-align: center;
+}
+
+/* keep the middle line; it will now sit dead-center */
+#numbersSplit .split-half.right,
+#punctSplit .split-half.right {
+  border-left: 1px solid var(--box-border) !important;
+}

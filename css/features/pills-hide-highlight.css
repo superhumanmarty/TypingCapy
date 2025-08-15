@@ -1,0 +1,226 @@
+/* ==== Display pills (Hide / Highlight) — final overrides ==== */
+
+/* Main display pills — centered & taller */
+#hidePill,
+#highlightPill {
+  --display-pill-height: 84px;        /* control total height here */
+  display: flex;
+  flex-direction: column;             /* stack title over selected option */
+  align-items: center;                 /* center horizontally */
+  justify-content: center;             /* center vertically */
+  gap: 0.35rem;                        /* space between lines */
+  padding: 0.9rem 1rem;
+  min-height: var(--display-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  line-height: 1.15;
+  text-align: center;                  /* center text lines */
+}
+
+
+
+/* Title bits */
+
+#hidePill .pill-title,
+#highlightPill .pill-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+#hidePill .muted { opacity: .45; }
+#highlightPill .neon { color: #39ff14; }
+
+/* Selected option shown directly under the title, centered */
+#hideChoiceLabel,
+#highlightChoiceLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: .9;
+  margin: 0;
+  line-height: 1;     /* prevents vertical misalignment */
+  white-space: nowrap;
+}
+
+
+/* keep the title and the selected value perfectly inline */
+#hidePill .pill-title,
+#highlightPill .pill-title,
+#hideChoiceLabel,
+#highlightChoiceLabel {
+  font-size: 1rem;
+  line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+
+/* When pill is active, give a subtle glow */
+#hidePill.active,
+#highlightPill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Option rows occupy the exact same area as the pill they replace */
+#hideOptions,
+#highlightOptions {
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  min-height: 84px;        /* must match --display-pill-height */
+  box-sizing: border-box;  /* add this */
+}
+
+
+/* Each option = exactly 1/3 of the row */
+#hideOptions button,
+#highlightOptions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;                             /* fill grid cell vertically */
+  text-align: center;
+  padding: .55rem .6rem;                    /* a bit taller to match pill */
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  line-height: 1.1;
+  white-space: nowrap;                      /* keep labels on one line */
+  font-size: 0.9rem;                        /* smaller so all fit cleanly */
+  font-weight: 600;
+}
+
+#hideOptions button:hover,
+#highlightOptions button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+}
+
+
+/* Hide: 2 columns, 2 rows. Last option spans full width on row 2 */
+#hideOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;                       /* rows share the height */
+  gap: .5rem;
+}
+
+#hideOptions button {
+  padding: .62rem .6rem;   /* taller to match the main pill */
+  font-size: .9rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Highlight: 3 equal columns in one row */
+#highlightOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: .5rem;
+}
+
+#highlightOptions button {
+  padding: .62rem .6rem;   /* match Hide option height */
+  font-size: .9rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Pills for Hide/Highlight */
+.pill-row { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+
+.pill.wide { width: 100%; justify-content: space-between; display: flex; align-items: center; gap: 0.5rem; }
+.pill.option { display: inline-block; padding: 0.4rem 0.7rem; }
+.pill-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.pill-options.hidden { display: none; }
+
+.choice-label { margin-left: auto; opacity: 0.8; font-style: italic; }
+.muted { opacity: 0.35; }
+.neon { color: var(--highlight-color); }
+
+/* make the pill row keep its height when swapping */
+.pill-row { position: relative; }
+
+/* big pill spans column like your other pills */
+.pill-wide { width: 100%; }
+
+/* when showing choices, replace the big pill in-place */
+.pill-options.replace {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.pill-options.replace.hidden { display: none; }
+
+/* make the small options look like mini pills */
+.pill.option {
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  padding: 0.55rem 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.pill.option:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+}
+
+/* Shorter pills for Hide / Highlight */
+.pill-wide {
+  padding: 0.4rem 0.75rem; /* smaller height */
+  line-height: 1.2;
+}
+
+.pill-value {
+  margin-left: auto;  /* pushes right without breaking line */
+  opacity: 0.85;
+  font-style: italic;
+  white-space: nowrap; /* keeps it on one line */
+}
+
+/* Keep 🙈 and 🔦 on a single row */
+#hideWordsSettings,
+#highlightAheadSettings {
+  display: flex;            /* override the .settings default */
+  flex-direction: row;      /* <-- this was missing */
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;        /* don't wrap to a new line */
+}
+
+/* Let the dropdown size itself and not stretch weirdly */
+#hideWordsSettings select,
+#highlightAheadSettings select {
+  flex: 0 1 auto;           /* don't grow to full width */
+  max-width: 220px;         /* tweak if you want it narrower/wider */
+}
+
+/* Make "Current & Next" span both columns on the Hide grid */
+#hideCurrentNext { grid-column: 1 / span 2; }

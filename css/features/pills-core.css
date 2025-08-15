@@ -1,0 +1,254 @@
+/* --- pill settings UI --- */
+.settings.pill {
+  display: flex;               /* already there */
+  align-items: center;         /* keeps vertical centering */
+  justify-content: space-between; /* pushes option text to the far right */
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  margin: 0.25rem auto;
+}
+
+
+.settings.pill:focus-within,
+.settings.pill:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--header-color) 40%, transparent);
+}
+
+.settings.pill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+.pill-name {
+  flex: 1 1 auto;
+  color: var(--correct-color);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.pill-input {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--body-bg);
+}
+
+.pill-input input[type="number"] {
+  width: 4.2em;
+  background: transparent;
+  border: none;
+  color: var(--correct-color);
+  text-align: right;
+  outline: none;
+}
+
+/* single pill (strict mode) doesn’t split */
+.pill-single .pill-input { display: none; }
+
+/* Two-option layout that exactly replaces the big pill area */
+.options-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: .5rem;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  min-height: var(--display-pill-height);
+}
+.options-2 .option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--box-bg);
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.options-2 .option.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* Reusable tall “display” pill (same height/shape as your other big pills) */
+.display-pill {
+  --display-pill-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.9rem 1rem;
+  min-height: var(--display-pill-height);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  font-weight: 700;
+}
+
+/* 1) Make every pill-size container include borders/padding in width */
+#hidePill,
+#highlightPill,
+#typedErrorsPill,
+#ghostCursorSettings,
+.keyboard-pill,
+.display-pill,
+.options-2,
+#hideOptions,
+#highlightOptions,
+.split-pill,
+.select-pill,
+.settings-hero,
+.settings.pill {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* 2) Flex/grid children are allowed to shrink (prevents right overflow) */
+#hidePill > *,
+#highlightPill > *,
+#typedErrorsPill > *,
+#ghostCursorSettings > *,
+.settings-hero .hero-content,
+.options-2 > *,
+#hideOptions > *,
+#highlightOptions > *,
+.split-pill > *,
+.select-pill > *,
+.settings.inline-setting > * {
+  min-width: 0; /* critical for Safari/Chrome flexbox overflow */
+}
+
+/* 3) Buttons inside option grids never grow past the lane */
+#hideOptions button,
+#highlightOptions button,
+.options-2 .option,
+.split-half {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* 4) Long labels don’t push containers wider on tiny screens */
+#hideOptions button,
+#highlightOptions button,
+.options-2 .option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 5) Inline setting rows: let the select actually shrink */
+.settings.inline-setting .select-pill {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* anything inside each group (the pill boxes) won’t exceed the cap */
+.settings-group > *:not(h4) {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Center the labels when their number box is hidden */
+#minWPMSettings:has(#endWpmWrapper.hidden),
+#minAccuracySettings:has(#endAccWrapper.hidden) {
+  justify-content: center;     /* overrides the pill's space-between */
+}
+
+/* Center the text itself */
+#minWPMSettings .pill-name,
+#minAccuracySettings .pill-name {
+  text-align: center;
+}
+
+/* Keep "End if WPM <" and "End if Accuracy <" on one line */
+#minWPMSettings,
+#minAccuracySettings {
+  display: flex;
+  flex-direction: row;      /* override base.css column */
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;        /* change to wrap if you want small screens to break */
+}
+
+#minWPMSettings > label,
+#minAccuracySettings > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;             /* checkbox ↔ text spacing */
+  margin: 0;
+  white-space: nowrap;      /* keep the label text on one line */
+}
+
+#endWpmWrapper,
+#endAccWrapper {
+  display: inline-flex;     /* number box sits to the right, not below */
+  align-items: center;
+}
+
+/* --- Tiny-width containment: keep content inside the big pills --- */
+
+/* Clip children to the pill/card borders (no visual spillover) */
+#hidePill,
+#highlightPill,
+#typedErrorsPill,
+#ghostCursorSettings,
+.keyboard-pill,
+.display-pill,
+.options-2,
+#hideOptions,
+#highlightOptions,
+.split-pill,
+.select-pill,
+.settings-hero,
+#limitsHero .limit-cell {
+  position: relative;
+  overflow: hidden;           /* key line: contain contents */
+  border-radius: 12px;        /* ensure clipping respects corners */
+}
+
+/* Make immediate children shrink rather than overflow */
+#hidePill > *,
+#highlightPill > *,
+#typedErrorsPill > *,
+#ghostCursorSettings > *
+.keyboard-pill > *,
+.display-pill > *,
+.options-2 > *,
+#hideOptions > *,
+#highlightOptions > *,
+.split-pill > *,
+.select-pill > *,
+.settings-hero > *,
+#limitsHero .limit-cell > * {
+  min-width: 0;               /* flex/grid overflow fix */
+  max-width: 100%;
+}
+
+/* Allow long labels/titles to wrap instead of pushing out */
+.pill-name,
+.hero-title,
+.limit-btn .btn-label {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}

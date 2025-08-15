@@ -1,0 +1,25 @@
+/* Keyboard image pill */
+.keyboard-pill {
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  margin: .6rem auto 0;
+  justify-content: center; /* center image */
+}
+
+.keyboard-pill-img {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: 84px;              /* same height as pill */
+  object-fit: contain;       /* show whole image */
+  border-radius: 8px;
+  pointer-events: none;
+  background-color: var(--bg-color); /* optional, fills empty space */
+}
+
+/* “on” state matches other active pills */
+.keyboard-pill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}

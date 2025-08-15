@@ -1,0 +1,138 @@
+/* === Themed pill selects === */
+.select-pill {
+  --h: 56px;                /* height */
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100% - 2rem);
+  max-width: 540px;
+  min-height: var(--h);
+  margin: .6rem auto 0;
+  padding: 0;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+.select-pill.small {
+  --h: 44px;                /* compact for inline settings */
+  max-width: 360px;
+  margin: .4rem 0 0;
+}
+
+.select-pill:focus-within {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* native select reset + make it fill the pill */
+.select-pill select.ui-select {
+  position: absolute;
+  inset: 0;                     /* cover the whole pill */
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0 2.2rem 0 .9rem;    /* left padding + space for chevron */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--correct-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: normal;
+  cursor: pointer;
+}
+
+
+/* placeholder-ish dim for disabled */
+.select-pill select.ui-select:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Chevron (pure CSS, no data URI) */
+.select-pill::after {
+  content: "";
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  transform: translateY(-35%);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;  
+  border-left: .36rem solid transparent;
+  border-right: .36rem solid transparent;
+  border-top: .42rem solid #a3ffa3; /* matches your neon-ish accent */
+  opacity: .9;
+}
+
+/* Options text size (some browsers ignore this; native popup styling is limited on macOS) */
+.select-pill select.ui-select option {
+  font-size: 1.05rem;
+}
+
+/* Put these where selects live in “inline-setting” rows */
+.settings.inline-setting .select-pill {
+  margin: 0;                /* sit flush with label */
+}
+
+/* Make sure inline rows never cover their pill */
+.settings.inline-setting { 
+  position: relative;
+  overflow: visible;
+}
+
+/* In inline rows, keep the label in its lane */
+.settings.inline-setting label {
+  position: relative;
+  z-index: 1;           /* below the pill + select */
+  flex: 0 0 auto;       /* don't stretch over the pill */
+}
+
+/* Raise the pill above the label */
+.settings.inline-setting .select-pill {
+  position: relative;
+  z-index: 3;           /* sits above the label */
+  flex: 1 1 auto;       /* let it take the remaining width */
+}
+
+/* Chevron stays visually above pill bg but click-through */
+.select-pill::after {
+  z-index: 2;           /* below the actual <select> */
+  pointer-events: none; /* never block clicks */
+}
+
+
+/* Keep base styling everywhere EXCEPT inside #limitsHero, which has its own sizing */
+:not(#limitsHero) .btn-dropdown select {
+  width: 100%;
+  height: 36px;
+  padding: 0 .6rem;
+  border: 1px solid var(--box-border);
+  border-radius: 10px;
+  background: var(--body-bg);
+  color: var(--correct-color);
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Make emoji + dropdown sit on one line */
+.settings.inline-setting {
+  display: flex;
+  flex-direction: row;   /* <-- forces row, overrides .settings column */
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings.inline-setting label {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}

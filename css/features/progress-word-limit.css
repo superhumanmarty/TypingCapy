@@ -1,0 +1,34 @@
+/* Word Progress Bar */
+.word-progress {
+  margin-bottom: 1rem;
+  width: 200px; /* Smaller width for "little bar" */
+  height: 20px; /* Thicker to avoid line look */
+  background: var(--box-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 auto; /* Center it */
+  min-height: 20px; /* Reserve space */
+}
+.word-progress-fill {
+  height: 100%;
+  background: var(--stats-color);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.word-progress.hidden {
+  visibility: hidden; /* Hide but reserve space */
+}
+
+
+/* Progress Wrapper */
+.progress-wrapper {
+  position: relative;
+  height: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Never show the word-limit bar once the game is ended */
+body.game-ended #wordProgress,
+body.game-ended #wordProgressFill {
+  display: none !important;
+}

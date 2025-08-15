@@ -1,0 +1,28 @@
+/* utility */
+.sr-only {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* keep the old .hidden override strong */
+.hidden { display: none !important; }
+
+/* Transparent text for Hide */
+.transparent-text {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Neon green text for Highlight */
+.neon-green-text {
+  color: #00ff40;
+}
+
+/* 6) Last resort guard (only if you still see a tiny horizontal scroll) */
+html, body { overflow-x: hidden; }
+
+/*  B) When the viewport gets narrower, drop the ad column */
+@media (max-width: 1100px) {
+  #ad-left { display: none !important; }
+}

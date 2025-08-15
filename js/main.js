@@ -162,12 +162,12 @@ function buildResultsSettingsSummary() {
   const langLabel = document.querySelector('#languageSelector option:checked')?.textContent?.trim();
   if (langLabel) add(`Language: ${langLabel}`);
 
-  // Word list size / paragraphs — ONLY for human languages
+  // Word list size — ONLY for human languages
   const wls = document.getElementById('wordListSizeSelector');
   if (isHuman && wls && wls.options?.length > 0) {
-    if (wls.value === 'paragraphs') add('Real paragraphs');
-    else if (wls.value && !isNaN(parseInt(wls.value, 10))) add(`${wls.value} words`);
+    if (wls.value && !isNaN(parseInt(wls.value, 10))) add(`${wls.value} words`);
   }
+
 
   // Toggles: 123, !?, +=, @#& — ONLY for human languages (and only if that row is visible)
   const togglesVisible = isHuman && !document.getElementById('togglesSettings')?.classList.contains('hidden');
@@ -408,11 +408,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   function updateUIForLanguage() {
     const lang = languageSelector.value;
     const conf = configs[lang];
+
     const wordListSizeSettings = document.getElementById('wordListSizeSettings');
     const wordListSizeSelector = document.getElementById('wordListSizeSelector');
     wordListSizeSelector.innerHTML = '';
-    
-    if (conf.word_lists.length > 0 || conf.paragraphs) {
+
+    // ONLY word lists (no paragraphs)
+    if (Array.isArray(conf.word_lists) && conf.word_lists.length > 0) {
       wordListSizeSettings.classList.remove('hidden');
       conf.word_lists.forEach((size, index) => {
         const option = document.createElement('option');
@@ -421,25 +423,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (index === 0) option.selected = true;
         wordListSizeSelector.appendChild(option);
       });
-      if (conf.paragraphs) {
-        const option = document.createElement('option');
-        option.value = 'paragraphs';
-        option.textContent = 'Real Paragraphs';
-        wordListSizeSelector.appendChild(option);
-      }
     } else {
       wordListSizeSettings.classList.add('hidden');
     }
 
-    // Toggle punctuation/number/symbol controls only for human langs
+    // Toggles: show only for human langs (unchanged)
     const togglesSettings = document.getElementById('togglesSettings');
-    if (conf.type === 'human') {
-      togglesSettings.classList.remove('hidden');
-    } else {
-      togglesSettings.classList.add('hidden');
-    }
+    if (conf.type === 'human') togglesSettings.classList.remove('hidden');
+    else togglesSettings.classList.add('hidden');
 
-    // Russian disables keyboard guide (checkbox version)
+    // Russian disables keyboard guide (unchanged)
     const keyboardSettings = document.getElementById('keyboardDiagramSettings');
     const keyboardToggle = document.getElementById('keyboardDiagramToggle');
     if (lang === 'rus') {
@@ -449,18 +442,17 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
       keyboardSettings?.classList.add('disabled');
     } else {
-      if (keyboardToggle) {
-        keyboardToggle.disabled = false;
-      }
+      if (keyboardToggle) keyboardToggle.disabled = false;
       keyboardSettings?.classList.remove('disabled');
     }
 
-    // Reflect current toggle state in the UI
+    // Reflect keyboard toggle into panel
     const kbPanel = document.getElementById('keyboardDiagram');
     if (kbPanel && keyboardToggle) {
       kbPanel.classList.toggle('hidden', !keyboardToggle.checked);
     }
-}
+  }
+
 
 
 function watchResultsScreenForSettings() {
@@ -722,17 +714,7 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
 
     if (!btnEndless || !btnTimer || !btnWord || !timerSel || !wordSel) return;
 
-    // add this helper near the top of setupGameLimitsButtons()
-    function isParagraphsMode() {
-      const wlsSel = document.getElementById('wordListSizeSelector');
-      return !!wlsSel && wlsSel.value === 'paragraphs';
-    }
-
   async function setActive(mode) {
-    // Normalize first: Real Paragraphs cannot use Word limit
-    if (mode === 'word' && isParagraphsMode()) {
-      mode = 'endless';
-    }
 
     const isEndless = mode === 'endless';
     const isTimer   = mode === 'timer';
@@ -797,18 +779,11 @@ if (settingsRoot && !settingsRoot.dataset.refocusWired) {
   // button clicks
   btnEndless.addEventListener('click', () => setActive('endless'));
   btnTimer  .addEventListener('click', () => setActive('timer'));
-  btnWord   .addEventListener('click', () => {
-    if (btnWord.disabled || btnWord.getAttribute('aria-disabled') === 'true' || isParagraphsMode()) return;
-    setActive('word');
-  });
+  btnWord   .addEventListener('click', () => setActive('word'));
 
   // dropdown changes
   timerInlineSelect.addEventListener('change', () => {
     setActive('timer');   // always route through setActive
-  });
-  wordInlineSelect.addEventListener('change', () => {
-    if (btnWord.disabled || btnWord.getAttribute('aria-disabled') === 'true' || isParagraphsMode()) return;
-    setActive('word');    // always route through setActive
   });
 
 
@@ -995,11 +970,6 @@ function watchWordLimitRadios() {
   }
 }
 
-function getWordSizeOrMode() {
-  const el = document.getElementById('wordListSizeSelector');
-  return el && typeof el.value === 'string' ? el.value : null;
-}
-
 function setupThresholdToggle(groupId, radioName, wrapperId, defaultValue) {
   const group = document.getElementById(groupId);
   if (!group) return;
@@ -1118,63 +1088,33 @@ function wireSinglePill(pillId, checkboxId) {
 
 
 function enforceWordLimitAvailability() {
-
-  // If results overlay is up, always hide progress and bail
+  // Hide progress during results overlay
   if (document.body.classList.contains('game-ended')) {
     document.getElementById('wordProgress')?.classList.add('hidden');
     return;
   }
 
-  const wlsSel    = document.getElementById('wordListSizeSelector');
-  const wlSel     = document.getElementById('wordLimitSelector');
-  const progress  = document.getElementById('wordProgress');
+  const wlSel    = document.getElementById('wordLimitSelector');
+  const progress = document.getElementById('wordProgress');
 
-  // 3-button UI bits
-  const btnEndless        = document.getElementById('btnEndless');
-  const btnTimer          = document.getElementById('btnTimer');
-  const btnWord           = document.getElementById('btnWord');
-  const wordInline        = document.getElementById('wordInline');
-  const wordInlineSelect  = document.getElementById('wordLimitInlineSelect');
+  const btnWord          = document.getElementById('btnWord');
+  const wordInline       = document.getElementById('wordInline');
+  const wordInlineSelect = document.getElementById('wordLimitInlineSelect');
 
-  const isParagraphs = wlsSel && wlsSel.value === 'paragraphs';
+  // Always enable Word Limit controls now
+  if (btnWord) {
+    btnWord.removeAttribute('aria-disabled');
+    btnWord.disabled = false;
+  }
+  if (wordInlineSelect) wordInlineSelect.disabled = false;
 
-  if (isParagraphs) {
-    // Force Word Limit OFF & disable the selector
-    if (wlSel) {
-      wlSel.value = 'off';
-      wlSel.disabled = true;
-    }
-
-    // Hide the progress bar (WL bar is irrelevant)
-    progress?.classList.add('hidden');
-
-    // Disable the "Word" button & inline dropdown
-    if (btnWord) {
-      btnWord.setAttribute('aria-disabled', 'true');
-      btnWord.disabled = true;
-      btnWord.classList.remove('active', 'show-dropdown');
-      btnWord.setAttribute('aria-pressed', 'false');
-    }
-    if (wordInline) wordInline.classList.add('hidden');
-    if (wordInlineSelect) wordInlineSelect.disabled = true;
-
-  } else {
-    // Re-enable Word Limit controls outside of paragraphs mode
-    if (wlSel) wlSel.disabled = false;
-
-    if (btnWord) {
-      btnWord.removeAttribute('aria-disabled');
-      btnWord.disabled = false;
-    }
-    if (wordInlineSelect) wordInlineSelect.disabled = false;
-
-    // Show/hide WL progress bar only when Word Limit is actually on
-    if (progress) {
-      if (wlSel && wlSel.value === 'off') progress.classList.add('hidden');
-      else progress.classList.remove('hidden');
-    }
+  // Show progress bar only when Word Limit is ON
+  if (progress) {
+    if (wlSel && wlSel.value === 'off') progress.classList.add('hidden');
+    else progress.classList.remove('hidden');
   }
 }
+
 
 
 // Build the exact target words from the current run's required chars
@@ -1647,20 +1587,12 @@ async function onKey(e) {
 
 
 
-  // Append more text near end
-  const selectedOption = getWordSizeOrMode();
-  const isParagraphs = selectedOption === 'paragraphs';
-  if (isParagraphs) {
-    if (currentIndex >= originalLength - 50) {
-      await appendTyping(textDisplay, hideControl);
-      setWordsForHistoryFromChars();
-    }
-  } else {
-    if (wordLimit === 0 && currentIndex >= originalLength - 50) {
-      await appendTyping(textDisplay, hideControl);
-      setWordsForHistoryFromChars();
-    }
+  // Append more text near end (endless/random only)
+  if (wordLimit === 0 && currentIndex >= originalLength - 50) {
+    await appendTyping(textDisplay, hideControl);
+    setWordsForHistoryFromChars();
   }
+
 
   // Re-apply highlight & hide based on current modes
   const widx = getCurrentWord(chars, currentIndex);

@@ -1,0 +1,50 @@
+/* Hidden word */
+.hidden-word { visibility: hidden; }
+
+.hidden-word.current {
+  /* show caret but keep text hidden */
+  visibility: visible !important;
+  color: transparent;
+}
+
+/* Show ghost caret on hidden words without revealing the text */
+.hidden-word.ghost {
+  visibility: visible !important;
+  color: transparent; /* keep letters invisible */
+}
+
+/* — look-ahead "color" only, no background box — */
+.ahead1,
+.ahead2 {
+  background: none;
+  color: var(--highlight-color);
+}
+
+.blink {
+  /* make sure this animation always wins over any .aheadN color */
+  animation: blink-color 1s steps(1) infinite !important;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Ghost caret */
+.char.ghost::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  width: 2px;
+  height: 1em;
+  background: var(--stats-color); /* Change to different color for distinction, e.g. green */
+  opacity: 0.7; /* Slightly higher opacity */
+  animation: blink 1s steps(1) infinite;
+  z-index: 1;
+}
+
+/* Adjust for spaces/newlines */
+.char.space.ghost::before,
+.char.newline.ghost::before {
+  left: 0;
+}

@@ -1,0 +1,16 @@
+/* Timer Display — overlay above stats/words (no layout shift) */
+.timer-display {
+  position: absolute;
+  top: 15rem;                 /* sits below your error bubble at 9rem */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 18;                  /* under the error bubble (z:20), above stats/text */
+  margin: 0;                    /* no flow margin */
+  font-size: 1.2rem;
+  color: var(--stats-color);
+  font-weight: bold;
+  text-align: center;
+}
+.timer-display.hidden {
+  display: none;                /* fully remove overlay when hidden */
+}

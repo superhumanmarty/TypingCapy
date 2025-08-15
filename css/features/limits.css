@@ -1,0 +1,196 @@
+/* ==== GAME LIMITS hero (no icon) ==== */
+#limitsHero {
+  display: grid;
+  grid-template-columns: 1fr;   /* no left icon column */
+  grid-auto-rows: auto;
+  align-items: center;
+  gap: .6rem;
+}
+#limitsHero .hero-content { display: contents; }
+#limitsHero .hero-title { grid-column: 1; grid-row: 1; justify-self: start; }
+#limitsHero #timerSettings      { grid-column: 1; grid-row: 2; }
+#limitsHero #wordLimitSettings  { grid-column: 1; grid-row: 3; }
+
+
+/* === GAME LIMITS: 3-button switch ============================= */
+#limitsHero .limits-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+  margin-top: .4rem;
+}
+
+/* GAME LIMITS: card lives on the cell, not the button */
+#limitsHero .limit-cell{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .45rem;
+  padding: .7rem;
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* The button becomes a clean, stackable header area */
+#limitsHero .limit-btn{
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  min-height: 90px;      /* can grow; just a comfy minimum */
+  padding: .4rem 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Dropdown sits in normal flow and is shown only for the active mode */
+#limitsHero .btn-dropdown{
+  position: static;
+  display: none;
+  width: 100%;         /* was 72% */
+  max-width: 240px;    /* was 160px */
+  margin-top: .25rem;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+
+/* JS already toggles `.show-dropdown` on the button; use that to reveal the sibling */
+#limitsHero .limit-btn.show-dropdown + .btn-dropdown{ display: block; }
+
+#limitsHero .limit-cell { box-sizing: border-box; }
+#limitsHero .btn-dropdown select { max-width: 100%; } /* belt & suspenders */
+
+
+
+/* --- GAME LIMITS: dropdown sizing --- */
+#limitsHero .btn-dropdown select{
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;      /* ensures touch target */
+  height: auto;          /* lets padding define height */
+  line-height: normal;   /* avoids clipping on Safari/macOS */
+  padding: .4rem .6rem;  /* comfortable vertical space */
+  font-size: 0.70rem;    /* a touch smaller so long text fits */
+  max-width: 100%;
+}
+
+
+/* --- GAME LIMITS: remove boxes around the image on active/focus --- */
+#limitsHero .limit-btn.active{
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+#limitsHero .limit-btn:focus,
+#limitsHero .limit-btn:focus-visible{
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* make sure the icon never gets a border/outline */
+#limitsHero .limit-btn img{
+  display: block;
+  border: 0;
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* keep the highlight only on the card */
+#limitsHero .limit-cell:has(.limit-btn.active){
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+#limitsHero .limit-cell { align-items: stretch; }          /* let children fill width */
+#limitsHero .limit-btn  { width: 100%; align-items: center; }  /* keep contents centered */
+
+#limitsHero .limit-btn{
+  outline: none;
+  -webkit-tap-highlight-color: transparent; /* remove mobile tap glow */
+}
+
+/* === GAME LIMITS: make the whole card clickable (lower halves too) === */
+#limitsHero .limit-cell {
+  align-items: stretch;   /* let children fill width */
+  cursor: pointer;        /* signal clickability */
+  isolation: isolate;     /* keep any z-index scoped to this card */
+}
+
+#limitsHero .limit-btn {
+  flex: 1 1 auto;         /* stretch button to fill the full card height */
+  width: 100%;
+}
+
+/* Keep the dropdown interactive but not “owning” neighboring hit areas */
+#limitsHero .btn-dropdown {
+  position: static;       /* in-flow, no overlay */
+  z-index: 0;
+}
+
+#limitsHero .btn-dropdown,
+#limitsHero .btn-dropdown * {
+  cursor: auto;           /* normal cursor inside the dropdown */
+}
+
+/* Grids can shrink on very narrow screens */
+#limitsHero .limits-grid,
+#togglesSettings {
+  min-width: 0;
+}
+
+.limit-btn:active { transform: translateY(1px); }
+
+.limit-btn img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.limit-btn .btn-label {
+  font-weight: 700;
+  color: var(--correct-color);
+  line-height: 1.1;
+}
+
+.limit-btn.active {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--header-color);
+  box-shadow: inset 0 0 0 1px var(--header-color);
+}
+
+/* === GAME LIMITS: hide title & captions; maximize icons === */
+#limitsHero .hero-title { 
+  display: none !important; 
+}
+
+#limitsHero .limit-btn .btn-label { 
+  display: none !important; 
+}
+
+/* shrink card padding so the icon can grow */
+#limitsHero .limit-cell{
+  padding: .25rem !important;
+}
+
+/* let the image control the height */
+#limitsHero .limit-btn{
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+/* make the icon fill the card width */
+#limitsHero .limit-btn img{
+  display: block;
+  width: 100% !important;     /* fill the button/card */
+  height: auto !important;    /* keep aspect ratio */
+  max-height: 180px;          /* tweak if you want taller */
+  object-fit: contain;
+}

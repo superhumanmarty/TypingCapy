@@ -1,0 +1,35 @@
+/* Keyboard Diagram (overlay, no layout shift) */
+.typing-panel { position: relative; }
+
+.keyboard-diagram {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  margin-left: auto;
+  margin-right: auto;
+  width: min(686px, calc(100% - 24px));
+  max-width: 100%;
+  max-height: 21vh;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.keyboard-diagram.hidden { display: none; }
+
+.keyboard-diagram img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Responsive easing */
+@media (max-width: 1100px) {
+  .keyboard-diagram { width: min(600px, calc(100% - 24px)); }
+}
+@media (max-width: 900px) {
+  .keyboard-diagram { width: min(520px, calc(100% - 24px)); }
+}
+@media (max-width: 700px) {
+  .keyboard-diagram { width: min(480px, calc(100% - 24px)); }
+}
