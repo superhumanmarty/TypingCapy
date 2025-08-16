@@ -73,3 +73,15 @@ window.addEventListener('blur', () => {
     updateKeyboardImage();
   }
 });
+
+export function positionKeyboardDiagram() {
+  const panel = document.querySelector('.typing-panel');
+  const text  = document.getElementById('textDisplay');
+  const kd    = document.getElementById('keyboardDiagram');
+  if (!panel || !text || !kd || kd.classList.contains('hidden')) return;
+
+  const panelRect = panel.getBoundingClientRect();
+  const textRect  = text.getBoundingClientRect();
+  const top = (textRect.bottom - panelRect.top) + 12; // 12px gap
+  kd.style.top = `${top}px`;
+}
