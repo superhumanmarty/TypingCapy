@@ -1,4 +1,4 @@
-// focusMode.js
+// js/focusMode.js
 // Focus Mode controller
 // - Enters on first real typing key
 // - ESC: quit mid-game (no results), return to settings/ad layout and regenerate new text immediately

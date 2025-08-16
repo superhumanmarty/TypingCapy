@@ -1,3 +1,5 @@
+/* css/features/timer.css */
+
 /* Timer Display — overlay above stats/words (no layout shift) */
 .timer-display {
   position: absolute;
