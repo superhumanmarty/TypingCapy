@@ -151,6 +151,22 @@
   white-space: nowrap;
 }
 
+/* Better contrast for Hide/Highlight option buttons */
+#hideOptions button,
+#highlightOptions button {
+  color: #f7faff;                         /* bright text */
+  text-shadow: 0 1px 0 rgba(0,0,0,.35);   /* subtle lift on dark bg */
+}
+
+#hideOptions button:hover,
+#hideOptions button:focus,
+#highlightOptions button:hover,
+#highlightOptions button:focus {
+  color: #ffffff;                         /* keep bright on hover/focus */
+  outline: none;
+}
+
+
 /* Pills for Hide/Highlight */
 .pill-row { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
 
@@ -226,3 +242,56 @@
 
 /* Make "Current & Next" span both columns on the Hide grid */
 #hideCurrentNext { grid-column: 1 / span 2; }
+
+/* --- CRISP CORNERS: Hide/Highlight option buttons --- */
+#hideOptions button,
+#highlightOptions button {
+  /* stop the semi-transparent bg from painting under the 1px rounded border */
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+}
+
+#hideOptions button:hover,
+#hideOptions button:focus,
+#highlightOptions button:hover,
+#highlightOptions button:focus {
+  /* no inner stroke at the corners */
+  box-shadow: none;
+  outline: none;
+}
+
+/* === CRISP CORNERS for Hide/Highlight option buttons === */
+
+/* 1) Unify radius to 12px, drop the physical border, and draw a crisp stroke */
+#hideOptions button,
+#highlightOptions button {
+  border: 0;
+  border-radius: 12px;                       /* was 10px */
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+  box-shadow: 0 0 0 1px var(--box-border);   /* border replacement = crisp */
+}
+
+/* 2) Hover/focus: keep one clean stroke (no inset) */
+#hideOptions button:hover,
+#hideOptions button:focus,
+#highlightOptions button:hover,
+#highlightOptions button:focus {
+  box-shadow: 0 0 0 1.5px var(--header-color);
+  outline: none;
+}
+
+/* 3) Active state: one strong stroke (no inset) */
+#hideOptions button.active,
+#highlightOptions button.active {
+  box-shadow: 0 0 0 2px var(--header-color);
+}
+
+/* 4) Ensure the neon stroke doesn't get clipped by inner antialiasing */
+#hideOptions,
+#highlightOptions {
+  /* leave overflow default; the buttons themselves have the radius */
+  overflow: visible;
+}
+
+

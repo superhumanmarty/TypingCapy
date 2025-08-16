@@ -62,6 +62,10 @@ export function wireGlobalListeners({
     if (e.key === 'Tab' && !document.body.classList.contains('focus-mode')) {
       e.preventDefault();
 
+      // fresh run on TAB: reset error cap counter
+      window.capyErrors = 0;
+      window.dispatchEvent(new Event('capy:runReset'));
+
       sanitizeExistingText(textDisplay);
       setWordsForHistoryFromChars();
 

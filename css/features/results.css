@@ -149,3 +149,17 @@
   margin-right: .5rem;
   font-size: 1.05rem;
 }
+
+/* When the game has ended, hide the live game UI completely */
+body.game-ended #textDisplay,
+body.game-ended #stats,
+body.game-ended #timerDisplay,
+body.game-ended #wordProgress,
+body.game-ended #typedErrorDisplay {
+  display: none !important;
+}
+
+/* And make sure the results are definitely visible */
+body.game-ended #resultsScreen {
+  display: block !important;
+}

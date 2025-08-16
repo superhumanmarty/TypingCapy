@@ -77,3 +77,29 @@
 #punctSplit .split-half.right {
   border-left: 1px solid var(--box-border) !important;
 }
+
+/* === CRISP CORNERS for big split pills (123, +=, !?, @#&) === */
+.split-pill{
+  /* replace physical border with a single crisp ring */
+  border: 0;
+  border-radius: 12px;
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+  box-shadow: 0 0 0 1.5px var(--box-border);
+}
+
+/* hover/focus: keep the same solid ring (no corner thinning) */
+.split-pill:has(.split-half:hover),
+.split-pill:has(.split-half:focus-visible){
+  box-shadow: 0 0 0 1.5px var(--header-color);
+}
+
+/* selected (one side ON): upgrade the ring color/weight */
+.split-pill:has(.split-half.is-on){
+  box-shadow: 0 0 0 2px var(--header-color);
+}
+
+/* remove the inner inset ring that causes the fade */
+.split-half.is-on{
+  box-shadow: none !important;
+}

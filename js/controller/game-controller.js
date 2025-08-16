@@ -26,6 +26,14 @@ import { enforceWordLimitAvailability } from '../ui/limits.js';
 
 const WARMUP_MS = 2000;
 
+function maybeHitErrorCap() {
+  const on = document.getElementById('endErrToggle')?.checked;
+  if (!on) return;
+  const cap = parseInt(document.getElementById('endErrValue')?.value, 10);
+  if (!Number.isFinite(cap) || cap <= 0) return;
+  if ((window.capyErrors || 0) >= cap) endGame();
+}
+
 // module-scoped UI refs (set by initController)
 let refs = {
   textDisplay: null,
@@ -35,8 +43,6 @@ let refs = {
 
 // local run-state
 let gameLocked = false;
-let firstKeySeen = false;
-let firstKeyMistake = false;
 
 // ============ public API ============
 export function initController({ textDisplay, hideControl, highlightControl }) {
@@ -51,19 +57,31 @@ export function initController({ textDisplay, hideControl, highlightControl }) {
 export function resetGameLock() {
   gameLocked = false;
   document.body.classList.remove('game-ended');
+  document.getElementById('textDisplay')?.classList.remove('hidden');
+  document.getElementById('resultsScreen')?.classList.add('hidden');
+  document.getElementById('typedErrorDisplay')?.classList.add('hidden');
+
+  // fresh run: reset error cap counter
+  window.capyErrors = 0;
+  window.dispatchEvent(new Event('capy:runReset'));
 
   // clear any stale WL fill
   const wlFill = document.getElementById('wordProgressFill');
   if (wlFill) wlFill.style.width = '0%';
 
   enforceWordLimitAvailability();
-  firstKeySeen = false;
-  firstKeyMistake = false;
 }
 
 export function endGame() {
   gameLocked = true;
   document.body.classList.add('game-ended');
+
+   // Hide the live text + HUD; show results
+   document.getElementById('textDisplay')?.classList.add('hidden');
+   document.getElementById('stats')?.classList.add('hidden');
+   document.getElementById('typedErrorDisplay')?.classList.add('hidden');
+   document.getElementById('resultsScreen')?.classList.remove('hidden');
+   window.dispatchEvent(new Event('capy:timeup'));
 
   const wlBar = document.getElementById('wordProgress');
   if (wlBar) wlBar.classList.add('hidden');
@@ -134,6 +152,7 @@ export function setWordsForHistoryFromChars() {
 
 // key handlers (wire these in main.js after initController)
 export async function handleKeyDown(e) {
+  if (document.body.classList.contains('editing-threshold')) return; 
   if (document.body.classList.contains('game-ended') || isGameEnded() || gameLocked) return;
 
   // Ignore when a real control is focused (mouse-only <select> is allowed)
@@ -199,11 +218,17 @@ export async function handleKeyDown(e) {
     await handleSpace(textDisplay, hideControl);
     const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
     if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
+
+    // Now that history is logged, end the run if the error cap was reached.
+    maybeHitErrorCap();
   } else {
     const idx = currentIndex;
     const cur = idx < chars.length ? chars[idx] : null;
     if (!cur || cur.textContent === ' ' || cur.textContent === '\n' || cur.classList.contains('correct')) {
       logExtra(k);
+      // Typing when nothing is required here = one extra-char error
+      window.capyErrors = (window.capyErrors || 0) + 1;
+      maybeHitErrorCap();
       await handleExtra(k, textDisplay, hideControl);
     } else {
       if (k === cur.textContent) logCorrect(k);
@@ -220,7 +245,6 @@ export async function handleKeyDown(e) {
   const totalAttempted = correctCount + totalErrors;
 
   const newErrors    = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
-  const strictMode   = document.getElementById('endOnMistakeCheckbox')?.checked === true;
   const addedCorrect = Math.max(0, correctCount - prevCorrect);
   const addedError   = newErrors > prevErrors;
 
@@ -242,13 +266,6 @@ export async function handleKeyDown(e) {
   if (accSpan) {
     accSpan.textContent = `Accuracy: ${calculateAccuracy(totalAttempted, correctCount)}%`;
   }
-
-  if (!firstKeySeen) {
-    firstKeyMistake = addedError && addedCorrect === 0;
-    firstKeySeen = true;
-  }
-
-  if (strictMode && newErrors > prevErrors) endGame();
 
   // End if WPM < (after warmup only)
   if (document.getElementById('endWpmToggle')?.checked && elapsedMs >= WARMUP_MS) {
@@ -298,6 +315,7 @@ export async function handleKeyDown(e) {
 }
 
 export function handleKeyUp(e) {
+  if (document.body.classList.contains('editing-threshold')) return;
   if (document.body.classList.contains('game-ended') || isGameEnded()) return;
   handleKeyboardState(e);
 }

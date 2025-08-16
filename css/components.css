@@ -234,13 +234,3 @@
 
 /* reveal when the corresponding button is “active” */
 .limit-btn.show-dropdown + .btn-dropdown { display: block; }
-
-
-#timerInlineSelect,
-#wordLimitInlineSelect {
-  position: static !important;
-  inset: auto !important;
-  width: 100%;      /* fill the 160px overlay */
-  max-width: 100%;
-}
-

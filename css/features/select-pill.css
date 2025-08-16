@@ -138,3 +138,129 @@
   display: inline-flex;
   align-items: center;
 }
+
+/* ==== Enhanced pill selects (custom animated popup) ==== */
+
+.select-pill { position: relative; }
+.select-pill.enhanced { overflow: visible !important; } /* override any global overflow:hidden */
+
+/* Visually hide the native select but keep it in the DOM for a11y + events */
+.select-pill.enhanced > select.ui-select{
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%);
+  overflow: hidden; white-space: nowrap;
+  left: 0; top: 0; pointer-events: none;
+}
+
+/* Button that shows current value (sits where the select was) */
+.pill-select-btn{
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  min-height: var(--h,56px);
+  /* add right padding so text doesn't run under the chevron */
+  padding: 0 2.2rem 0 .9rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;  /* text at the left */
+  background: transparent;
+  border: 0;
+  color: var(--correct-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+/* Chevron pinned to the right */
+.pill-select-btn::after{
+  content: "";
+  position: absolute;
+  right: .9rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  border-left: .36rem solid transparent;
+  border-right:.36rem solid transparent;
+  border-top:  .42rem solid #a3ffa3;
+  opacity: .9;
+  margin: 0; /* was adding stray space */
+  transition: transform .15s ease;
+}
+.select-pill.open .pill-select-btn::after{
+  transform: translateY(-50%) rotate(180deg);
+}
+/* Popup menu — portaled to .settings-panel and positioned absolutely */
+.pill-select-menu{
+  position: absolute;                     /* overlay; never scrolls the settings column */
+  left: 0; top: 0;                     /* JS overwrites on open */
+  z-index: 10000;
+
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.55);
+  padding: .35rem;
+
+  font-size: 1.05rem;                  /* ensure readable size */
+  line-height: 1.35;
+
+  max-height: 320px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(.98);
+  pointer-events: none;
+  transition: opacity .16s ease, transform .2s cubic-bezier(.2,.7,.2,1), visibility 0s .16s;
+}
+
+/* When open */
+.pill-select-menu.is-open,
+.select-pill.open .pill-select-menu{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  transition: opacity .16s ease, transform .2s cubic-bezier(.2,.7,.2,1), visibility 0s;
+}
+
+/* Compact variant */
+.select-pill.small .pill-select-menu{ max-height: 260px; }
+
+/* One chevron only: hide the base arrow when using the enhanced button */
+.select-pill.enhanced::after,
+.select-pill:has(.pill-select-btn)::after,
+.select-pill.open::after {
+  content: none !important;
+}
+
+/* Options */
+.pill-select-menu .pill-option{
+  padding: .6rem .9rem;      /* bigger hit area */
+  border-radius: 10px;
+  color: var(--correct-color);
+  font-size: 1.05rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pill-select-menu .pill-option:hover,
+.pill-select-menu .pill-option.is-active{
+  background: rgba(255,255,255,.10);   /* subtle hover glow */
+}
+
+.pill-select-menu .pill-option.is-selected{
+  background: rgba(255,255,255,.06);
+  box-shadow: inset 0 0 0 2px var(--header-color); /* selected ring */
+}
+
+.pill-select-menu .pill-option[aria-disabled="true"]{
+  opacity:.5; pointer-events:none;
+}
+
+/* perf hint for the animated popup */
+.pill-select-menu { will-change: transform, opacity; }
+

@@ -83,11 +83,10 @@ export function buildResultsSettingsSummary() {
     const v = document.getElementById('endWpmValue')?.value;
     if (v) add(`End if WPM < ${v}`);
   }
-  if (document.getElementById('endAccToggle')?.checked) {
-    const v = document.getElementById('endAccValue')?.value;
-    if (v) add(`End if Accuracy < ${v}%`);
+  if (document.getElementById('endErrToggle')?.checked) {
+    const v = document.getElementById('endErrValue')?.value;
+    if (v) add(`End at ${v} errors`);
   }
-  if (document.getElementById('endOnMistakeCheckbox')?.checked) add('End on any mistake');
 
   const host = document.getElementById('runGraph');
   if (host) {

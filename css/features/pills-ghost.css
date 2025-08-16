@@ -98,3 +98,44 @@
 #ghostWpmWrapper input[type="number"] {
   width: 4em;
 }
+
+/* --- Smooth slide for the Ghost WPM editor (CSS only) --- */
+
+/* CLOSED baseline */
+#ghostWpmWrapper{
+  overflow: hidden;
+  max-height: 0;                 /* animate this */
+  opacity: 0;
+  transform: translateY(-6px);
+  margin-top: 0;
+
+  /* collapse box while closed */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+
+  transition:
+    max-height .28s cubic-bezier(.2,.7,.2,1),
+    opacity    .18s ease,
+    transform  .28s cubic-bezier(.2,.7,.2,1),
+    margin-top .28s ease,
+    padding    .28s ease,
+    border-width .28s ease,
+    border-color .28s ease;
+  will-change: max-height, opacity, transform;
+}
+
+/* OPEN */
+#ghostCursorSettings.active #ghostWpmWrapper,
+#ghostWpmWrapper.is-open{
+  max-height: 64px;              /* tall enough for the input row */
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: .35rem;
+
+  padding-top: .25rem !important;
+  padding-bottom: .25rem !important;
+  border-width: 1px !important;
+  border-color: var(--box-border) !important;
+}

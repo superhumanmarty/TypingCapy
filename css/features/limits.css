@@ -1,5 +1,8 @@
 /* css/features/limits.css */
 
+/* Unified icon area height for all three cards (closed state) */
+:root { --limit-icon-h: 100px; } /* tweak this number to match your Endless card */
+
 /* ==== GAME LIMITS hero (no icon) ==== */
 #limitsHero {
   display: grid;
@@ -23,48 +26,78 @@
   margin-top: .4rem;
 }
 
+/* Do NOT stretch other cards to match the tallest one; center them vertically */
+#limitsHero .limits-grid {
+  align-items: center; /* items keep their own height and are centered in the row */
+}
+
+#limitsHero .limit-cell {
+  align-self: center;  /* extra safety: each card centers within its grid area */
+}
+
+
 /* GAME LIMITS: card lives on the cell, not the button */
 #limitsHero .limit-cell{
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .45rem;
+  gap: 0;
   padding: .7rem;
   border: 1px solid var(--box-border);
   border-radius: 12px;
   background: rgba(255,255,255,0.05);
 }
 
-/* The button becomes a clean, stackable header area */
 #limitsHero .limit-btn{
   position: static;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: .4rem;
-  min-height: 90px;      /* can grow; just a comfy minimum */
-  padding: .4rem 0;
+  justify-content: center;
+  width: 100%;
+  height: var(--limit-icon-h);
+  min-height: var(--limit-icon-h);
+  padding: 0;
   border: 0;
   background: transparent;
 }
 
-/* Dropdown sits in normal flow and is shown only for the active mode */
+
+/* Closed state: no vertical space added */
 #limitsHero .btn-dropdown{
   position: static;
-  display: none;
-  width: 100%;         /* was 72% */
-  max-width: 240px;    /* was 160px */
-  margin-top: .25rem;
+  width: 100%;
+  max-width: 240px;
+  /* was: margin-top: .25rem; */
+  margin-top: 0;                 /* <-- keep cards same height when closed */
   padding: 0;
   background: transparent;
   box-shadow: none;
   border-radius: 10px;
+
+  overflow: hidden;
+  max-height: 0;                 /* closed */
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: max-height .25s ease, opacity .2s ease, transform .25s ease;
+}
+
+/* Open state: add the spacing only when expanded */
+#limitsHero .limit-btn.show-dropdown + .btn-dropdown{
+  margin-top: .25rem;            /* <-- move margin here */
+  max-height: 140px;             /* open */
+  opacity: 1;
+  transform: translateY(0);
 }
 
 
-/* JS already toggles `.show-dropdown` on the button; use that to reveal the sibling */
-#limitsHero .limit-btn.show-dropdown + .btn-dropdown{ display: block; }
+/* Motion-reduced users: snap open/closed */
+@media (prefers-reduced-motion: reduce){
+  #limitsHero .btn-dropdown{
+    transition: none;
+  }
+}
+
 
 #limitsHero .limit-cell { box-sizing: border-box; }
 #limitsHero .btn-dropdown select { max-width: 100%; } /* belt & suspenders */
@@ -120,15 +153,17 @@
 
 /* === GAME LIMITS: make the whole card clickable (lower halves too) === */
 #limitsHero .limit-cell {
-  align-items: stretch;   /* let children fill width */
-  cursor: pointer;        /* signal clickability */
-  isolation: isolate;     /* keep any z-index scoped to this card */
+  align-items: center;     /* center horizontally */
+  justify-content: center; /* center vertically as row grows */
+  cursor: pointer;
+  isolation: isolate;
 }
 
-#limitsHero .limit-btn {
-  flex: 1 1 auto;         /* stretch button to fill the full card height */
+#limitsHero .limit-btn  {
+  flex: 0 0 auto;          /* don't stretch; keep intrinsic height */
   width: 100%;
 }
+
 
 /* Keep the dropdown interactive but not “owning” neighboring hit areas */
 #limitsHero .btn-dropdown {
@@ -182,17 +217,61 @@
   padding: .25rem !important;
 }
 
-/* let the image control the height */
-#limitsHero .limit-btn{
-  min-height: 0 !important;
-  padding: 0 !important;
-}
-
-/* make the icon fill the card width */
 #limitsHero .limit-btn img{
   display: block;
-  width: 100% !important;     /* fill the button/card */
-  height: auto !important;    /* keep aspect ratio */
-  max-height: 180px;          /* tweak if you want taller */
-  object-fit: contain;
+  width: 100%;
+  height: 100%;          /* fill the fixed icon area */
+  max-width: 100%;
+  object-fit: contain;   /* keep proportions */
+}
+
+/* ==== GAME LIMITS: left-align the inline dropdown value ==== */
+/* Native <select> case */
+#limitsHero .select-pill select.ui-select,
+#timerInlineSelect,
+#wordLimitInlineSelect {
+  text-align: left;        /* Chrome/Safari */
+  text-align-last: left;   /* Firefox/Edge */
+  direction: ltr;          /* prevent accidental RTL flipping */
+  padding-left: .9rem;     /* space before text */
+  padding-right: 2.2rem;   /* keep clear of chevron on the right */
+}
+
+/* Enhanced select (custom button) case */
+#limitsHero .select-pill .pill-select-btn {
+  justify-content: flex-start;
+  text-align: left;
+  padding-left: .9rem;
+  padding-right: 2.2rem;   /* same chevron gap */
+}
+
+/* Ensure the chevron never blocks clicks or text */
+#limitsHero .select-pill::after {
+  right: .8rem;
+  pointer-events: none;
+}
+
+/* ==== GAME LIMITS inline selects: fill pill + left-aligned text ==== */
+#limitsHero .select-pill > select#timerInlineSelect,
+#limitsHero .select-pill > select#wordLimitInlineSelect {
+  position: absolute !important;   /* cover the pill */
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  /* keep space for the chevron on the right, comfy padding on the left */
+  padding: 0 2.2rem 0 .9rem !important;
+
+  /* left-align the displayed value in all browsers */
+  text-align: left;
+  text-align-last: left;            /* Firefox/Edge */
+  direction: ltr;
+}
+
+/* If you’re using the enhanced pill select, keep its label left too */
+#limitsHero .select-pill .pill-select-btn {
+  justify-content: flex-start;
+  text-align: left;
+  padding-left: .9rem;
+  padding-right: 2.2rem;
 }

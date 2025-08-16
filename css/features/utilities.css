@@ -24,7 +24,347 @@
 /* 6) Last resort guard (only if you still see a tiny horizontal scroll) */
 html, body { overflow-x: hidden; }
 
-/*  B) When the viewport gets narrower, drop the ad column */
-@media (max-width: 1100px) {
-  #ad-left { display: none !important; }
+/* Touch the ad banner and the settings column */
+.container { gap: 0 !important; }          /* remove the strip */
+
+#ad-left { margin-right: 0 !important; }   /* belt & suspenders */
+.settings-panel {
+  margin-left: 0 !important;
+  border-top-left-radius: 0;               /* make the seam perfectly flush */
+  border-bottom-left-radius: 0;
 }
+
+/* Keep room between settings and the typing panel */
+.typing-panel { margin-left: 1rem; }
+
+/* When the ad hides on narrow screens, restore the left radius & spacing */
+@media (max-width: 1100px) {
+  .typing-panel { margin-left: 0; }
+  .settings-panel {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+}
+
+/* =========================
+   Responsive: keep settings usable
+   - Protect settings min width
+   - Gently scale game area down on narrower viewports
+   ========================= */
+
+/* 1) Settings column never collapses below 320px */
+.settings-panel {
+  flex: 0 0 360px;         /* preferred width */
+  min-width: 320px;        /* don't let it get crushed */
+}
+
+/* 2) Let the typing panel do the flexible shrinking */
+.typing-panel {
+  flex: 1 1 auto;
+  min-width: 0;            /* allow it to actually shrink */
+  --game-scale: 1;         /* default scale */
+}
+
+/* 3) Scale the game area (zoom where supported, transform fallback) */
+@supports (zoom: 1) {
+  .typing-panel { zoom: var(--game-scale); }
+}
+@supports not (zoom: 1) {
+  .typing-panel > * {
+    transform: scale(var(--game-scale));
+    transform-origin: top center;   /* was left top */
+  }
+  .typing-panel { padding-right: calc((1 - var(--game-scale)) * 24px); }
+}
+
+
+/* 4) Step-downs: keep text readable (floor ≈ 0.82) */
+@media (max-width: 1200px) { .typing-panel { --game-scale: .98; } }
+@media (max-width: 1080px) { .typing-panel { --game-scale: .95; } }
+@media (max-width: 980px)  { .typing-panel { --game-scale: .92; } }
+@media (max-width: 900px)  { .typing-panel { --game-scale: .88; } }
+@media (max-width: 820px)  { .typing-panel { --game-scale: .85; } }
+@media (max-width: 760px)  { .typing-panel { --game-scale: .82; } }
+
+/* 5) Font-size guards so content stays legible while scaling */
+#textDisplay {
+  /* cap between 1.3rem and 1.75rem, fluid in between */
+  font-size: clamp(1.3rem, 1.0rem + 1.2vw, 1.75rem);
+}
+#stats, .timer-display { font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.1rem); }
+.keyboard-diagram img { max-height: clamp(220px, 40vh, 500px); }
+
+/* When the ad hides (<1100px), this still works — no changes needed */
+
+/* Settings panel shrinks gradually on narrower viewports */
+.settings-panel {
+  flex: 0 0 360px;    /* default */
+  min-width: 320px;
+}
+
+@media (max-width: 1200px) { .settings-panel { flex-basis: 340px; } }
+@media (max-width: 1080px) { .settings-panel { flex-basis: 320px; min-width: 300px; } }
+@media (max-width: 980px)  { .settings-panel { flex-basis: 300px; min-width: 280px; } }
+@media (max-width: 900px)  { .settings-panel { flex-basis: 280px; min-width: 260px; } }
+@media (max-width: 820px)  { .settings-panel { flex-basis: 260px; min-width: 240px; } }
+@media (max-width: 760px)  { .settings-panel { flex-basis: 240px; min-width: 220px; } }
+
+/* Make the typing panel shrink a bit less aggressively now that settings also shrinks */
+@media (max-width: 1200px) { .typing-panel { --game-scale: .99; } }
+@media (max-width: 1080px) { .typing-panel { --game-scale: .97; } }
+@media (max-width: 980px)  { .typing-panel { --game-scale: .95; } }
+@media (max-width: 900px)  { .typing-panel { --game-scale: .92; } }
+@media (max-width: 820px)  { .typing-panel { --game-scale: .89; } }
+@media (max-width: 760px)  { .typing-panel { --game-scale: .86; } }
+
+/* make dropdowns positioned inside the panel, not the viewport */
+.settings-panel { position: relative; }
+
+/* Make the page never scroll vertically (no right-side scrollbar ever) */
+html, body {
+  height: 100%;
+  overflow: hidden;                 /* lock the page */
+}
+
+/* Ensure the app fills exactly the viewport height */
+.container {
+  min-height: 100dvh;
+  height: 100dvh;                   /* fixes tiny rounding/zoom gaps */
+}
+
+/* Settings column = the only scroller; don't bubble scroll to the page */
+.settings-panel {
+  position: relative;               /* also needed for dropdown positioning */
+  height: 100dvh;                   /* exact viewport height inside the app */
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;   /* stop scroll-chaining */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;         /* no layout shift when its own bar shows */
+}
+
+/* Use UI font for the labels, keep numbers mono if you like */
+#minWPMSettings .pill-name,
+#minWPMSettings > label,
+#maxErrorsSettings .pill-name,
+#maxErrorsSettings > label {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+               Arial, "Noto Sans", sans-serif !important;
+  letter-spacing: .2px;
+}
+
+#endWpmWrapper input[type="number"],
+#endErrWrapper input[type="number"] {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Bigger display text + taller pills */
+#hidePill,
+#highlightPill { --display-pill-height: 96px; }  /* was 84px */
+
+#ghostCursorSettings { min-height: 96px; }
+
+/* Titles */
+#hidePill .pill-title,
+#highlightPill .pill-title,
+#ghostCursorSettings .ghost-title {
+  font-size: 1.35rem;   /* bigger */
+  line-height: 1.15;
+}
+
+/* Subtext / selected value / ghost label line */
+#hideChoiceLabel,
+#highlightChoiceLabel,
+#ghostCursorSettings > label {
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+/* Responsive safety */
+@media (max-width: 420px){
+  #hidePill, #highlightPill { --display-pill-height: 88px; }
+  #ghostCursorSettings { min-height: 88px; }
+
+  #hidePill .pill-title,
+  #highlightPill .pill-title,
+  #ghostCursorSettings .ghost-title { font-size: 1.2rem; }
+
+  #hideChoiceLabel,
+  #highlightChoiceLabel,
+  #ghostCursorSettings > label { font-size: 1rem; }
+}
+
+/* Make the threshold pills (WPM + # Errors) EXACTLY as wide as the other hero pills */
+#proHero #minWPMSettings,
+#proHero #maxErrorsSettings{
+  width: 100% !important;     /* same as Language/Words/Theme/Sound inside heroes */
+  max-width: 100% !important;
+  margin: 0 !important;       /* match the hero pills (no side margins) */
+  box-sizing: border-box;     /* consistent with other pills */
+}
+
+/* If you ever render these outside #proHero, keep them full-width in any hero */
+.settings-hero #minWPMSettings,
+.settings-hero #maxErrorsSettings{
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Optional: when the number box is hidden, keep the label centered */
+#minWPMSettings:has(#endWpmWrapper.hidden),
+#maxErrorsSettings:has(#endErrWrapper.hidden){
+  justify-content: center;
+}
+
+/* === PRO hero: spacing only (do not affect widths) === */
+#proHero {
+  row-gap: .6rem !important;            /* comfortable vertical rhythm */
+}
+
+/* Bring rows back to the standard spacing */
+#proHero .pill-row {
+  margin-bottom: .6rem !important;
+}
+
+/* Restore the default top margin for each pill/option block */
+#proHero #hidePill,
+#proHero #highlightPill,
+#proHero #hideOptions,
+#proHero #highlightOptions,
+#proHero #ghostCursorSettings,
+#proHero #minWPMSettings,
+#proHero #maxErrorsSettings {
+  margin-top: .6rem !important;
+}
+
+/* Make sure any earlier micro-tightening doesn't sneak in */
+#proHero #hideOptions,
+#proHero #highlightOptions {
+  margin-bottom: 0 !important; /* keep grid rows snug without shrinking width */
+}
+
+/* === ON state tokens (tweak if you want) =============================== */
+:root{
+  --on-ring:   var(--header-color);
+  --on-fill:   color-mix(in srgb, var(--header-color) 22%, transparent);
+  --on-glow:   color-mix(in srgb, var(--header-color) 35%, transparent);
+}
+
+/* Base “on” look for any pill-like box */
+.is-on{
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* Motion-respect: no pop for reduced-motion users */
+@media (prefers-reduced-motion: reduce){
+  .is-on{ transform: none; }
+}
+
+/* Tiny check badge (top-right) for on things */
+.is-on{ position: relative; }
+.is-on::after{
+  content: "✓";
+  position: absolute;
+  top: 6px; right: 8px;
+  font-weight: 900;
+  font-size: .9rem;
+  line-height: 1.2;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--on-ring);
+  color: var(--box-bg);
+  box-shadow: 0 0 0 2px var(--box-bg), 0 2px 8px rgba(0,0,0,.4);
+  pointer-events: none;
+}
+
+/* --- PRESS feedback (instant) ----------------------------------------- */
+.split-half:active,
+.limit-btn:active,
+.pill.option:active,
+.settings.pill:active,
+.select-pill:active,
+.display-pill:active,
+.keyboard-pill:active{
+  transform: scale(.985);
+  filter: brightness(1.08);
+}
+
+/* === LIMITS buttons (Timer / Word limit / Endless) ===================== */
+/* Make the whole card “on” when its button is active or open */
+#limitsHero .limit-cell:has(.limit-btn.active),
+#limitsHero .limit-cell:has(.limit-btn.show-dropdown){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* === 123 / += / !? / @#& split pills ================================== */
+/* keep your crisp outer ring from earlier, but boost when a side is on */
+.split-pill:has(.split-half.is-on){
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+}
+.split-half{ position: relative; }
+.split-half.is-on{
+  background: color-mix(in srgb, var(--header-color) 18%, transparent);
+  color: #39ff14;                 /* you already use neon; keep it shouting */
+  font-weight: 800;
+}
+/* add a tiny badge on the selected half (not just the container) */
+.split-half.is-on::after{
+  content: "✓";
+  position: absolute;
+  top: 6px; right: 8px;
+  font-weight: 900;
+  font-size: .85rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--on-ring);
+  color: var(--box-bg);
+  box-shadow: 0 0 0 2px var(--box-bg);
+}
+
+/* === Small choice buttons (Hide/Highlight option grids) ================ */
+#hideOptions button.active,
+#highlightOptions button.active{
+  background: color-mix(in srgb, var(--header-color) 18%, transparent) !important;
+  box-shadow: 0 0 0 2px var(--on-ring) !important;
+  transform: translateZ(0) scale(1.02);
+}
+
+/* === “Typed errors”, “Keyboard”, “Ghost”, “End if WPM <”, “End at #” === */
+/* Pure-CSS ‘on’ when the pill has a checked checkbox inside */
+#typedErrorsPill:has(input[type="checkbox"]:checked),
+.keyboard-pill:has(input[type="checkbox"]:checked),
+#ghostCursorSettings:has(input[type="checkbox"]:checked),
+#minWPMSettings:has(input[type="checkbox"]:checked),
+#maxErrorsSettings:has(input[type="checkbox"]:checked){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* === Hide / Highlight big pills “on when not Off” ====================== */
+/* We’ll also toggle .is-on via JS (below) for bulletproof detection.
+   These selectors allow a no-JS fallback if you store ‘data-selected’. */
+#hidePill[data-selected]:not([data-selected="off"]),
+#highlightPill[data-selected]:not([data-selected="off"]){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* === Sound select “on when not Off” ==================================== */
+/* Works with native select: lights the pill ONLY if value ≠ "off" */
+.select-pill:has(select#soundSelect option:not([value="off"]):checked),
+.select-pill:has(select#soundInlineSelect option:not([value="off"]):checked){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* kill all “check” badges */
+.is-on::after,
+.split-half.is-on::after { content: none !important; }

@@ -49,6 +49,12 @@ export function setupGameLimitsButtons({
   const timerInline = document.getElementById('timerInline');
   const wordInline  = document.getElementById('wordInline');
 
+  [timerInline, wordInline].forEach(el => {
+    if (!el) return;
+    el.classList.remove('hidden');      // kills display:none !important
+    el.classList.add('btn-dropdown');   // required for the slide CSS to target
+  });
+
   const timerInlineSelect = document.getElementById('timerInlineSelect');
   const wordInlineSelect  = document.getElementById('wordLimitInlineSelect');
 
@@ -70,8 +76,6 @@ export function setupGameLimitsButtons({
     btnTimer.setAttribute('aria-pressed',   String(isTimer));
     btnWord.setAttribute('aria-pressed',    String(isWord));
 
-    timerInline.classList.toggle('hidden', !isTimer);
-    wordInline.classList.toggle('hidden',  !isWord);
     btnTimer.classList.toggle('show-dropdown', isTimer);
     btnWord.classList.toggle('show-dropdown',  isWord);
 
@@ -118,6 +122,7 @@ export function setupGameLimitsButtons({
   btnWord   .addEventListener('click', () => setActive('word'));
 
   timerInlineSelect.addEventListener('change', () => setActive('timer'));
+  wordInlineSelect.addEventListener('change', () => setActive('word'));
 
   // default to Endless on load
   setActive('endless');

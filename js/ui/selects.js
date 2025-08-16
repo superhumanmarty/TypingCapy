@@ -60,8 +60,8 @@ export function wireMouseOnlySelects(root = document) {
   });
 }
 
-// Put keyboard focus back on the game immediately after a settings action
 export function refocusToGame() {
+  if (document.body.classList.contains('editing-threshold')) return;  // <— add
   requestAnimationFrame(() => {
     const ae = document.activeElement;
     if (ae && ae !== document.body && typeof ae.blur === 'function') ae.blur();
@@ -82,7 +82,7 @@ export function wireSettingsRefocus(refocusToGame) {
   });
 
   settingsRoot.addEventListener('click', (e) => {
-    if (e.target.closest('#ghostWpmWrapper, #endWpmWrapper, #endAccWrapper')) return;
+    if (e.target.closest('#ghostWpmWrapper, #endWpmWrapper, #endErrWrapper, #endAccWrapper')) return;
     if (e.target.closest('.select-pill')) return;
     if (e.target.closest('.btn-dropdown')) return;
     if (e.target.closest('button, [role="button"], .pill.option, .split-half, #hidePill, #highlightPill, #typedErrorsPill, #ghostCursorSettings')) {

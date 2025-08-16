@@ -21,6 +21,8 @@ export function wireRestartButtonUI({
   if (!btn) return;
 
   btn.addEventListener('click', () => {
+    window.capyErrors = 0;
+    window.dispatchEvent(new Event('capy:runReset'));
     resetHistory?.();
     setAvgOverrideForRun?.(null);
 

@@ -176,14 +176,15 @@
 #proHero #minAccuracySettings  { grid-column: 1 / -1; grid-row: 6; }
 #proHero #strictModeSettings   { grid-column: 1 / -1; grid-row: 7; }
 
+/* Full-width split pills in the PRO hero */
 #proHero #minWPMSettings,
-#proHero #minAccuracySettings,
-#proHero #strictModeSettings {
+#proHero #maxErrorsSettings {
   width: calc(100% - 2rem);
   max-width: 540px;
   margin: .6rem auto 0;
   box-sizing: border-box;
 }
+
 
 /* === Settings column sizing ========================================= */
 .settings-panel {
@@ -333,4 +334,114 @@
   .settings-panel {
     padding-right: calc((1 - var(--ui-scale)) * 24px);
   }
+}
+
+/* Place the new errors pill under Min WPM, before Strict */
+#proHero #maxErrorsSettings  { grid-column: 1 / -1; grid-row: 6; }
+
+/* If any old accuracy pill still sneaks into the DOM, kill it */
+#minAccuracySettings { display: none !important; }
+
+
+/* === Bigger hero icons (3×) + larger titles ======================= */
+/* Only affects the hero header icons next to the titles */
+.settings-hero > .hero-icon {
+  width: 192px !important;   /* was 64px */
+  height: 192px !important;  /* was 64px */
+  object-fit: contain;
+  margin-left: .2rem;
+  opacity: .95;
+}
+
+/* Widen the icon column for the heroes that use a title icon */
+#textGenHero,
+#themeHero,
+#soundHero,
+#noobHero,
+#proHero {
+  grid-template-columns: 216px 1fr; /* was 72px 1fr (≈3×) */
+}
+
+/* Make the hero title text proportionally larger */
+#textGenHero .hero-title,
+#themeHero  .hero-title,
+#soundHero  .hero-title,
+#noobHero   .hero-title,
+#proHero    .hero-title {
+  font-size: 1.4rem;   /* was 1.05rem; ~1.8× for balance with the 3× icon */
+  line-height: 1.1;
+  margin: 0 0 .4rem 0;
+}
+
+/* Keep form controls readable; no change to their size */
+.settings-hero .select-pill select.ui-select {
+  font-size: 1rem;
+}
+
+/* Safety on narrow screens so the panel doesn't overflow */
+@media (max-width: 420px) {
+  .settings-hero > .hero-icon {
+    width: 128px !important;
+    height: 128px !important;
+  }
+  #textGenHero, #themeHero, #soundHero, #noobHero, #proHero {
+    grid-template-columns: 152px 1fr;
+  }
+  #textGenHero .hero-title,
+  #themeHero  .hero-title,
+  #soundHero  .hero-title,
+  #noobHero   .hero-title,
+  #proHero    .hero-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* === Hero icon size: half of previous bump ======================= */
+/* Only the header icons next to hero titles (not limit buttons / keyboard img) */
+.settings-hero > .hero-icon {
+  width: 96px !important;   /* was 192px */
+  height: 96px !important;  /* was 192px */
+}
+
+/* Widen the first column to fit the 96px icon comfortably */
+#textGenHero,
+#themeHero,
+#soundHero,
+#noobHero,
+#proHero {
+  grid-template-columns: 120px 1fr; /* was 216px 1fr */
+}
+
+/* Responsive safety for very narrow screens */
+@media (max-width: 420px) {
+  .settings-hero > .hero-icon {
+    width: 84px !important;
+    height: 84px !important;
+  }
+  #textGenHero, #themeHero, #soundHero, #noobHero, #proHero {
+    grid-template-columns: 108px 1fr;
+  }
+}
+
+/* === PRO hero: tighten spacing between Hide / Highlight / Ghost === */
+#proHero {
+  row-gap: .35rem;                /* was .9rem via generic .settings-hero */
+}
+
+/* shrink the extra gap added by the wrapper rows */
+#proHero .pill-row {
+  margin-bottom: .25rem !important;  /* was ~.75rem */
+}
+
+/* reduce the individual pill top margins inside PRO */
+#proHero #hidePill,
+#proHero #highlightPill,
+#proHero #ghostCursorSettings {
+  margin-top: .25rem !important;     /* was .6rem */
+}
+
+/* keep the option rows aligned with the tighter stack when they appear */
+#proHero #hideOptions,
+#proHero #highlightOptions {
+  margin-top: .25rem !important;     /* was .6rem */
 }

@@ -1,4 +1,5 @@
 // js/handlers/space.js
+
 import { chars, setCurrentIndex } from '../engine.js';
 import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils.js';
 import { updateHide } from '../hide.js';
@@ -22,6 +23,16 @@ export async function handleSpace(textDisplay, hideControl) {
   clearTypedErrorBubble();
   const currentIndex = await getCurrent();
   const current = chars[currentIndex];
+
+  // If space was pressed when a space/newline was NOT expected,
+  // treat it as a single error for the cap.
+  const cur = chars[currentIndex];
+  const expectingSpace = !!cur && (cur.textContent === ' ' || cur.textContent === '\n');
+  if (!expectingSpace) {
+    // Count the wrong space as one error, but do NOT end the game here.
+    window.capyErrors = (window.capyErrors || 0) + 1;
+  }
+
 
   // If the expected char is a real space, type it as normal
   if (current && current.textContent === ' ') {

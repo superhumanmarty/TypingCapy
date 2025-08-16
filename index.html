@@ -15,7 +15,9 @@
 </head>
 <body tabindex="0"> <!-- make body focusable -->
   <div class="container">
-    <div id="ad-left">ads</div>
+    <aside id="ad-left">
+      <div class="ad-slot">ads</div>
+    </aside>
     <div class="settings-panel">
       <div class="settings-group no-card">
         <div id="textGenHero" class="settings-hero">
@@ -25,11 +27,16 @@
             <div class="hero-title">TEXT</div>
 
             <div id="languageSettings">
-              <select id="languageSelector"></select>
+              <div class="select-pill">
+                <select id="languageSelector" class="ui-select"></select>
+              </div>
             </div>
 
+
             <div id="wordListSizeSettings" class="hidden">
-              <select id="wordListSizeSelector"></select>
+              <div class="select-pill">
+                <select id="wordListSizeSelector" class="ui-select"></select>
+              </div>
             </div>
             <!-- hidden state checkboxes that the split-pill buttons control -->
             <input type="checkbox" id="numbersToggle" hidden>
@@ -74,13 +81,15 @@
                 <!-- moved OUTSIDE the button -->
                 <div id="timerInline" class="btn-dropdown hidden">
                   <label for="timerInlineSelect" class="sr-only">Timer length</label>
-                  <select id="timerInlineSelect" aria-label="Timer length">
-                    <option value="15">15s</option>
-                    <option value="30">30s</option>
-                    <option value="60">1 min</option>
-                    <option value="120">2 min</option>
-                    <option value="300">5 min</option>
-                  </select>
+                  <div class="select-pill small">
+                    <select id="timerInlineSelect" class="ui-select" aria-label="Timer length">
+                      <option value="15">15s</option>
+                      <option value="30">30s</option>
+                      <option value="60">1 min</option>
+                      <option value="120">2 min</option>
+                      <option value="300">5 min</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -93,18 +102,21 @@
                 <!-- moved OUTSIDE the button -->
                 <div id="wordInline" class="btn-dropdown hidden">
                   <label for="wordLimitInlineSelect" class="sr-only">Word limit</label>
-                  <select id="wordLimitInlineSelect" aria-label="Word limit">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                    <option value="25">25</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                  </select>
+                  <div class="select-pill small">
+                    <select id="wordLimitInlineSelect" class="ui-select" aria-label="Word limit">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="20">20</option>
+                      <option value="25">25</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="200">200</option>
+                    </select>
+                  </div>
                 </div>
+
               </div>
             </div>
 
@@ -254,7 +266,7 @@
                   <span class="cursor ghost-cursor" aria-hidden="true"></span>
                   <span class="cursor real-cursor" aria-hidden="true"></span>
                 </div>
-                <div id="ghostWpmWrapper" class="pill-input below hidden">
+                <div id="ghostWpmWrapper" class="pill-input below">
                   <label for="customGhostWPM" class="sr-only">Ghost WPM</label>
                   <input type="number" id="customGhostWPM" value="60" min="10" max="300" />
                 </div>
@@ -269,18 +281,14 @@
                 </div>
               </div>
 
-              <div id="minAccuracySettings" class="settings pill pill-split" role="button" aria-controls="endAccWrapper">
-                <input type="checkbox" id="endAccToggle" class="pill-toggle" hidden>
-                <div class="pill-name">End if Accuracy &lt;</div>
-                <div id="endAccWrapper" class="pill-input hidden">
-                  <input type="number" id="endAccValue" value="95" min="50" max="100" style="width: 4em;"> %
+              <!-- New: End at # errors -->
+              <div id="maxErrorsSettings" class="settings pill pill-split" role="button" aria-controls="endErrWrapper">
+                <input type="checkbox" id="endErrToggle" class="pill-toggle" hidden>
+                <div class="pill-name">End at # Errors</div>
+                <div id="endErrWrapper" class="pill-input hidden">
+                  <input id="endErrValue" type="number" min="1" step="1" placeholder="#" style="width: 4em;">
+                  <span class="suffix">errors</span>
                 </div>
-              </div>
-
-              <!-- Strict mode -->
-              <div id="strictModeSettings" class="settings pill pill-single" role="button">
-                <input type="checkbox" id="endOnMistakeCheckbox" class="pill-toggle" hidden>
-                <div class="pill-name">End on Any Mistake</div>
               </div>
             </div>
           </div>
@@ -366,6 +374,10 @@
   <!-- PDF + DOM to image (UMD builds; expose window.jspdf and window.html2canvas) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script type="module" src="./js/defaultSelects.js"></script>
+  <script src="./js/on-states.js" defer></script>
+
+
 
 </body>
 </html>

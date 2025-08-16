@@ -95,12 +95,12 @@ function isTypingKey(e) {
 }
 
 function enterFocusMode() {
-  if (inFocusMode) return;
+  if (inFocusMode || isEditingThreshold()) return; // <-- added guard
   inFocusMode = true;
   document.body.classList.add('focus-mode');
-  // snapshot the exact words visible at the start of this run
   snapshotRunBaseline();
 }
+
 
 function scrollTextToTop() {
   const el = textDisplayEl();
@@ -132,6 +132,11 @@ function forceStatsVisible() {
   s.style.removeProperty('display');
   s.style.removeProperty('visibility');
 }
+
+function isEditingThreshold() {
+  return document.body.classList.contains('editing-threshold');
+}
+
 
 
 function observeTextBaseline() {
@@ -339,6 +344,7 @@ function observeResultsScreen() {
 /* ----------------- Key handling ----------------- */
 
 async function onKeydown(e) {
+  if (isEditingThreshold()) return;
   // Enter focus mode on first meaningful typing key
   if (!inFocusMode && isTypingKey(e)) {
     enterFocusMode();

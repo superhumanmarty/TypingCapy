@@ -254,3 +254,152 @@
   overflow-wrap: anywhere;
   word-break: normal;
 }
+
+/* Ensure all small option pills are readable on dark backgrounds */
+.pill.option,
+.options-2 .option {
+  color: #f7faff;
+  text-shadow: 0 1px 0 rgba(0,0,0,.35);
+}
+
+.options-2 .option.active,
+.pill.option.active {
+  color: #f7faff; /* keep text bright when active */
+}
+
+/* --- CRISP CORNERS: generic small option pills everywhere --- */
+.pill.option,
+.options-2 .option {
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+}
+
+/* remove the inset 1px stroke that makes corners look thin */
+.options-2 .option.active,
+.pill.option.active {
+  box-shadow: none;
+}
+
+/* === CRISP CORNERS for generic mini option pills (.options-2 / .pill.option) === */
+
+/* unify look everywhere these small options appear */
+.options-2 .option,
+.pill.option {
+  border: 0;
+  border-radius: 12px;                       /* match big pills */
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+  box-shadow: 0 0 0 1px var(--box-border);
+}
+
+.options-2 .option:hover,
+.options-2 .option:focus,
+.pill.option:hover,
+.pill.option:focus {
+  box-shadow: 0 0 0 1.5px var(--header-color);
+  outline: none;
+}
+
+.options-2 .option.active,
+.pill.option.active {
+  background: rgba(255,255,255,0.08);        /* keep your active fill */
+  box-shadow: 0 0 0 2px var(--header-color); /* single clean stroke */
+}
+
+/* === Threshold edit overlay (only the active pill stays crisp) === */
+
+/* Disable interaction everywhere; overlay provides the visual dim */
+body.editing-threshold .typing-panel,
+body.editing-threshold .settings-panel > *:not(#proHero),
+body.editing-threshold #proHero .hero-content > * {
+  pointer-events: none !important;
+  filter: none !important; /* per-element blur off; we use a global overlay */
+}
+
+/* Gentle global dim */
+body.editing-threshold::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;                      /* below the active pill we lift */
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  pointer-events: none;
+  transition: backdrop-filter .12s ease, background .12s ease;
+}
+
+/* --- ACTIVE pill stays crisp and interactive --- */
+body.editing-threshold.editing-wpm   #proHero .hero-content > #minWPMSettings,
+body.editing-threshold.editing-err   #proHero .hero-content > #maxErrorsSettings,
+body.editing-threshold.editing-ghost #proHero .hero-content > #ghostCursorSettings {
+  position: relative;
+  z-index: 1000;                     /* above overlay */
+  filter: none !important;
+  pointer-events: auto !important;
+  box-shadow: 0 0 0 2px var(--header-color), 0 8px 28px rgba(0,0,0,.45);
+}
+
+/* --- INACTIVE threshold pills get a light blur --- */
+body.editing-threshold.editing-wpm   #proHero .hero-content > #maxErrorsSettings,
+body.editing-threshold.editing-wpm   #proHero .hero-content > #ghostCursorSettings,
+body.editing-threshold.editing-err   #proHero .hero-content > #minWPMSettings,
+body.editing-threshold.editing-err   #proHero .hero-content > #ghostCursorSettings,
+body.editing-threshold.editing-ghost #proHero .hero-content > #minWPMSettings,
+body.editing-threshold.editing-ghost #proHero .hero-content > #maxErrorsSettings {
+  filter: blur(2px) brightness(.85) !important;
+}
+
+/* Safety: keep children of the active pill crisp */
+body.editing-threshold.editing-wpm   #minWPMSettings *,
+body.editing-threshold.editing-err   #maxErrorsSettings *,
+body.editing-threshold.editing-ghost #ghostCursorSettings * {
+  filter: none !important;
+}
+
+/* If focus-mode adds filters, keep the active pill crisp anyway */
+body.editing-threshold.focus-mode.editing-wpm   #minWPMSettings,
+body.editing-threshold.focus-mode.editing-err   #maxErrorsSettings,
+body.editing-threshold.focus-mode.editing-ghost #ghostCursorSettings {
+  filter: none !important;
+  pointer-events: auto !important;
+}
+
+/* Smooth transition */
+.typing-panel,
+.settings-panel > *,
+#proHero .hero-content > * {
+  transition: filter .12s ease;
+}
+
+/* While editing a threshold, the pill's ON/OFF toggle should not react */
+body.editing-threshold.editing-wpm   #minWPMSettings label,
+body.editing-threshold.editing-wpm   #minWPMSettings input[type="checkbox"],
+body.editing-threshold.editing-err   #maxErrorsSettings label,
+body.editing-threshold.editing-err   #maxErrorsSettings input[type="checkbox"],
+body.editing-threshold.editing-ghost #ghostCursorSettings label,
+body.editing-threshold.editing-ghost #ghostCursorSettings input[type="checkbox"] {
+  pointer-events: none !important;
+}
+
+/* While editing the Ghost WPM, don't let the checkbox/label be clickable */
+body.editing-threshold.editing-ghost #ghostCursorSettings input#ghostModeToggle,
+body.editing-threshold.editing-ghost #ghostCursorSettings > label {
+  pointer-events: none !important;
+}
+
+
+/* If we’re not actively editing a threshold, make sure no overlay shows */
+body:not(.editing-threshold)::after { display: none !important; }
+
+/* Also ensure the typing area can’t be dimmed/hidden by mistake */
+body:not(.editing-threshold) .typing-panel,
+body:not(.editing-threshold) #textDisplay {
+  opacity: 1 !important;
+  filter: none !important;
+  visibility: visible !important;
+}
+
+/* In case something collapsed the typing box */
+#textDisplay { min-height: calc(1.4em * 3) !important; }
+

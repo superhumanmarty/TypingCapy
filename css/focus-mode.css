@@ -22,37 +22,41 @@
 
 /* Start: normal layout already defined by your existing CSS */
 
-/* Focus mode on <body> toggles the layout */
+/* Focus mode: center the game; remove gap for perfect centering */
 body.focus-mode .container {
-  gap: 0.25rem; /* slightly tighter, reads as “focused” */
+  gap: 0;                    /* no phantom spacing from flex gap */
+  justify-content: center;   /* flex container centers lone child */
 }
 
-/* Slide the ad + settings out to the left and collapse their width */
+/* Slide the ad + settings out and collapse their width (NO display:none) */
 body.focus-mode #ad-left,
 body.focus-mode .settings-panel {
   transform: translateX(-40px);
   opacity: 0;
   width: 0 !important;
   max-width: 0 !important;
+  min-width: 0 !important;
   padding: 0 !important;
   border-width: 0 !important;
   margin: 0 !important;
-  pointer-events: none;
+  overflow: hidden !important;
+  pointer-events: none !important;
 }
 
-/* Let the typing area expand and feel centered */
+/* Let the typing area expand and animate into the center */
 .typing-panel {
   transition:
     transform var(--focus-transition) ease,
     max-width var(--focus-transition) ease;
 }
 
-/* Give it a little “snap to center” feel */
+/* Center/limit the game; keep it animatable */
 body.focus-mode .typing-panel {
-  max-width: min(980px, 94vw);
-  margin-left: auto;
-  margin-right: auto;
-  transform: translateX(0);
+  flex: 0 1 auto !important;      /* don't stretch edge-to-edge */
+  width: auto;
+  max-width: min(980px, 94vw);    /* desired max width */
+  margin: 0 auto !important;      /* center horizontally */
+  transform: none !important;     /* cancel any previous transforms */
 }
 
 /* Focus mode hints (top-left/top-right) */
@@ -95,3 +99,7 @@ body.game-ended .focus-hint {
   display: none !important;
 }
 
+/* Transform fallback (when zoom isn't supported): center scaling nicely */
+@supports not (zoom: 1) {
+  .typing-panel > * { transform-origin: top center; }
+}

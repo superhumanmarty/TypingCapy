@@ -4,6 +4,21 @@ import { getCurrentWord, scrollToCurrent } from '../utils.js';
 import { updateHide, clearRevealedWord } from '../hide.js';
 import { playPentatonic, playBlip, playClick, playErrorBuzz, getSoundMode } from '../sound.js';
 import { getHideMode } from '../settings.js';
+import { endGame } from '../controller/game-controller.js';
+
+
+// Global-ish counter that resets on each fresh run
+window.capyErrors = 0;
+window.addEventListener('capy:runReset', () => { window.capyErrors = 0; });
+
+function checkErrorCapAfterIncrement() {
+  const on  = document.getElementById('endErrToggle')?.checked;
+  if (!on) return;
+  const cap = parseInt(document.getElementById('endErrValue')?.value, 10);
+  if (!Number.isFinite(cap) || cap <= 0) return;
+  if ((window.capyErrors || 0) >= cap) endGame();
+}
+
 
 function getCurrent() {
   return import('../engine.js').then(m => m.currentIndex);
@@ -41,11 +56,14 @@ export async function handleChar(k, textDisplay, hideControl) {
     current.classList.remove('current');
     current.classList.add('incorrect');
     const showErrors = !!document.getElementById('showTypedErrorsToggle')?.checked;
-    
+
     if (showErrors) {
       document.getElementById('typedLetter').textContent = k;
       document.getElementById('typedErrorDisplay').classList.remove('hidden');
     }
+    // Count one error for a wrong key
+    window.capyErrors = (window.capyErrors || 0) + 1;
+    checkErrorCapAfterIncrement();
     setCurrentIndex(currentIndex + 1);
     const nxt = chars[currentIndex + 1];
     if (nxt) nxt.classList.add('current');
