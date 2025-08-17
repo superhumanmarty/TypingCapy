@@ -76,7 +76,7 @@ export function renderRunGraph(hostEl, durationMs) {
   hostEl.innerHTML = '';
   const title = document.createElement('div');
   title.className = 'title';
-  title.textContent = 'Speed over time (WPM)';
+  title.textContent = 'WPM over time';
   const canvas = document.createElement('canvas');
   hostEl.appendChild(title);
   hostEl.appendChild(canvas);

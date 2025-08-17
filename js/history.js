@@ -135,6 +135,38 @@ function ensureStyles() {
   text-shadow: 0 1px 0 rgba(0,0,0,.35);
 }
 #typingHistory .t-corr  { color: #f7faff; } /* ensure correct chars stay bright */
+
+/* Results screen: show raw text (no pill) for Typed/Target */
+.results-screen #typingHistory .box,
+.results-screen #supposedText .box{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Make the text a little bigger & brighter against the page background */
+.results-screen #typingHistory .box,
+.results-screen #supposedText .box{
+  font-size: clamp(1rem, 1.2vw, 1.15rem) !important;
+  line-height: 1.5;
+  color: #f7faff !important;
+  text-shadow: none;
+}
+
+/* Keep per-char colors vivid without the pill */
+.results-screen #typingHistory .t-corr  { color: #f7faff !important; }
+.results-screen #typingHistory .t-err,
+.results-screen #typingHistory .t-extra { color: #ff6b6b !important; }
+.results-screen #typingHistory .t-skip  { color: #ff6b6b !important; opacity: .55 !important; }
+
+/* Titles (“Typed” / “Target”) stay Inter & bold (you already set this elsewhere) */
+.results-screen #typingHistory .title,
+.results-screen #supposedText .title{
+  font-weight: 800 !important;
+  margin-bottom: .4rem;
+}
+
 `;
   document.head.appendChild(style);
 }

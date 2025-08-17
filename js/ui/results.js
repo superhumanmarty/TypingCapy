@@ -157,3 +157,4 @@ export function watchResultsScreenForSettings() {
 
   window.addEventListener('capy:timeup', renderIfShown);
 }
+
