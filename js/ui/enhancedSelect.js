@@ -176,7 +176,7 @@ function enhanceOne(select){
   }
 
 
-  function close(){
+  function close({ refocus = false } = {}) {
     wrap.classList.remove('open');
     menu.classList.remove('is-open');
     btn.setAttribute('aria-expanded','false');
@@ -192,9 +192,23 @@ function enhanceOne(select){
       portalRoot.removeEventListener('scroll', onWinMove, true);
       onWinMove = null;
     }
+
+    // ⬅ NEW: if we closed from the pill/ESC, return focus to the game
+    if (refocus) {
+      setTimeout(() => {
+        if (!document.body.classList.contains('editing-threshold')) {
+          btn.blur?.();
+          document.body.focus({ preventScroll: true });
+        }
+      }, 0);
+    }
   }
 
-  function toggle(){ wrap.classList.contains('open') ? close() : open(); }
+
+  function toggle(){
+    wrap.classList.contains('open') ? close({ refocus: true }) : open();
+  }
+
 
   function choose(i){
     if (i < 0 || i >= select.options.length) return;
@@ -298,7 +312,7 @@ function enhanceOne(select){
       if (e.key === 'Home')      activeIndex = 0;
       if (e.key === 'End')       activeIndex = options.length - 1;
       if (e.key === 'Enter' || e.key === ' ') choose(activeIndex);
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') close({ refocus: true });
       setActiveVisual(activeIndex);
     }
   }

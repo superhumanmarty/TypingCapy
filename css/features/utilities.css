@@ -368,3 +368,4 @@ html, body {
 /* kill all “check” badges */
 .is-on::after,
 .split-half.is-on::after { content: none !important; }
+
