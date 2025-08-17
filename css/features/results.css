@@ -190,3 +190,44 @@ body.game-ended #resultsScreen {
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
 }
+
+/* results.css */
+.run-graph {
+  margin: 1rem auto 0;                /* centers the pill */
+  width: min(880px, 96%);
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem 1.25rem;      /* symmetric L/R padding */
+  overflow: visible;
+  box-sizing: border-box;             /* so padding is consistent */
+}
+
+.run-graph .title {
+  font-weight: 700;
+  margin-bottom: .5rem;
+  color: var(--correct-color);
+  text-align: center;
+  font-size: 1.05rem;
+  opacity: .95;
+}
+
+.run-graph canvas {
+  display: block;
+  /* JS will set an exact pixel width; margin auto keeps it centered if it’s a hair smaller */
+  margin: 0 auto;
+  width: 100%;
+  height: 180px;
+  border-radius: 6px;
+}
+
+/* Micro-nudge the whole graph pill a hair to the left */
+.run-graph {
+  --graph-nudge: -7px;          /* tweak to -2px or -4px if you want */
+  transform: translateX(var(--graph-nudge));
+}
+
+/* On small screens, a slightly smaller nudge feels nicer */
+@media (max-width: 560px) {
+  .run-graph { --graph-nudge: -2px; }
+}
