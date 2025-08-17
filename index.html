@@ -338,7 +338,16 @@
       </div>
       <!-- Results Screen -->
       <div id="resultsScreen" class="results-screen hidden">
-        <h2>Time's Up!</h2>
+        <!-- Hints FIRST -->
+        <div class="results-hints" id="resultsHints">
+          <div class="hint"><span class="keycap esc">ESC</span> for new game</div>
+          <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
+        </div>
+
+        <!-- Chips placeholder (the JS will populate this) -->
+        <div id="runSettings" class="run-settings"></div>
+
+        <!-- Final WPM / Accuracy -->
         <div class="results-stats">
           <div class="result-item">
             <span class="result-label">Final WPM:</span>
@@ -349,13 +358,9 @@
             <span id="finalAccuracy" class="result-value">100%</span>
           </div>
         </div>
-        <button id="restartButton" class="restart-button">Start New Session</button>
-        <!-- Shortcut hints inside the results box -->
-        <div class="results-hints" id="resultsHints">
-          <div class="hint"><span class="keycap esc">ESC</span> for new game</div>
-          <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
-        </div>
+
         <div id="runGraph" class="run-graph"></div>
+        <button id="restartButton" class="restart-button">Start New Session</button>
       </div>
       <!-- Keyboard Diagram -->
       <div id="keyboardDiagram" class="keyboard-diagram hidden">
@@ -376,6 +381,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script type="module" src="./js/defaultSelects.js"></script>
   <script src="./js/on-states.js" defer></script>
+  <script type="module" src="./js/ui/stats-polish.js"></script>
 
 
 

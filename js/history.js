@@ -278,7 +278,7 @@ export function renderTypingHistory() {
   wrap.innerHTML = '';
   const title = document.createElement('div');
   title.className = 'title';
-  title.textContent = 'Keystroke history';
+  title.textContent = 'Typed';
 
   const box = document.createElement('div');
   box.className = 'box';
@@ -368,7 +368,7 @@ export function renderTypingHistory() {
   sup.innerHTML = '';
   const supTitle = document.createElement('div');
   supTitle.className = 'title';
-  supTitle.textContent = 'What the player was supposed to type';
+  supTitle.textContent = 'Target';
   const supBox = document.createElement('div');
   supBox.className = 'box';
 

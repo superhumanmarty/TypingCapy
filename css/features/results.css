@@ -163,3 +163,14 @@ body.game-ended #typedErrorDisplay {
 body.game-ended #resultsScreen {
   display: block !important;
 }
+
+/* keep hints above with a little space below */
+.results-screen .results-hints {
+  margin-top: .25rem;
+  margin-bottom: .75rem;
+}
+
+/* chips block sits between hints and stats */
+.results-screen .run-settings {
+  margin: .25rem 0 1rem;   /* slightly tighter above, comfy below */
+}
