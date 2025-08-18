@@ -213,7 +213,7 @@ function animateTo(pos){
       { transform: `translate3d(${from.x}px, ${from.y}px, 0)`, height: `${from.h}px` },
       { transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,   height: `${pos.h}px` }
     ],
-    { duration: dur * 8, easing: 'cubic-bezier(.2,.9,.1,1)', fill: 'forwards' }
+    { duration: dur * 7, easing: 'cubic-bezier(.2,.9,.1,1)', fill: 'forwards' }
   );
   ANIM.onfinish = () => {
     CARET.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;

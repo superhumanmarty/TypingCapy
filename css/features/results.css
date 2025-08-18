@@ -231,3 +231,23 @@ body.game-ended #resultsScreen {
 @media (max-width: 560px) {
   .run-graph { --graph-nudge: -2px; }
 }
+
+/* === Lock the results graph pill to a consistent width === */
+.results-screen .run-graph {
+  width: 880px !important;     /* fixed desktop width */
+  max-width: 880px !important;
+  min-width: 880px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box;      /* keep padding inside the 880px */
+}
+
+/* Responsive fallback: on narrow screens, fill the viewport safely */
+@media (max-width: 920px) {
+  .results-screen .run-graph {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    min-width: auto !important;
+  }
+}
+
