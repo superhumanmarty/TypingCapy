@@ -205,7 +205,24 @@ function hopDurationMs(from, to){
 
 function animateTo(pos){
   const from = readCurrentPos();
-  const dur = hopDurationMs(from, pos);
+
+  // Base duration from distance (your existing feel)
+  const base = hopDurationMs(from, pos); // already clamped 24–90ms
+
+  // Cross-line jump (down OR up) = big vertical delta vs line height
+  const lineH = Math.max(from.h, pos.h, LAST.h || 0);
+  const dy = pos.y - from.y;
+  const isLineJump = Math.abs(dy) > lineH * 0.6;
+
+  // Same-line uses your old multiplier, cross-line is much snappier
+  const multiplier = isLineJump ? 2.1 : 7;
+  let duration = Math.round(base * multiplier);
+
+  // Keep wraps tight (works for both down and up)
+  if (isLineJump) {
+    duration = Math.max(22, Math.min(140, duration));
+  }
+
   if (ANIM) { ANIM.cancel(); ANIM = null; }
 
   ANIM = CARET.animate(
@@ -213,7 +230,7 @@ function animateTo(pos){
       { transform: `translate3d(${from.x}px, ${from.y}px, 0)`, height: `${from.h}px` },
       { transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,   height: `${pos.h}px` }
     ],
-    { duration: dur * 7, easing: 'cubic-bezier(.2,.9,.1,1)', fill: 'forwards' }
+    { duration, easing: 'cubic-bezier(.2,.9,.1,1)', fill: 'forwards' }
   );
   ANIM.onfinish = () => {
     CARET.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
@@ -222,6 +239,7 @@ function animateTo(pos){
     show();
   };
 }
+
 
 function update({ immediate = false } = {}){
   if (!HOST) return;
