@@ -167,6 +167,26 @@ function ensureStyles() {
   margin-bottom: .4rem;
 }
 
+/* RESULTS: cap to 3 lines + scroll, and show ↕️ indicator when overflowing */
+.results-screen #typingHistory .box,
+#resultsScreen    #typingHistory .box,
+.results-screen #supposedText .box,
+#resultsScreen    #supposedText .box{
+  /* 3 lines (line-height is already 1.5 above) */
+  max-height: calc(1.5em * 3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Inline indicator next to the title text */
+.results-screen .title .scroll-indicator,
+#resultsScreen    .title .scroll-indicator{
+  margin-left: .4rem;
+  opacity: .9;
+  font-size: .95em;
+}
+
 `;
   document.head.appendChild(style);
 }
@@ -288,6 +308,23 @@ function getLastAttemptedWordIndex() {
   return last;
 }
 
+function markIfOverflow(titleEl, boxEl) {
+  if (!titleEl || !boxEl) return;
+
+  // Remove any prior indicator (if we re-render)
+  titleEl.querySelector('.scroll-indicator')?.remove();
+
+  // Wait a tick so layout is settled before measuring
+  requestAnimationFrame(() => {
+    const needs = boxEl.scrollHeight > Math.ceil(boxEl.clientHeight + 1);
+    if (needs) {
+      const i = document.createElement('span');
+      i.className = 'scroll-indicator';
+      i.textContent = '↕️';
+      titleEl.appendChild(i);
+    }
+  });
+}
 
 
 export function renderTypingHistory() {
@@ -476,5 +513,19 @@ export function renderTypingHistory() {
 
   sup.appendChild(supTitle);
   sup.appendChild(supBox);
+
+  // Ensure the Target box starts scrolled to the bottom as well
+  supBox.scrollTop = supBox.scrollHeight;
+
+  // After both sections are in the DOM, add indicators if they overflow
+  requestAnimationFrame(() => {
+    markIfOverflow(title,    box);
+    markIfOverflow(supTitle, supBox);
+
+    // Re-assert bottom alignment after fonts/layout settle
+    box.scrollTop    = box.scrollHeight;
+    supBox.scrollTop = supBox.scrollHeight;
+  });
+
 
 }
