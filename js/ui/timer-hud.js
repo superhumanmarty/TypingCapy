@@ -26,5 +26,5 @@ export function setTimerLabelToFull() {
   }
   const m = Math.floor(sec / 60);
   const s = sec % 60;
-  tr.textContent = `Time: ${m}:${String(s).padStart(2, '0')}`;
+  tr.textContent = `${m}:${String(s).padStart(2, '0')}`;
 }

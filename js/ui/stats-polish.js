@@ -121,6 +121,13 @@
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
+    /* TIMER HUD: Inter + bold numerals */
+    #timerDisplay, #timeRemaining {
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
     /* …but keep these two pills (and everything inside them) in monospace */
     #resultsScreen #typingHistory,
     #resultsScreen #typingHistory * ,
@@ -156,6 +163,12 @@
       const m = String(raw || '').match(/\d+/);
       return m ? m[0] : '0';
     }
+
+    if (type === 'time') {
+      // Remove any "Time:" prefix and trim
+      return String(raw || '').replace(/^Time:\s*/i, '').trim();
+    }
+
     const m = String(raw || '').match(/\d+(?:\.\d+)?/);
     const v = m ? m[0] : '100';
     return `${v}%`;
@@ -184,6 +197,7 @@
   function init() {
     const wpmEl = document.getElementById('wpm');
     const accEl = document.getElementById('accuracy');
+    const timeEl = document.getElementById('timeRemaining');
     if (!wpmEl && !accEl) return;
     ensureInter();
     injectCSS();
@@ -191,6 +205,7 @@
     // live
     watch(wpmEl, 'wpm');
     watch(accEl, 'accuracy');
+    if (timeEl) watch(timeEl, 'time');
 
     // results 
     const finalWpmEl = document.getElementById('finalWPM');
