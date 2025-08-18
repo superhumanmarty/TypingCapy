@@ -311,11 +311,6 @@ export function renderRunGraph(hostEl, durationMs) {
     ctx.stroke();
     ctx.restore();
 
-    ctx.fillStyle = withAlpha(text, 0.7);
-    ctx.font = '11px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('warm-up', (x0 + joinX) / 2, yWarm - 6);
-
     // ----- Main speed line (solid), only from >= warmup -----
     if (samples.length > 0) {
       const startIdx = samples.findIndex(s => s.t >= warmupMs);
