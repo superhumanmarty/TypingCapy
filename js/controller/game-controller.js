@@ -24,7 +24,10 @@ import {
 import { buildResultsSettingsSummary, removeLegacyResultsHints } from '../ui/results.js';
 import { enforceWordLimitAvailability } from '../ui/limits.js';
 
+
 const WARMUP_MS = 2000;
+
+
 
 function maybeHitErrorCap() {
   const on = document.getElementById('endErrToggle')?.checked;
@@ -43,6 +46,7 @@ let refs = {
 
 // local run-state
 let gameLocked = false;
+
 
 // ============ public API ============
 export function initController({ textDisplay, hideControl, highlightControl }) {
@@ -71,6 +75,7 @@ export function resetGameLock() {
 
   enforceWordLimitAvailability();
 }
+
 
 export function endGame() {
   gameLocked = true;

@@ -108,55 +108,6 @@
   /* vertical-align: text-bottom; */ /* Commented out */
 }
 
-/* Unified caret for ALL current chars (letters, spaces, newlines) */
-.char.current::before {
-  content: '';
-  position: absolute;
-  left: -2px;               /* Offset slightly left to avoid overlapping letter edges */
-  top: 0;
-  width: 2px;
-  height: 1em;
-  background: var(--header-color);
-  animation: blink 1s steps(1) infinite;
-  z-index: 1;               /* Ensure caret is above text if needed */
-}
-
-/* For spaces and newlines, adjust left back to 0 (no offset needed) */
-.char.space.current::before,
-.char.newline.current::before {
-  left: 0;
-}
-
-/* Ensure hidden newline characters don't interfere with cursor */
-.char[style*="display: none"].current {
-  display: inline-block !important;
-  width: 2px;
-  visibility: visible;
-  color: transparent;
-}
-
-/* Ensure newline characters are typeable positions */
-.char[style*="display: none"] {
-  position: relative;
-  width: 0;
-  display: inline-block !important;
-}
-
-/* Fix newline cursor (use unified ::before instead of box-shadow) */
-.char.newline.current,
-.char[style*="display: none"].current {
-  width: 2px;
-  height: 1em;               /* Match text height */
-  display: inline-block;
-  /* Remove vertical-align to prevent any potential shift (consistent with spaces) */
-  /* vertical-align: text-bottom; */ /* Commented out */
-  visibility: visible;
-  border-left: none !important;
-  /* Remove box-shadow, rely on ::before */
-  box-shadow: none !important;
-  /* No custom animation here; uses .char.current::before */
-}
-
 /* Handle newlines properly */
 .char.newline {
   display: none;

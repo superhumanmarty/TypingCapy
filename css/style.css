@@ -113,13 +113,6 @@ body {
   border: 1px solid var(--incorrect-color);
 }
 
-/* Make cursor visible even on hidden characters */
-.char.current {
-  position: relative;
-  border-left: 2px solid var(--header-color);
-  animation: blink 1s steps(1) infinite;
-}
-
 .hidden-word.current {
   /* show caret but keep text hidden */
   visibility: visible !important;
