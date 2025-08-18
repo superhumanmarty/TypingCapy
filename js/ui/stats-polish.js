@@ -121,6 +121,40 @@
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
+    /* WORD LIMIT: thick, clean, lifted — no slanted overlay */
+    #wordProgress {
+    position: relative;
+    height: clamp(12px, 1.6vw, 18px);
+    border-radius: 9999px;
+    /* subtle glassy track */
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow:
+        0 10px 26px rgba(0,0,0,.28),
+        inset 0 2px 4px rgba(255,255,255,.06),
+        inset 0 0 0 1px rgba(255,255,255,.05);
+    overflow: hidden;
+    transform: translateY(-12px); /* lift it a bit higher */
+    will-change: transform;
+    }
+    #wordProgress.hidden { display: none !important; }
+
+    #wordProgressFill {
+    height: 100%;
+    border-radius: inherit;      /* rounded cap on the blue end */
+    transition: width 140ms ease;
+    /* rich but simple fill; no overlay on the right edge */
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 55%),
+        linear-gradient(180deg, var(--accent, #1f63ff), #0b5cff);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.12),
+        0 0 14px rgba(31,99,255,.45);   /* soft glow */
+    }
+
+
+
     /* TIMER HUD: Inter + bold numerals */
     #timerDisplay, #timeRemaining {
       font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
