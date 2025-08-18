@@ -193,19 +193,25 @@
   }
 
   function desiredText(raw, type) {
-    const txt = String(raw || '').trim();
-
     if (type === 'wpm') {
-      // If the game is in warmup and shows an ellipsis, keep it.
-      if (txt.includes('...')) return '...';
-      // Otherwise show just the digits (e.g., "WPM: 72" -> "72").
+      // Strip any "WPM:" prefix the game might add, then decide what to show.
+      const txt = String(raw || '').replace(/^WPM:\s*/i, '').trim();
+
+      // If the game is intentionally showing an ellipsis during warmup, keep it.
+      if (txt === '…' || txt === '...' || /^\.\.\.$/.test(txt)) return '...';
+
+      // Otherwise, compress to just the digits (e.g., "123").
       const m = txt.match(/\d+/);
-      // If no digits are present, prefer "..." over forcing a 0.
-      return m ? m[0] : '...';
+      return m ? m[0] : '...'; // <-- default to ellipsis, NOT 0
     }
 
-    // Accuracy stays numeric with a % suffix.
-    const m = txt.match(/\d+(?:\.\d+)?/);
+    if (type === 'time') {
+      // Remove any "Time:" prefix and trim (keeps m:ss intact).
+      return String(raw || '').replace(/^Time:\s*/i, '').trim();
+    }
+
+    // Accuracy sanitizer (unchanged): keep just the number and append %.
+    const m = String(raw || '').match(/\d+(?:\.\d+)?/);
     const v = m ? m[0] : '100';
     return `${v}%`;
   }
