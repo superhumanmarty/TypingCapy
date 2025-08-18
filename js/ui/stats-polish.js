@@ -193,20 +193,23 @@
   }
 
   function desiredText(raw, type) {
+    const txt = String(raw || '').trim();
+
     if (type === 'wpm') {
-      const m = String(raw || '').match(/\d+/);
-      return m ? m[0] : '0';
+      // If the game is in warmup and shows an ellipsis, keep it.
+      if (txt.includes('...')) return '...';
+      // Otherwise show just the digits (e.g., "WPM: 72" -> "72").
+      const m = txt.match(/\d+/);
+      // If no digits are present, prefer "..." over forcing a 0.
+      return m ? m[0] : '...';
     }
 
-    if (type === 'time') {
-      // Remove any "Time:" prefix and trim
-      return String(raw || '').replace(/^Time:\s*/i, '').trim();
-    }
-
-    const m = String(raw || '').match(/\d+(?:\.\d+)?/);
+    // Accuracy stays numeric with a % suffix.
+    const m = txt.match(/\d+(?:\.\d+)?/);
     const v = m ? m[0] : '100';
     return `${v}%`;
   }
+
 
   // IMPORTANT: only write when the value would change
   function sanitize(el, type, mo) {
