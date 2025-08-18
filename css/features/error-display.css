@@ -22,3 +22,19 @@
   border-radius: 4px;
   border: 1px solid var(--incorrect-color);
 }
+
+/* Ensure we can absolutely position the error bubble relative to the game panel */
+.typing-panel {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Move the typed error bubble ~0.5 inch up and ~0.5 cm left */
+#typedErrorDisplay {
+  position: absolute;
+  top: max(0px, calc(clamp(80px, 8vh, 40px) - 48px)); /* ~0.5in higher */
+  left: 50%;
+  transform: translateX(calc(-41%));              /* ~0.5cm left */
+  margin: 0 !important;
+  z-index: 1001;
+}
