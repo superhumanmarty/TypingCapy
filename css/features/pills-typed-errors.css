@@ -51,3 +51,17 @@
   line-height: 1;
   box-shadow: 0 0 0 3px var(--body-bg) inset; /* matches your screenshot vibe */
 }
+
+/* “You typed:” in Inter */
+#typedErrorsPill .te-label {
+  font-family: var(--ui-font) !important;
+  font-weight: 800;                /* stays bold like before */
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The sample letter in the little box stays monospace */
+#typedErrorsPill .te-box {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
+}
