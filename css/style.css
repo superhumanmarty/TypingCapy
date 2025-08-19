@@ -39,26 +39,33 @@ body {
 .settings span { margin-right: 0.5rem; }
 .settings label { margin-right: 1rem; cursor: pointer; }
 
-/* Typing Box */
+/* Typing Box — exactly 3 full lines, no half lines */
 #textDisplay {
   box-sizing: border-box;
   width: 100%;
   background: var(--box-bg);
-  padding: 1rem;
+  /* keep side padding if you want, but kill top/bottom padding */
+  padding: 0 1rem;
   border: 2px solid var(--box-border);
   border-radius: 4px;
-  line-height: 1.5em;
-  height: calc(1.5em * 3);
+
+  /* fixed line height + exact triple height */
+  --lh: 1.4em;
+  line-height: var(--lh);
+  height: calc(var(--lh) * 3);
+
   font-size: 1.5rem;
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   margin-bottom: 1rem;
+
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
 }
+
 
 /* Force each character span to stay together with its word */
 .char {

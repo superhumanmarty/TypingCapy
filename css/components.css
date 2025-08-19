@@ -1,35 +1,41 @@
 /* css/components.css */
 
-/* Typing Box - balanced sizing for 3 lines */
+/* Typing Box — exactly 3 full lines, no half lines */
 #textDisplay {
   box-sizing: border-box;
   width: 100%;
-  background: transparent; /* Removed background */
-  padding: 0.75rem 1rem; /* Balanced padding */
-  border: none; /* Removed border */
+  background: transparent;
+  /* keep side padding if you want, but kill top/bottom padding */
+  padding: 0 1rem;
+  border: none;
   border-radius: 4px;
-  line-height: 1.4em; /* More comfortable line height */
-  height: calc(3 * 1.4em + 1.5rem); /* 3 lines + 0.75rem top + 0.75rem bottom padding */
-  font-size: 1.75rem; /* Smaller, more readable size */
+
+  /* fixed line height + exact triple height */
+  --lh: 1.4em;
+  line-height: var(--lh);
+  height: calc(var(--lh) * 3);
+
+  font-size: 1.75rem;
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   margin-bottom: 1rem;
+
   white-space: normal;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-  text-rendering: optimizeSpeed; /* Disable advanced rendering for consistent widths */
-  font-kerning: none; /* Disable kerning to prevent width changes */
-  letter-spacing: 0; /* Ensure no extra spacing */
-  font-feature-settings: "kern" 0; /* Explicitly disable kerning */
-  -webkit-font-smoothing: none; /* Disable subpixel antialiasing */
-  -moz-osx-font-smoothing: unset; /* For Firefox on macOS */
-  font-smooth: never; /* Disable font smoothing for integer pixel widths */
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE 10+ */
+
+  text-rendering: optimizeSpeed;
+  font-kerning: none;
+  letter-spacing: 0;
+  font-feature-settings: "kern" 0;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
 }
-#textDisplay::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
+#textDisplay::-webkit-scrollbar { display: none; }
+
 
 /* always show the theme dropdown, but hide the color‑picker row by default */
 .customizer {

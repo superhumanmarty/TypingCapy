@@ -21,16 +21,20 @@ export function scrollToCurrent(textDisplay, chars, index){
   const cur  = chars[i];
   const prev = i > 0 ? chars[i - 1] : null;
 
-  // only consider Space/Enter as scroll triggers
-  const triggerIsSpace  = !!(prev && prev.textContent === ' ');
-  const triggerIsEnter  = !!(prev && prev.textContent === '\n');
-  if (!triggerIsSpace && !triggerIsEnter) return;
+  // Only fire after a commit that *can* move us to a new line:
+  //   - typed a Space
+  //   - typed an Enter
+  //   - typed an extra character (.extra) that pushed a wrap
+  const triggerIsSpace = !!(prev && prev.textContent === ' ');
+  const triggerIsEnter = !!(prev && prev.textContent === '\n');
+  const triggerIsExtra = !!(prev && prev.classList && prev.classList.contains('extra'));
+  if (!triggerIsSpace && !triggerIsEnter && !triggerIsExtra) return;
 
   const pRect = textDisplay.getBoundingClientRect();
   const cRect = (cur.getClientRects()[0] || cur.getBoundingClientRect());
   const pr    = prev ? (prev.getClientRects()[0] || prev.getBoundingClientRect()) : null;
 
-  // detect a new visual line (vertical jump bigger than ~0.6 of line height)
+  // New visual line? (vertical delta > ~0.6 × line height)
   let crossedLine = false;
   if (pr) {
     const lh = Math.max(
@@ -40,15 +44,17 @@ export function scrollToCurrent(textDisplay, chars, index){
     );
     crossedLine = Math.abs(cRect.top - pr.top) > lh * 0.6;
   }
-
   if (!crossedLine) return;
 
-  // center the current line in the panel
-  const caretY   = (cRect.top - pRect.top) + textDisplay.scrollTop;
-  const desired  = Math.max(0, caretY - (textDisplay.clientHeight / 2 - cRect.height / 2));
-  const maxTop   = Math.max(0, textDisplay.scrollHeight - textDisplay.clientHeight);
-  textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'auto' });
+  // Center the current line in the 3-line viewport (line 2 of 3)
+  const caretY  = (cRect.top - pRect.top) + textDisplay.scrollTop;
+  const desired = Math.max(0, caretY - (textDisplay.clientHeight / 2 - cRect.height / 2));
+  const maxTop  = Math.max(0, textDisplay.scrollHeight - textDisplay.clientHeight);
+
+  // Smooth animation
+  textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'smooth' });
 }
+
 
 
 // WPM = (correctChars / 5) / minutes
