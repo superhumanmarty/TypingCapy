@@ -5,6 +5,7 @@ let raf = null;
 let startMs = 0;
 let wpm = 60;
 
+
 function injectCSS() {
   if (document.getElementById('ghostCaretCSS_v3')) return;
   const s = document.createElement('style');
@@ -26,7 +27,6 @@ function injectCSS() {
       opacity:var(--gop,0);          /* 0/1 */
       transition:
         transform var(--gdur,120ms) cubic-bezier(.22,.61,.36,1),
-        height    80ms linear,
         opacity   80ms linear;
       pointer-events:none;
     }
@@ -92,24 +92,40 @@ function tick() {
   const ar = relRect(a, panelRect, p);
   const br = relRect(b, panelRect, p);
 
-  // Detect line change (vertical jump larger than ~half a line height)
-  const lineJump = Math.abs(br.y - ar.y) > ((ar.h + br.h) * 0.5) * 0.5;
+  // line height in px (robust fallback if line-height is 'normal')
+  const lh = (() => {
+    const s = getComputedStyle(p);
+    const px = parseFloat(s.lineHeight);
+    return Number.isFinite(px) && px > 0 ? Math.round(px) : Math.max(16, Math.round(p.clientHeight / 3));
+  })();
+
+  // Quantize to line rows with a bit of hysteresis so we don't flap
+  const lineA = Math.floor((ar.y + lh * 0.35) / lh);
+  const lineB = Math.floor((br.y + lh * 0.35) / lh);
+  const sameLine = lineA === lineB;
+
+  // Lock caret height to line height (prevents tiny glyph-driven blips)
+  const H = lh;
 
   let x, y, h, dur;
-  if (!lineJump) {
-    // Same line: slide horizontally at steady pace
+
+  // On the same line: interpolate X only; keep Y locked to the row baseline
+  if (sameLine) {
     x = ar.x + (br.x - ar.x) * frac;
-    y = ar.y;
-    h = ar.h * (1 - frac) + br.h * frac;
-    dur = 110;                           // gentle slide
+    y = lineA * lh;   // hold Y steady; no end-of-word “dip”
+    h = H;
+    dur = 110;
+  // Crossing to the next line: keep Y on the current row until index advances
   } else {
-    // New line: snap X to next line start, quick Y hop
-    const fast = Math.min(1, frac * 4);  // 4x faster than on-line motion
-    x = br.x;                            // snap horizontally
-    y = ar.y + (br.y - ar.y) * fast;     // quick vertical ease
-    h = ar.h * (1 - fast) + br.h * fast;
-    dur = 150;                            // short transition feels “instant”
+    // Ease X toward the next line’s start, but don’t move Y yet.
+    // This avoids the one-frame vertical flicker at wraps.
+    const ease = Math.min(1, frac / 0.85); // gentle approach; snaps the last bit
+    x = ar.x + (br.x - ar.x) * ease;
+    y = lineA * lh;   // stay on current row until i actually increments next frame
+    h = H;
+    dur = 140;        // a hair more time so the hop feels smooth
   }
+
 
   // Hide when outside the visible panel (clipped area)
   const visY = y - p.scrollTop; // y is in content coords
