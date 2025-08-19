@@ -14,17 +14,42 @@ export function getCurrentWord(chars, currentIndex) {
   return idx;
 }
 
-// scrolls the display so the current span is visible
-export function scrollToCurrent(textDisplay, chars, currentIndex) {
-  const box = textDisplay, c = chars[currentIndex];
-  if (!c) return;
-  const lh = parseFloat(getComputedStyle(box).lineHeight);
-  // Add a small delay to allow browser reflow time
-  setTimeout(() => {
-    const top = c.offsetTop;
-    box.scrollTop = Math.max(0, top - lh);
-  }, 50); // 50ms delay for reflow
+export function scrollToCurrent(textDisplay, chars, index){
+  if (!textDisplay || !chars || !chars.length) return;
+
+  const i = Math.max(0, Math.min(index, chars.length - 1));
+  const cur  = chars[i];
+  const prev = i > 0 ? chars[i - 1] : null;
+
+  // only consider Space/Enter as scroll triggers
+  const triggerIsSpace  = !!(prev && prev.textContent === ' ');
+  const triggerIsEnter  = !!(prev && prev.textContent === '\n');
+  if (!triggerIsSpace && !triggerIsEnter) return;
+
+  const pRect = textDisplay.getBoundingClientRect();
+  const cRect = (cur.getClientRects()[0] || cur.getBoundingClientRect());
+  const pr    = prev ? (prev.getClientRects()[0] || prev.getBoundingClientRect()) : null;
+
+  // detect a new visual line (vertical jump bigger than ~0.6 of line height)
+  let crossedLine = false;
+  if (pr) {
+    const lh = Math.max(
+      cRect.height || 0,
+      pr.height    || 0,
+      parseFloat(getComputedStyle(cur).lineHeight) || 0
+    );
+    crossedLine = Math.abs(cRect.top - pr.top) > lh * 0.6;
+  }
+
+  if (!crossedLine) return;
+
+  // center the current line in the panel
+  const caretY   = (cRect.top - pRect.top) + textDisplay.scrollTop;
+  const desired  = Math.max(0, caretY - (textDisplay.clientHeight / 2 - cRect.height / 2));
+  const maxTop   = Math.max(0, textDisplay.scrollHeight - textDisplay.clientHeight);
+  textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'auto' });
 }
+
 
 // WPM = (correctChars / 5) / minutes
 export function calculateWPM(startTime, correctChars) {

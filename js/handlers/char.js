@@ -78,5 +78,6 @@ export async function handleChar(k, textDisplay, hideControl) {
 
   const mode = getHideMode(hideControl);
   updateHide(mode, getCurrentWord(chars, idxAfter), chars, textDisplay);
+
   scrollToCurrent(textDisplay, chars, idxAfter);
 }

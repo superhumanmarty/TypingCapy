@@ -5,6 +5,7 @@ import { boot } from './app/boot.js';
 import { EVT } from './app/events.js';
 import { initSmoothCaret } from './smooth-caret.js';
 
+
 window.addEventListener('DOMContentLoaded', async () => {
   const configs = await loadConfigs();
   window.configs = configs;

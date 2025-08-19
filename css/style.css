@@ -283,10 +283,9 @@ body.theme-cyberpunk {
   white-space: nowrap;
 }
 
-/* Ensure spaces are preserved */
-.char.space {
-  white-space: pre;
-}
+/* collapse spaces (pre would force a visible leading space) */
+.char.space { white-space: normal; }
+
 
 /* Ensure hidden newline characters don't interfere with cursor */
 .char[style*="display: none"].current {

@@ -38,6 +38,7 @@ export async function handleSpace(textDisplay, hideControl) {
   if (current && current.textContent === ' ') {
     return handleChar(' ', textDisplay, hideControl);
   }
+  
 
   // Otherwise: skip the rest of the word
   if (getSoundMode() !== 'off') playErrorBuzz();

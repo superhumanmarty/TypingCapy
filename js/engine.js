@@ -4,10 +4,12 @@ import { updateHide } from './hide.js';
 import { generateText } from './promptGenerator.js';
 import { getHideMode } from './settings.js';
 
+
 export let chars = [];
 export let currentIndex = 0;
 export let startTime = 0;
 export let originalLength = 0;
+
 
 export function setCurrentIndex(value) {
   currentIndex = value;
@@ -39,6 +41,7 @@ export function getParts(text) {
   
   return parts;
 }
+
 
 /* ---------- SAFE CONTROL READER ---------- */
 function readGenerationControls() {

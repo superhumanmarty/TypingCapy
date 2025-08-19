@@ -89,24 +89,17 @@
   margin-right: 0;
 }
 
-/* Spaces - add margin after space for proper word spacing */
-.char.space {
-  width: 1ch;
-  display: inline-block;
-  position: relative;
-  margin-right: 0; /* Remove margin, use fixed width */
+/* collapse spaces so a wrapped line never shows a leading space */
+.char.space,
+.char.space.current{
+  display: inline;       /* no box */
+  width: auto;           /* no fixed 1ch */
+  white-space: normal;   /* allow collapsing at line start */
+  margin: 0;
+  padding: 0;
+  position: static;
 }
 
-/* Spaces - remove custom ::before and vertical-align (use unified) */
-.char.space.current {
-  width: 1ch;               /* Keep fixed width */
-  height: 1em;
-  display: inline-block;
-  position: relative;
-  border-left: none !important;  /* Already none */
-  /* Remove vertical-align: text-bottom to prevent dip/shift */
-  /* vertical-align: text-bottom; */ /* Commented out */
-}
 
 /* Handle newlines properly */
 .char.newline {

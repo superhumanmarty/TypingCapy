@@ -11,6 +11,8 @@ let RAF = 0;
 let ARMED = false; // false => next update snaps (no fly-in)
 let LAST = { x: 0, y: 0, h: 0 };
 
+
+
 const STYLE_ID = 'smooth-caret-style-v8';
 
 let SETTINGS = {
@@ -128,6 +130,15 @@ function toHostContentXY(childRect, hostRect, sx, sy){
   return { x, y };
 }
 
+function isCollapsedSpace(node){
+  if (!node || !node.classList || !node.classList.contains('space')) return false;
+  // collapsed spaces have no rects or effectively zero width
+  const rects = node.getClientRects();
+  if (!rects || rects.length === 0) return true;
+  const w = rects[0].width || node.getBoundingClientRect().width;
+  return w < 0.5;
+}
+
 function anchorRect(){
   const cur = firstCurrent();
   if (!cur) return null;
@@ -138,20 +149,25 @@ function anchorRect(){
   const prev = prevChar(cur);
   let x, y, h;
 
-  if (prev && !prev.classList.contains('newline')) {
+  // Use previous char unless it is a collapsed space
+  const canUsePrev = prev && !prev.classList.contains('newline') && !isCollapsedSpace(prev);
+
+  if (canUsePrev) {
     const pr = prev.getBoundingClientRect();
     const pxy = toHostContentXY(pr, hostR, sx, sy);
-    x = pxy.x + (pr.width / sx);                 // right edge of prev (unscaled)
+    x = pxy.x + (pr.width / sx);
     y = pxy.y;
     h = Math.max(pr.height / sy, lineHeightUnscaled(prev, sy));
   } else {
-    const cr = cur.getBoundingClientRect();
-    const cxy = toHostContentXY(cr, hostR, sx, sy);
-    x = cxy.x;                                   // left edge of current
+    // fall back to the current char's rect — this handles "space at end of line"
+    const cr0 = cur.getClientRects()[0] || cur.getBoundingClientRect();
+    const cxy = toHostContentXY(cr0, hostR, sx, sy);
+    x = cxy.x;
     y = cxy.y;
-    h = Math.max(cr.height / sy, lineHeightUnscaled(cur, sy));
+    h = Math.max(cr0.height / sy, lineHeightUnscaled(cur, sy));
 
-    if (cur.classList.contains('newline') && prev) {
+    // special case: current is .newline — keep y/height from previous printable char if present
+    if (cur.classList.contains('newline') && prev && !isCollapsedSpace(prev)) {
       const pr = prev.getBoundingClientRect();
       const pxy = toHostContentXY(pr, hostR, sx, sy);
       y = pxy.y;
@@ -159,11 +175,10 @@ function anchorRect(){
     }
   }
 
-  // place the caret centered on the boundary
-  x -= SETTINGS.width * 0.5;
-
+  x -= SETTINGS.width * 0.5; // center the caret on the boundary
   return { x, y, h };
 }
+
 
 /* ---------- animation ---------- */
 function readCurrentPos(){
