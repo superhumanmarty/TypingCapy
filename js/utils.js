@@ -21,22 +21,20 @@ export function scrollToCurrent(textDisplay, chars, index){
   const cur  = chars[i];
   const prev = i > 0 ? chars[i - 1] : null;
 
-  // Only fire after a commit that *can* move us to a new line:
-  //   - typed a Space
-  //   - typed an Enter
-  //   - typed an extra character (.extra) that pushed a wrap
-  const triggerIsSpace = !!(prev && prev.textContent === ' ');
-  const triggerIsEnter = !!(prev && prev.textContent === '\n');
-  const triggerIsExtra = !!(prev && prev.classList && prev.classList.contains('extra'));
-  if (!triggerIsSpace && !triggerIsEnter && !triggerIsExtra) return;
+  // Did we just commit something that can move us to a new line?
+  const justTypedSpace = !!(prev && prev.textContent === ' ');
+  const justTypedEnter = !!(prev && prev.textContent === '\n');
+  const justTypedExtra = !!(prev && prev.classList && prev.classList.contains('extra'));
+  if (!justTypedSpace && !justTypedEnter && !justTypedExtra) return;
 
   const pRect = textDisplay.getBoundingClientRect();
   const cRect = (cur.getClientRects()[0] || cur.getBoundingClientRect());
   const pr    = prev ? (prev.getClientRects()[0] || prev.getBoundingClientRect()) : null;
 
-  // New visual line? (vertical delta > ~0.6 × line height)
-  let crossedLine = false;
-  if (pr) {
+  // If it was an EXTRA, always re-center (wrap detection can be timing-sensitive)
+  let crossedLine = justTypedExtra;
+
+  if (!crossedLine && pr) {
     const lh = Math.max(
       cRect.height || 0,
       pr.height    || 0,
@@ -44,16 +42,16 @@ export function scrollToCurrent(textDisplay, chars, index){
     );
     crossedLine = Math.abs(cRect.top - pr.top) > lh * 0.6;
   }
+
   if (!crossedLine) return;
 
-  // Center the current line in the 3-line viewport (line 2 of 3)
+  // Center current line (line 2 of 3) with smooth animation
   const caretY  = (cRect.top - pRect.top) + textDisplay.scrollTop;
   const desired = Math.max(0, caretY - (textDisplay.clientHeight / 2 - cRect.height / 2));
   const maxTop  = Math.max(0, textDisplay.scrollHeight - textDisplay.clientHeight);
-
-  // Smooth animation
   textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'smooth' });
 }
+
 
 
 

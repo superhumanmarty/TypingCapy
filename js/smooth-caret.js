@@ -149,35 +149,42 @@ function anchorRect(){
   const prev = prevChar(cur);
   let x, y, h;
 
-  // Use previous char unless it is a collapsed space
-  const canUsePrev = prev && !prev.classList.contains('newline') && !isCollapsedSpace(prev);
+  const cr  = cur.getBoundingClientRect();
+  const cxy = toHostContentXY(cr, hostR, sx, sy);
 
-  if (canUsePrev) {
-    const pr = prev.getBoundingClientRect();
-    const pxy = toHostContentXY(pr, hostR, sx, sy);
-    x = pxy.x + (pr.width / sx);
-    y = pxy.y;
-    h = Math.max(pr.height / sy, lineHeightUnscaled(prev, sy));
+  if (prev && !prev.classList.contains('newline')) {
+    if (prev.classList.contains('space')) {
+      // After a space: align to the CURRENT glyph’s line to avoid the tiny dip
+      x = cxy.x;                                   // left edge of current
+      y = cxy.y;
+      h = Math.max(cr.height / sy, lineHeightUnscaled(cur, sy));
+    } else {
+      const pr  = prev.getBoundingClientRect();
+      const pxy = toHostContentXY(pr, hostR, sx, sy);
+      x = pxy.x + (pr.width / sx);                 // right edge of prev
+      y = pxy.y;
+      h = Math.max(pr.height / sy, lineHeightUnscaled(prev, sy));
+    }
   } else {
-    // fall back to the current char's rect — this handles "space at end of line"
-    const cr0 = cur.getClientRects()[0] || cur.getBoundingClientRect();
-    const cxy = toHostContentXY(cr0, hostR, sx, sy);
+    // Start of line, or current is a newline placeholder
     x = cxy.x;
     y = cxy.y;
-    h = Math.max(cr0.height / sy, lineHeightUnscaled(cur, sy));
+    h = Math.max(cr.height / sy, lineHeightUnscaled(cur, sy));
 
-    // special case: current is .newline — keep y/height from previous printable char if present
-    if (cur.classList.contains('newline') && prev && !isCollapsedSpace(prev)) {
-      const pr = prev.getBoundingClientRect();
+    if (cur.classList.contains('newline') && prev) {
+      const pr  = prev.getBoundingClientRect();
       const pxy = toHostContentXY(pr, hostR, sx, sy);
       y = pxy.y;
       h = Math.max(pr.height / sy, lineHeightUnscaled(prev, sy));
     }
   }
 
-  x -= SETTINGS.width * 0.5; // center the caret on the boundary
+  // center the caret on the boundary
+  x -= SETTINGS.width * 0.5;
+
   return { x, y, h };
 }
+
 
 
 /* ---------- animation ---------- */
