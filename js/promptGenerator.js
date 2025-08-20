@@ -93,7 +93,8 @@ export async function generateText(
 
   // Coding languages: pull from snippets file (no random newlines)
   if (conf.type === 'coding') {
-    const snippets = await fetch(`data/words/words_${lang}.json`).then(res => res.json());
+    const fileLang = encodeURIComponent(lang);
+    const snippets = await fetch(`data/words/words_${fileLang}.json`).then(res => res.json());
     let text = '';
     for (let i = 0; i < wordCount; i++) {
       const tok = snippets[Math.floor(Math.random() * snippets.length)];
@@ -106,7 +107,8 @@ export async function generateText(
 
 
   // Human languages: random words list
-  let words = await fetch(`data/words/words_${lang}_${size}.json`).then(res => res.json());
+  const fileLang = encodeURIComponent(lang);
+  let words = await fetch(`data/words/words_${fileLang}_${size}.json`).then(res => res.json());
   words = words.sort(() => Math.random() - 0.5).slice(0, wordCount);
 
   // Capitalize first word if punctuation on
