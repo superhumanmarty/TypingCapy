@@ -4,6 +4,8 @@
 
 import { chars } from './engine.js';
 
+let _certGenerating = false;
+
 // ---------- small helpers ----------
 
 function readFinalWpm() {
@@ -311,7 +313,7 @@ function ensureCertificateNameDialogStyles() {
     font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
                  "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
   }
-                 
+
   /* card */
   .capy-cert-card {
     width: min(520px, 92vw);
@@ -471,12 +473,17 @@ export function setupCertificate() {
     ).appendChild(btn);
 
     btn.addEventListener('click', async () => {
-      const fullName = await askNameForCertificate();
-      if (!fullName) return;
-      await generateCertificate(fullName);
-      if (!fullName) return;
-      await generateCertificate(fullName);
+      if (_certGenerating) return;           // prevent double-fires
+      _certGenerating = true;
+      try {
+        const fullName = await askNameForCertificate();
+        if (!fullName) return;
+        await generateCertificate(fullName); // called once
+      } finally {
+        _certGenerating = false;
+      }
     });
+
 
     tagTargetGlobally();
     return true;
@@ -496,12 +503,17 @@ export function setupCertificate() {
     document.body.appendChild(btn);
 
     btn.addEventListener('click', async () => {
-      const fullName = await askNameForCertificate();
-      if (!fullName) return;
-      await generateCertificate(fullName);
-      if (!fullName) return;
-      await generateCertificate(fullName);
+      if (_certGenerating) return;           // prevent double-fires
+      _certGenerating = true;
+      try {
+        const fullName = await askNameForCertificate();
+        if (!fullName) return;
+        await generateCertificate(fullName); // called once
+      } finally {
+        _certGenerating = false;
+      }
     });
+
 
     tagTargetGlobally();
   };
