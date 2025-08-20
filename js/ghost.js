@@ -39,10 +39,24 @@ function panel() {
   return document.getElementById('textDisplay');
 }
 
-/** Filter to the baseline path: no .extra, no .skipped */
+// Replace the whole function with this
+let _lastTrack = [];
+let _rebuild = true; // build on first call, then every other frame
+
 function trackChars() {
-  return chars.filter(c => !c.classList.contains('extra') && !c.classList.contains('skipped'));
+  if (_rebuild) {
+    const out = [];
+    // manual loop is a bit faster than .filter for big NodeLists
+    for (let i = 0; i < chars.length; i++) {
+      const cl = chars[i].classList;
+      if (!cl.contains('extra') && !cl.contains('skipped')) out.push(chars[i]);
+    }
+    _lastTrack = out;
+  }
+  _rebuild = !_rebuild; // throttle: rebuild every other frame
+  return _lastTrack;
 }
+
 
 /** rect relative to panel */
 function relRect(el, panelRect, p) {
