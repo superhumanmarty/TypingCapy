@@ -80,8 +80,12 @@ export function positionKeyboardDiagram() {
   const kd    = document.getElementById('keyboardDiagram');
   if (!panel || !text || !kd || kd.classList.contains('hidden')) return;
 
+  // ≈ 3/4 cm down
+  const OFFSET_PX = 10; // tweak this number if you want a different nudge
+
   const panelRect = panel.getBoundingClientRect();
   const textRect  = text.getBoundingClientRect();
-  const top = (textRect.bottom - panelRect.top) + 12; // 12px gap
-  kd.style.top = `${top}px`;
+  const top = (textRect.bottom - panelRect.top) + 12 + OFFSET_PX; // was +12
+  kd.style.top = `${Math.round(top)}px`;
 }
+
