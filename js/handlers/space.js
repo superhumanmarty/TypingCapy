@@ -5,6 +5,8 @@ import { updateHide } from '../hide.js';
 import { playErrorBuzz, getSoundMode } from '../sound.js';
 import { handleChar } from './char.js';
 import { getHideMode } from '../settings.js';
+import { setState, markAttemptedOnce } from '../app/state.js';
+import { noteMetrics } from '../metrics.js';
 
 // Exported for compatibility with other modules (even if not used here)
 export let skipFrom = null;
@@ -44,6 +46,8 @@ export async function handleSpace(textDisplay, hideControl) {
     chars[endOfWord].classList.remove('current', 'correct', 'incorrect');
     chars[endOfWord].classList.add('skipped');
     chars[endOfWord].dataset.spaceSkipped = '1';
+    setState(chars[endOfWord], 'skipped');
+    markAttemptedOnce(chars[endOfWord]);
     endOfWord++;
   }
 
@@ -61,6 +65,8 @@ export async function handleSpace(textDisplay, hideControl) {
 
   // Start the ~1s countdown (idempotent: won’t restart if already running)
   scheduleTypedErrorHide(1000);
+
+  noteMetrics(Date.now(), 0, true);
 
   const updatedIndex = await getCurrent();
   const mode = getHideMode(hideControl);

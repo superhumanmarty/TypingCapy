@@ -46,7 +46,7 @@ import { resetGameLock, setWordsForHistoryFromChars } from '../controller/game-c
 import { getCurrentWord } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { updateHighlight } from '../highlight.js';
-import { resetMetrics, setAvgOverrideForRun } from '../metrics.js';
+import { resetMetrics, setAvgOverrideForRun, getLiveWPM } from '../metrics.js';
 import { resetHistory } from '../history.js';
 
 import { wireKeyboardVisibility } from '../ui/keyboard-visibility.js';
@@ -54,6 +54,7 @@ import { setupGhost } from '../ghost.js';
 import { enforceTimerVisibility, setTimerLabelToFull } from '../ui/timer-hud.js';
 import { initHideHighlightWatchers } from '../ui/hide-highlight-watchers.js';
 import { initPills } from '../ui/pills-init.js';
+import { setupHUD } from '../ui/hud.js';
 
 export async function boot({ configs }) {
   // --- DOM refs ---
@@ -69,6 +70,8 @@ export async function boot({ configs }) {
   const colorPickers = [...document.querySelectorAll('input[type="color"]')];
   const wpmSpan = document.getElementById('wpm');
   const accSpan = document.getElementById('accuracy');
+
+  setupHUD({ wpmSpan, accSpan, getLiveWPM, warmupMs: 2000 });
 
   // --- Start base layer ---
   startApp({ textDisplay, hideControl, highlightControl });

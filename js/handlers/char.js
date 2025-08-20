@@ -11,6 +11,9 @@ import { playPentatonic, playBlip, playClick, playErrorBuzz, getSoundMode } from
 import { getHideMode } from '../settings.js';
 import { endGame } from '../controller/game-controller.js';
 
+import { setState, markAttemptedOnce } from '../app/state.js';
+import { noteMetrics } from '../metrics.js';
+
 // Global-ish counter that resets on each fresh run
 window.capyErrors = 0;
 window.addEventListener('capy:runReset', () => { window.capyErrors = 0; });
@@ -51,6 +54,10 @@ export async function handleChar(k, textDisplay, hideControl) {
     current.classList.remove('current', 'incorrect');
     current.classList.add('correct');
 
+    setState(current, 'correct');
+    markAttemptedOnce(current);
+    noteMetrics(Date.now(), 1, false);
+
     // user did "other stuff" → start ~1s linger (do not restart if already running)
     scheduleTypedErrorHide(1000);
 
@@ -68,6 +75,10 @@ export async function handleChar(k, textDisplay, hideControl) {
     if (getSoundMode() !== 'off') playErrorBuzz();
     current.classList.remove('current');
     current.classList.add('incorrect');
+
+    setState(current, 'incorrect');
+    markAttemptedOnce(current);
+    noteMetrics(Date.now(), 0, true);
 
     const showErrors = !!document.getElementById('showTypedErrorsToggle')?.checked;
     if (showErrors) {

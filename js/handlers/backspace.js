@@ -3,6 +3,7 @@ import { chars, setCurrentIndex } from '../engine.js';
 import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { getHideMode } from '../settings.js';
+import { setState } from '../app/state.js';
 
 function getCurrent() {
   return import('../engine.js').then(m => m.currentIndex);
@@ -24,6 +25,7 @@ export async function handleBackspace(textDisplay, hideControl) {
 
   // Remove "extra" char if present
   if (currentIndex > 0 && chars[currentIndex - 1].classList.contains('extra')) {
+    setState(chars[currentIndex - 1], null);
     chars[currentIndex - 1].remove();
     chars.splice(currentIndex - 1, 1);
     setCurrentIndex(currentIndex - 1);
@@ -88,6 +90,7 @@ export async function handleBackspace(textDisplay, hideControl) {
     if (atWordStart) {
       for (let i = skipStart; i < chars.length && chars[i].classList.contains('skipped'); i++) {
         chars[i].classList.remove('skipped');
+        setState(chars[i], null);
       }
       if (currentIndex > 0) {
         chars[currentIndex - 1].classList.remove('correct', 'incorrect');
@@ -112,6 +115,7 @@ export async function handleBackspace(textDisplay, hideControl) {
     while (s > 0 && chars[s - 1].classList.contains('skipped')) s--;
     for (let i = s; i <= currentIndex - 2; i++) {
       chars[i].classList.remove('skipped');
+      setState(chars[i], null);
     }
     chars[currentIndex - 1].classList.remove('correct', 'incorrect');
     chars[currentIndex]?.classList.remove('current');
@@ -122,6 +126,7 @@ export async function handleBackspace(textDisplay, hideControl) {
     setCurrentIndex(currentIndex - 1);
     // Remove correctness marks from the char we moved onto
     chars[currentIndex - 1].classList.remove('correct', 'incorrect');
+    setState(chars[currentIndex - 1], null);
     chars[currentIndex - 1].classList.add('current');
 
     // NOTE: we intentionally DO NOT hide the error bubble here for normal backspaces

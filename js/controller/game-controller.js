@@ -19,10 +19,12 @@ import {
   logSpace, logEnter, logSkipped, setTargetWordsForRun, renderTypingHistory
 } from '../history.js';
 import {
-  resetMetrics, startMetrics, noteMetrics, getLiveWPM
+  resetMetrics, startMetrics, getLiveWPM
 } from '../metrics.js';
 import { buildResultsSettingsSummary, removeLegacyResultsHints } from '../ui/results.js';
 import { enforceWordLimitAvailability } from '../ui/limits.js';
+import { AppState, initWordProgress, resetTally, Tally } from '../app/state.js';
+import { scheduleHUD } from '../ui/hud.js';
 
 
 const WARMUP_MS = 2000;
@@ -72,6 +74,8 @@ export function resetGameLock() {
   // clear any stale WL fill
   const wlFill = document.getElementById('wordProgressFill');
   if (wlFill) wlFill.style.width = '0%';
+
+  resetTally();
 
   enforceWordLimitAvailability();
 }
@@ -138,7 +142,6 @@ export function endGame() {
   removeLegacyResultsHints();
 }
 
-// Rebuild _targetWords from required chars (used by main too)
 export function setWordsForHistoryFromChars() {
   const out = [];
   let buf = '';
@@ -153,7 +156,11 @@ export function setWordsForHistoryFromChars() {
   }
   if (buf) out.push(buf);
   setTargetWordsForRun(out);
+
+  // NEW: precompute required nodes & clear per-node flags
+  initWordProgress(chars);
 }
+
 
 // key handlers (wire these in main.js after initController)
 export async function handleKeyDown(e) {
@@ -195,9 +202,6 @@ export async function handleKeyDown(e) {
   if (getTimerDuration() > 0) startTimer();
 
   const { textDisplay, hideControl, highlightControl } = refs;
-
-  const prevCorrect = document.querySelectorAll('.char.correct').length;
-  const prevErrors  = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
 
   if (k === 'Backspace') {
     logBackspace();
@@ -242,37 +246,11 @@ export async function handleKeyDown(e) {
     }
   }
 
-  const correctCount   = document.querySelectorAll('.char.correct').length;
-  const incorrectCount = document.querySelectorAll('.char.incorrect').length;
-  const skippedCount   = document.querySelectorAll('.char.skipped').length;
-  const extraCount     = document.querySelectorAll('.char.extra').length;
-  const totalErrors    = incorrectCount + skippedCount + extraCount;
-  const totalAttempted = correctCount + totalErrors;
-
-  const newErrors    = document.querySelectorAll('.char.incorrect, .char.skipped, .char.extra').length;
-  const addedCorrect = Math.max(0, correctCount - prevCorrect);
-  const addedError   = newErrors > prevErrors;
-
-  // feed metrics stream
-  noteMetrics(Date.now(), addedCorrect, addedError);
-
-  // live HUD
-  const wpmSpan = document.getElementById('wpm');
-  const accSpan = document.getElementById('accuracy');
-
-  const elapsedMs = startTime ? (Date.now() - startTime) : 0;
-  if (elapsedMs < WARMUP_MS) {
-    if (wpmSpan) wpmSpan.textContent = 'WPM: ...';
-  } else {
-    const liveWpm = getLiveWPM(2000);
-    if (wpmSpan) wpmSpan.textContent = `WPM: ${liveWpm}`;
-  }
-
-  if (accSpan) {
-    accSpan.textContent = `Accuracy: ${calculateAccuracy(totalAttempted, correctCount)}%`;
-  }
+  // Batch HUD paint (1x per frame)
+  scheduleHUD(startTime);
 
   // End if WPM < (after warmup only)
+  const elapsedMs = startTime ? (Date.now() - startTime) : 0;
   if (document.getElementById('endWpmToggle')?.checked && elapsedMs >= WARMUP_MS) {
     const minWPM = parseInt(document.getElementById('endWpmValue').value, 10);
     const currentWPM = getLiveWPM(2000);
@@ -280,32 +258,21 @@ export async function handleKeyDown(e) {
   }
 
   // End if Accuracy <
-  if (document.getElementById('endAccToggle')?.checked && totalAttempted > 0) {
-    const minAccuracy = parseFloat(document.getElementById('endAccValue').value);
-    const currentAccuracy = parseFloat((accSpan?.textContent || '').replace('Accuracy: ', '').replace('%', ''));
-    if (!isNaN(minAccuracy) && currentAccuracy < minAccuracy) endGame();
-  }
-
-  // Word-limit progress + finish condition
-  const wordLimit = getWordLimit();
-  if (wordLimit > 0) {
-    const requiredNodes = chars.filter(n => n?.dataset?.required === '1');
-    const totalRequired = requiredNodes.length;
-
-    let attemptedRequired = 0;
-    for (const n of requiredNodes) {
-      const cl = n.classList;
-      if (cl.contains('correct') || cl.contains('incorrect') || cl.contains('skipped')) {
-        attemptedRequired++;
-      }
+  if (document.getElementById('endAccToggle')?.checked) {
+    const attempted = Tally.correct + Tally.incorrect + Tally.skipped + Tally.extra;
+    if (attempted > 0) {
+      const minAccuracy = parseFloat(document.getElementById('endAccValue').value);
+      const currentAccuracy = calculateAccuracy(attempted, Tally.correct);
+      if (!isNaN(minAccuracy) && currentAccuracy < minAccuracy) endGame();
     }
-
-    const progress = totalRequired ? (attemptedRequired / totalRequired) : 0;
-    const fill = document.getElementById('wordProgressFill');
-    if (fill) fill.style.width = Math.min(progress * 100, 100) + '%';
-
-    if (attemptedRequired >= totalRequired) endGame();
   }
+
+  // Word-limit finish (progress bar is painted by markAttemptedOnce)
+  const wordLimit = getWordLimit();
+  if (wordLimit > 0 && AppState.attemptedRequired >= AppState.totalRequired) {
+    endGame();
+  }
+
 
   // Endless append near end
   if (wordLimit === 0 && currentIndex >= originalLength - 50) {
