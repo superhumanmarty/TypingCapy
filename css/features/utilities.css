@@ -91,7 +91,7 @@ html, body { overflow-x: hidden; }
   /* cap between 1.3rem and 1.75rem, fluid in between */
   font-size: clamp(1.3rem, 1.0rem + 1.2vw, 1.75rem);
 }
-#stats, .timer-display { font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.1rem); }
+#stats { font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.1rem); }
 .keyboard-diagram img { max-height: clamp(220px, 40vh, 500px); }
 
 /* When the ad hides (<1100px), this still works — no changes needed */
