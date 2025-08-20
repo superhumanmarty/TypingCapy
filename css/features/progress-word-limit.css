@@ -34,3 +34,43 @@ body.game-ended #wordProgress,
 body.game-ended #wordProgressFill {
   display: none !important;
 }
+
+/* === Bigger + slightly higher Word Limit bar (only the bar) === */
+/* 1cm ≈ 37.8px; round to 38px */
+:root{
+  --wl-raise: 38px;      /* how much to lift it */
+  --wl-width: 420px;     /* make it a lot wider */
+  --wl-height: 32px;     /* and taller */
+}
+
+#wordProgress{
+  position: relative;
+  z-index: 17;                    /* under error bubble (20), under timer (18) */
+  width: min(var(--wl-width), 90vw);
+  height: var(--wl-height);
+  min-height: var(--wl-height);
+  border-radius: 10px;
+  margin: 0 auto;                 /* stay centered */
+  will-change: transform;
+}
+
+/* keep fill full-height after we made it taller */
+#wordProgressFill,
+.word-progress-fill{
+  height: 100%;
+}
+
+/* If the app uses zoom (Chromium): just translate up ~1cm */
+@supports (zoom: 1) {
+  .typing-panel > #wordProgress{
+    transform: translateY(calc(-1 * var(--wl-raise))) !important;
+  }
+}
+
+/* If the app uses the transform-scale fallback: include the scale, too */
+@supports not (zoom: 1) {
+  .typing-panel > #wordProgress{
+    transform: translateY(calc(-1 * var(--wl-raise))) scale(var(--game-scale)) !important;
+    transform-origin: top center;
+  }
+}
