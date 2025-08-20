@@ -279,9 +279,18 @@ export async function generateCertificate(fullName) {
 // Also put it on window as a safety rope for inline callers
 window.capyGenerateCertificate = generateCertificate;
 
+function ensureInterFontLinked() {
+  if (document.getElementById('capy-inter-font')) return;
+  const link = document.createElement('link');
+  link.id = 'capy-inter-font';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap';
+  document.head.appendChild(link);
+}
 
 // --- nice in-game name dialog ----------------------------------------------
 function ensureCertificateNameDialogStyles() {
+  ensureInterFontLinked();
   if (document.getElementById('cert-name-style')) return;
   const s = document.createElement('style');
   s.id = 'cert-name-style';
@@ -296,6 +305,13 @@ function ensureCertificateNameDialogStyles() {
   }
   @keyframes capyFadeIn { from { opacity: 0 } to { opacity: 1 } }
 
+  /* use Inter for the modal message text only */
+  .capy-cert-title,
+  .capy-cert-help {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+  }
+                 
   /* card */
   .capy-cert-card {
     width: min(520px, 92vw);
