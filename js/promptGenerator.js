@@ -91,15 +91,19 @@ export async function generateText(
   const conf = window.configs[lang];
   const sep = noSpaceLangs.includes(lang) ? '' : ' ';
 
-  // Coding languages: pull from snippets file
+  // Coding languages: pull from snippets file (no random newlines)
   if (conf.type === 'coding') {
     const snippets = await fetch(`data/words/words_${lang}.json`).then(res => res.json());
     let text = '';
     for (let i = 0; i < wordCount; i++) {
-      text += snippets[Math.floor(Math.random() * snippets.length)] + (Math.random() < 0.1 ? '\n' : ' ');
+      const tok = snippets[Math.floor(Math.random() * snippets.length)];
+      text += tok + ' ';
     }
+    text = text.replace(/[\r\n]+/g, ' '); // ← extra guard
     return text.trim();
   }
+
+
 
   // Human languages: random words list
   let words = await fetch(`data/words/words_${lang}_${size}.json`).then(res => res.json());
