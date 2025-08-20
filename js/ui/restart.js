@@ -15,7 +15,8 @@ export function wireRestartButtonUI({
   resetTimer,
   setTimerLabelToFull,
   resetGameLock,
-  applyKeyboardVisibility
+  applyKeyboardVisibility,
+  highlightControl,               // <-- accept the real highlight control
 }) {
   const btn = document.getElementById('restartButton');
   if (!btn) return;
@@ -36,9 +37,14 @@ export function wireRestartButtonUI({
     sanitizeExistingText(textDisplay);
     setWordsForHistoryFromChars();
 
-    const widx0 = getCurrentWord(window.chars || [], 0); // engine exports chars; window fallback
+    const widx0 = getCurrentWord(window.chars || [], 0);
+
+    // Correct: use hideControl for hide mode…
     updateHide(getHideMode(hideControl), widx0, window.chars, textDisplay);
-    updateHighlight(getHighlightMode(hideControl ? document.getElementById('highlightAheadSelector') : null) || getHighlightMode(document.getElementById('highlightAheadSelector')), widx0, window.chars);
+
+    // …and highlightControl for highlight mode (fallback to DOM selector if needed)
+    const hlCtrl = highlightControl ?? document.getElementById('highlightAheadSelector');
+    updateHighlight(getHighlightMode(hlCtrl), widx0, window.chars);
 
     resetMetrics?.();
     resetTimer?.();
