@@ -52,9 +52,6 @@ export function scrollToCurrent(textDisplay, chars, index){
   textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'smooth' });
 }
 
-
-
-
 // WPM = (correctChars / 5) / minutes
 export function calculateWPM(startTime, correctChars) {
   if (!startTime || startTime === 0) return 0;
@@ -68,7 +65,49 @@ export function calculateAccuracy(totalAttempted, correctChars) {
   return totalAttempted > 0 ? Math.round((correctChars / totalAttempted) * 100) : 100;
 }
 
+/* ================== Typed Error Bubble controls ====================== */
+/* Behavior:
+   - showTypedErrorBubble(ch): show/update the bubble, CANCEL any pending hide.
+   - scheduleTypedErrorHide(1000): start a ~1s hide countdown (no reset if already running).
+   - clearTypedErrorBubble(): hide immediately and cancel timer (used for “extra”, or deleting the wrong char).
+*/
+let _typedErrorHideTimer = null;
+
+export function showTypedErrorBubble(ch) {
+  const ted = document.getElementById('typedErrorDisplay');
+  const tl  = document.getElementById('typedLetter');
+  if (!ted || !tl) return;
+
+  tl.textContent = ch;
+  ted.classList.remove('hidden');
+
+  // Cancel any pending hide so it STAYS until we decide otherwise
+  if (_typedErrorHideTimer) {
+    clearTimeout(_typedErrorHideTimer);
+    _typedErrorHideTimer = null;
+  }
+}
+
+export function scheduleTypedErrorHide(ms = 1000) {
+  const ted = document.getElementById('typedErrorDisplay');
+  const tl  = document.getElementById('typedLetter');
+  if (!ted || ted.classList.contains('hidden')) return;
+
+  // Do NOT restart if a countdown is already running
+  if (_typedErrorHideTimer) return;
+
+  _typedErrorHideTimer = setTimeout(() => {
+    ted.classList.add('hidden');
+    if (tl) tl.textContent = '';
+    _typedErrorHideTimer = null;
+  }, ms);
+}
+
 export function clearTypedErrorBubble() {
+  if (_typedErrorHideTimer) {
+    clearTimeout(_typedErrorHideTimer);
+    _typedErrorHideTimer = null;
+  }
   const ted = document.getElementById('typedErrorDisplay');
   const tl  = document.getElementById('typedLetter');
   if (ted) ted.classList.add('hidden');

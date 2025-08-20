@@ -1,7 +1,6 @@
 // js/handlers/space.js
-
 import { chars, setCurrentIndex } from '../engine.js';
-import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils.js';
+import { getCurrentWord, scrollToCurrent, scheduleTypedErrorHide } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { playErrorBuzz, getSoundMode } from '../sound.js';
 import { handleChar } from './char.js';
@@ -20,27 +19,23 @@ function getCurrent() {
 }
 
 export async function handleSpace(textDisplay, hideControl) {
-  clearTypedErrorBubble();
   const currentIndex = await getCurrent();
   const current = chars[currentIndex];
 
   // If space was pressed when a space/newline was NOT expected,
-  // treat it as a single error for the cap.
+  // treat it as a single error for the cap (but do not end the game here).
   const cur = chars[currentIndex];
   const expectingSpace = !!cur && (cur.textContent === ' ' || cur.textContent === '\n');
   if (!expectingSpace) {
-    // Count the wrong space as one error, but do NOT end the game here.
     window.capyErrors = (window.capyErrors || 0) + 1;
   }
 
-
-  // If the expected char is a real space, type it as normal
+  // If the expected char is a real space, type it as normal (char.js will start the 1s linger)
   if (current && current.textContent === ' ') {
     return handleChar(' ', textDisplay, hideControl);
   }
-  
 
-  // Otherwise: skip the rest of the word
+  // Otherwise: skip the rest of the word (this is "other stuff" → start 1s linger)
   if (getSoundMode() !== 'off') playErrorBuzz();
 
   skipFrom = currentIndex;
@@ -48,7 +43,7 @@ export async function handleSpace(textDisplay, hideControl) {
   while (endOfWord < chars.length && chars[endOfWord].textContent !== ' ' && chars[endOfWord].textContent !== '\n') {
     chars[endOfWord].classList.remove('current', 'correct', 'incorrect');
     chars[endOfWord].classList.add('skipped');
-    chars[endOfWord].dataset.spaceSkipped = '1';  // persistently mark this word as space-skipped
+    chars[endOfWord].dataset.spaceSkipped = '1';
     endOfWord++;
   }
 
@@ -63,6 +58,9 @@ export async function handleSpace(textDisplay, hideControl) {
     chars[nextWordStart].classList.add('current');
   }
   skipTo = endOfWord;
+
+  // Start the ~1s countdown (idempotent: won’t restart if already running)
+  scheduleTypedErrorHide(1000);
 
   const updatedIndex = await getCurrent();
   const mode = getHideMode(hideControl);
