@@ -22,6 +22,41 @@ export async function handleBackspace(textDisplay, hideControl) {
     }
     return;
   }
+
+  // NEW: if caret is at the first char of an untyped word and user backspaces
+  // the separating space (or newline), permanently reveal that word.
+  // In "Current & Next", also reveal the following word forever.
+  (function markBackspaceRevealIfAtWordStart() {
+    const idx  = currentIndex;
+    const prev = idx > 0 ? chars[idx - 1] : null;
+    const cur  = idx < chars.length ? chars[idx] : null;
+    if (!prev || !cur) return;
+
+    // Only when the previous char is a separator and we are truly at a word start
+    if (prev.textContent !== ' ' && prev.textContent !== '\n') return;
+    const w = Number(cur.dataset.word);
+    if (!Number.isFinite(w) || w < 0) return;
+
+    // Ensure this word hasn't been typed/skipped yet
+    let hasTyped = false;
+    for (const n of chars) {
+      if (Number(n.dataset.word) === w) {
+        const cl = n.classList;
+        if (cl.contains('correct') || cl.contains('incorrect') || cl.contains('skipped')) {
+          hasTyped = true; break;
+        }
+      }
+    }
+    if (hasTyped) return;
+
+    // Flag every char in this word. hide.js will convert this flag into a
+    // permanent reveal (and also reveal w+1 in Current & Next).
+    for (const n of chars) {
+      if (Number(n.dataset.word) === w) {
+        n.dataset.backspaceReveal = '1';
+      }
+    }
+  })();
   
   // Detect skipped block just before
   let foundSkipped = false;

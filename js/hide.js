@@ -67,6 +67,30 @@ export function updateHide(mode, widx, chars, textDisplay) {
   // Once typing begins, remove the pre-typing blink entirely
   clearPreBlink(chars);
 
+  // --- PERMA-REVEAL SOURCES --------------------------------------------
+  // Any word that was space-skipped or flagged by a "backspace-before-typing"
+  // becomes permanently revealed for this run. In Current & Next mode,
+  // also reveal the immediately following word.
+  const flaggedWords = new Set();
+  for (const n of chars) {
+    const w = Number(n.dataset.word);
+    if (!Number.isFinite(w) || w < 0) continue;
+    if (
+      n.classList.contains('skipped') ||
+      n.dataset.spaceSkipped === '1' ||
+      n.dataset.backspaceReveal === '1'
+    ) {
+      flaggedWords.add(w);
+    }
+  }
+  for (const w of flaggedWords) {
+    revealedWords.add(w);          // always keep the skipped/flagged word visible
+    if (mode === 'currentNext') {
+      revealedWords.add(w + 1);    // and also the next word in Current & Next
+    }
+  }
+  // ----------------------------------------------------------------------
+
   // ---------- Normal hide logic ----------
   const currentWordHasError = chars.some(c => {
     const w = Number(c.dataset.word);

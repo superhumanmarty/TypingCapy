@@ -48,6 +48,7 @@ export async function handleSpace(textDisplay, hideControl) {
   while (endOfWord < chars.length && chars[endOfWord].textContent !== ' ' && chars[endOfWord].textContent !== '\n') {
     chars[endOfWord].classList.remove('current', 'correct', 'incorrect');
     chars[endOfWord].classList.add('skipped');
+    chars[endOfWord].dataset.spaceSkipped = '1';  // persistently mark this word as space-skipped
     endOfWord++;
   }
 
