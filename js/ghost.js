@@ -23,7 +23,7 @@ function injectCSS() {
       width:2px;
       height:var(--gh,18px);
       transform: translate(var(--gx,-9999px), var(--gy,-9999px));
-      background:#8fd8ff;
+      background: var(--caret-color, #8fd8ff);
       border-radius:1px;
       opacity:var(--gop,0);
       transition:
