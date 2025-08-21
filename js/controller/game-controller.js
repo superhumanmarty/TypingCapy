@@ -207,28 +207,25 @@ export async function handleKeyDown(e) {
     logBackspace();
     await handleBackspace(textDisplay, hideControl);
   } else if (k === 'Enter') {
-    const prevSkipped = new Set([...document.querySelectorAll('.char.skipped')]);
     logEnter();
     const cur = chars[currentIndex];
     const nxt = chars[currentIndex + 1];
+
     if (cur?.textContent === '\n') {
       await handleChar('\n', textDisplay, hideControl);
     } else if (cur?.classList.contains('correct') && nxt?.textContent === '\n') {
       setCurrentIndex(currentIndex + 1);
       await handleChar('\n', textDisplay, hideControl);
     } else {
+      // Enter behaves like Space when not on a newline
       await handleSpace(textDisplay, hideControl);
     }
+
     const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
     if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
   } else if (k === ' ') {
-    const prevSkipped = new Set([...document.querySelectorAll('.char.skipped')]);
     logSpace();
     await handleSpace(textDisplay, hideControl);
-    const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
-    if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
-
-    // Now that history is logged, end the run if the error cap was reached.
     maybeHitErrorCap();
   } else {
     const idx = currentIndex;

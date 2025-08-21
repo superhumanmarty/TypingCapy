@@ -43,8 +43,10 @@ export async function handleExtra(k, textDisplay, hideControl) {
   setState(extraSpan, 'extra');
   noteMetrics(Date.now(), 0, true);
 
-  chars.forEach(c => c.classList.remove('current'));
+  const prevCur = document.querySelector('.char.current');
+  if (prevCur) prevCur.classList.remove('current');
   chars[await getCurrent()]?.classList.add('current');
+
 
   const updatedIndex = await getCurrent();
   const mode = getHideMode(hideControl);

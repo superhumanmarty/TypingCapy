@@ -41,8 +41,9 @@ function playTypeSound() {
 }
 
 export async function handleChar(k, textDisplay, hideControl) {
-  // first, clear any leftover carets
-  chars.forEach(c => c.classList.remove('current'));
+  // first, clear the single previous caret (O(1) instead of O(N))
+  const prevCur = document.querySelector('.char.current');
+  if (prevCur) prevCur.classList.remove('current');
   const currentIndex = await getCurrent();
   if (currentIndex >= chars.length) return;
   const current = chars[currentIndex];

@@ -43,18 +43,11 @@
 }
 
 /* Character states */
-.char { 
-  color: var(--untyped-color); 
-  position: relative;
-  display: inline-block;
-  width: 1ch;
-  text-rendering: optimizeSpeed; /* Apply to chars too for consistency */
-  font-kerning: none;
-  letter-spacing: 0;
-  font-feature-settings: "kern" 0;
-  font-smooth: never; /* Disable smoothing on characters */
+.char {
+  color: var(--untyped-color);
+  display: inline;    /* natural glyph width */
+  position: static;   /* cheaper than relative on thousands of nodes */
 }
-
 .char.correct  { color: var(--correct-color); }
 .char.incorrect{ color: var(--incorrect-color); }
 .char.skipped  { color: var(--skipped-color); }

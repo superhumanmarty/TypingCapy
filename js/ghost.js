@@ -23,18 +23,23 @@ function injectCSS() {
       width:2px;
       height:var(--gh,18px);
       transform: translate(var(--gx,-9999px), var(--gy,-9999px));
-      background:#8fd8ff;           /* brighter */
+      background:#8fd8ff;
       border-radius:1px;
-      opacity:var(--gop,0);          /* 0/1 */
+      opacity:var(--gop,0);
       transition:
         transform var(--gdur,120ms) cubic-bezier(.22,.61,.36,1),
         opacity   80ms linear;
       pointer-events:none;
+
+      /* NEW: ensure compositor does the work (no main-thread paint) */
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
     body.game-ended #textDisplay::after { opacity:0 !important; }
   `;
   document.head.appendChild(s);
 }
+
 
 function panel() {
   return document.getElementById('textDisplay');
@@ -102,7 +107,7 @@ function tick() {
 
   if (_skipNextGeometry) { _skipNextGeometry = false; return; }
   _skipNextGeometry = true;
-  
+
   const panelRect = p.getBoundingClientRect();
   const a = T[i];
   const b = T[Math.min(T.length - 1, i + 1)] || a;
