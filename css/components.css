@@ -33,6 +33,8 @@
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
   font-smooth: never;
+
+  contain: layout paint;
 }
 #textDisplay::-webkit-scrollbar { display: none; }
 

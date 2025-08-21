@@ -4,13 +4,13 @@ body.theme-capyparadise {
   background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/capyparadise.png');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* ← lock the wallpaper in place */
-  --box-bg: #0a1f44; /* dark blue typing box */
-  --box-border: #66aaff; /* light‑blue border */
-  --header-color: #66aaff; /* title & theme text */
-  --stats-color: #aaddff; /* WPM & accuracy */
-  --correct-color: #ffffff;/* typed text */
-  --untyped-color: #cccccc;/* yet‑to‑type text */
+  background-attachment: scroll; /* was: fixed */
+  --box-bg: #0a1f44;
+  --box-border: #66aaff;
+  --header-color: #66aaff;
+  --stats-color: #aaddff;
+  --correct-color: #ffffff;
+  --untyped-color: #cccccc;
   --highlight-color: #39ff14;
 }
 
@@ -19,12 +19,12 @@ body.theme-cyberpunk {
   background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/cyberpunk.png');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* ← lock it here too */
-  --box-bg: #000000; /* black typing box */
-  --box-border: #ff00ff; /* neon pink border */
-  --header-color: #ff00ff; /* title & theme text */
-  --stats-color: #39ff14; /* WPM & accuracy in neon green */
-  --correct-color: #39ff14;/* typed text */
-  --untyped-color: #888888;/* yet‑to‑type text */
+  background-attachment: scroll; /* was: fixed */
+  --box-bg: #000000;
+  --box-border: #ff00ff;
+  --header-color: #ff00ff;
+  --stats-color: #39ff14;
+  --correct-color: #39ff14;
+  --untyped-color: #888888;
   --highlight-color: #00ffff;
 }
