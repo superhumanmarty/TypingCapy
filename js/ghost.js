@@ -4,6 +4,7 @@ import { chars } from './engine.js';
 let raf = null;
 let startMs = 0;
 let wpm = 60;
+let _skipNextGeometry = false; // throttle: compute geometry every other frame
 
 
 function injectCSS() {
@@ -39,7 +40,7 @@ function panel() {
   return document.getElementById('textDisplay');
 }
 
-// Replace the whole function with this
+
 let _lastTrack = [];
 let _rebuild = true; // build on first call, then every other frame
 
@@ -99,6 +100,9 @@ function tick() {
   const i = Math.min(T.length - 1, Math.floor(charFloat));
   const frac = Math.min(1, charFloat - i);
 
+  if (_skipNextGeometry) { _skipNextGeometry = false; return; }
+  _skipNextGeometry = true;
+  
   const panelRect = p.getBoundingClientRect();
   const a = T[i];
   const b = T[Math.min(T.length - 1, i + 1)] || a;
@@ -167,6 +171,8 @@ export function startGhost() {
   const raw = parseInt(document.getElementById('customGhostWPM')?.value || '60', 10);
   wpm = Number.isFinite(raw) ? Math.max(10, Math.min(300, raw)) : 60;
   startMs = performance.now();
+
+  _skipNextGeometry = false; // ← ensure no first-frame delay
 
   if (raf) cancelAnimationFrame(raf);
   tick();
