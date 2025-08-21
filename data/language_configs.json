@@ -1,40 +1,23 @@
 {
-  "c": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "c#": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "c++": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
+  "c":  { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "c#": { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "c++":{ "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+
   "eng": {
     "type": "human",
-    "word_lists": [500, 1000, 3000, 10000],
+    "word_lists": [100, 300, 500, 1000, 3000, 10000],
+    "subsets": {
+      "finance_bro": "words_eng_finance_bro.json",
+      "geo": "words_eng_geo.json",
+      "nerd": "words_eng_nerd.json"
+    },
     "punctuation_normal": "punctuation_normal_eng.json",
     "numbers_standalone": "numbers_standalone.json",
     "symbols_always": "symbols_always.json",
     "numbers_expressions": "numbers_expressions.json",
     "paragraphs": null
   },
+
   "indo": {
     "type": "human",
     "word_lists": [500, 1000],
@@ -44,51 +27,7 @@
     "numbers_expressions": "numbers_expressions.json",
     "paragraphs": null
   },
-  "java": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "js": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "php": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "python": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
-  "r": {
-    "type": "coding",
-    "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
-    "paragraphs": null
-  },
+
   "rus": {
     "type": "human",
     "word_lists": [500, 1000],
@@ -98,13 +37,73 @@
     "numbers_expressions": "numbers_expressions.json",
     "paragraphs": null
   },
-  "sql": {
-    "type": "coding",
+
+  "java":   { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "js":     { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "php":    { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "python": { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "r":      { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+  "sql":    { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
+
+  "goofy": {
+    "type": "human",
     "word_lists": [],
-    "punctuation_normal": null,
-    "numbers_standalone": null,
-    "symbols_always": null,
-    "numbers_expressions": null,
+    "subsets": {
+      "4chan": "words_eng_4chan.json",
+      "baby": "words_eng_baby.json",
+      "brainrot": "words_eng_brainrot.json",
+      "caveman": "words_eng_caveman.json",
+      "cat": "words_eng_cat.json",
+      "goose": "words_eng_goose.json",
+      "lolcat": "words_eng_lolcat.json",
+      "minecraft": "words_eng_minecraft.json",
+      "pirate": "words_eng_pirate.json",
+      "robot": "words_eng_robot.json",
+      "sarcasm": "words_eng_sarcasm.json",
+      "snake": "words_eng_snake.json",
+      "teenager": "words_eng_teenager.json",
+      "uwu": "words_eng_uwu.json",
+      "valley_girl": "words_eng_valley_girl.json",
+      "duck_duck_goose": "words_eng_ddg.json",
+
+      "brainf": "words_brainf.json",
+      "faces": "words_faces.json",
+      "ook": "words_ook.json",
+      "alien": "words_alien.json",
+      "jewish": "words_jewish.json",
+      "minion": "words_minion.json",
+      "piglatin": "words_piglatin.json",
+      "smoke_alarm": "words_smoke_alarm.json",
+      "binary": "words_binary.json"
+    },
+    "punctuation_normal": "punctuation_normal_eng.json",
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": "symbols_always.json",
+    "numbers_expressions": "numbers_expressions.json",
+    "paragraphs": null
+  },
+
+  "fictional": {
+    "type": "human",
+    "word_lists": [],
+    "subsets": {
+      "black_speech": "words_black_speech.json",
+      "galach": "words_galach.json",
+      "huttese": "words_huttese.json",
+      "jawaese": "words_jawaese.json",
+      "klingon": "words_klingon.json",
+      "matoran": "words_matoran.json",
+      "nadsat": "words_nadsat.json",
+      "orcish": "words_orcish.json",
+      "rlyehian": "words_rlyehian.json",
+      "sangheili": "words_sangheili.json",
+      "valyrian": "words_valyrian.json",
+      "harry_potter": "words_hp.json"
+    },
+    "punctuation_normal": "punctuation_normal_eng.json",
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": "symbols_always.json",
+    "numbers_expressions": "numbers_expressions.json",
     "paragraphs": null
   }
 }
