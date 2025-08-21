@@ -16,7 +16,7 @@ body.theme-capyparadise {
 
 /* Theme: Cyberpunk */
 body.theme-cyberpunk {
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/cyberpunk.png');
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../backgrounds/cyberpunk.png');
   background-size: cover;
   background-position: center;
   background-attachment: scroll; /* was: fixed */
