@@ -433,6 +433,7 @@ function askNameForCertificate() {
 // ---------- button wiring ----------
 
 export function setupCertificate() {
+  if (document.getElementById('downloadCertificateButton')) return; // controller owns the button
   // load styles once
   ensureCertificateButtonStyles();
 

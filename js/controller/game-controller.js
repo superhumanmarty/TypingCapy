@@ -221,8 +221,6 @@ export async function handleKeyDown(e) {
       await handleSpace(textDisplay, hideControl);
     }
 
-    const justSkipped = [...document.querySelectorAll('.char.skipped')].filter(n => !prevSkipped.has(n));
-    if (justSkipped.length) logSkipped(justSkipped.map(n => n.textContent));
   } else if (k === ' ') {
     logSpace();
     await handleSpace(textDisplay, hideControl);
@@ -258,7 +256,7 @@ export async function handleKeyDown(e) {
   if (document.getElementById('endAccToggle')?.checked) {
     const attempted = Tally.correct + Tally.incorrect + Tally.skipped + Tally.extra;
     if (attempted > 0) {
-      const minAccuracy = parseFloat(document.getElementById('endAccValue').value);
+      const minAccuracy = parseFloat(document.getElementById('endAccValue')?.value);
       const currentAccuracy = calculateAccuracy(attempted, Tally.correct);
       if (!isNaN(minAccuracy) && currentAccuracy < minAccuracy) endGame();
     }

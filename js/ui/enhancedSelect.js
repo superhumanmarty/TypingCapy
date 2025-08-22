@@ -104,13 +104,16 @@ function enhanceOne(select){
     const gutter   = 8;
 
     // Position within the panel’s own coordinate space (account for scroll)
-    const itemLeft   = panel.scrollLeft + (rect.left - rootRect.left);
-    const itemTop    = panel.scrollTop  + (rect.top  - rootRect.top);
+    const scrollLeft = panel === document.body ? window.scrollX : panel.scrollLeft;
+    const scrollTop  = panel === document.body ? window.scrollY : panel.scrollTop;
+    const itemLeft   = scrollLeft + (rect.left - rootRect.left);
+    const itemTop    = scrollTop  + (rect.top  - rootRect.top);
     const itemBottom = itemTop + rect.height;
 
     // Visible region of the panel
-    const visibleTop    = panel.scrollTop;
-    const visibleBottom = panel.scrollTop + panel.clientHeight;
+    const clientH       = panel === document.body ? window.innerHeight : panel.clientHeight;
+    const visibleTop    = scrollTop;
+    const visibleBottom = scrollTop + clientH;
 
     // Space that’s actually visible above/below the button
     const spaceAbove = (itemTop    - visibleTop)    - gutter;
