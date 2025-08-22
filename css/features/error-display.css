@@ -29,15 +29,17 @@
   overflow: visible !important;
 }
 
-/* Move the typed error bubble ~0.5 inch up and ~0.5 cm left */
-#typedErrorDisplay {
+/* Pin the error bubble near the very top, centered over the panel */
+#typedErrorDisplay{
   position: absolute;
-  top: max(0px, calc(clamp(80px, 8vh, 40px) - 48px)); /* ~0.5in higher */
+  top: clamp(4px, 1.25vh, 14px);   /* even closer to the top than before */
   left: 50%;
-  transform: translateX(calc(-41%));              /* ~0.5cm left */
+  transform: translateX(-41%);     /* keep slight left bias you like */
   margin: 0 !important;
   z-index: 1001;
+  pointer-events: none;            /* never block UI */
 }
+
 
 /* Use Inter (UI font) for the label, keep the boxed letter monospace */
 .typed-error-label {
@@ -53,3 +55,36 @@
 .typed-error-letter {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
 }
+
+/* --- Aggressive responsive shrink so the message never crowds anything --- */
+:root { --err-scale: 1; }
+
+@media (max-height: 900px) { :root { --err-scale: .94; } }
+@media (max-height: 840px) { :root { --err-scale: .88; } }
+@media (max-height: 780px) { :root { --err-scale: .82; } }
+@media (max-height: 720px) { :root { --err-scale: .75; } }
+@media (max-height: 660px) { :root { --err-scale: .68; } }
+@media (max-height: 600px) { :root { --err-scale: .60; } }
+@media (max-height: 560px) { :root { --err-scale: .54; } }
+@media (max-height: 520px) { :root { --err-scale: .50; } }
+@media (max-height: 480px) { :root { --err-scale: .46; } }
+@media (max-height: 440px) { :root { --err-scale: .42; } }
+@media (max-height: 400px) { :root { --err-scale: .38; } }
+@media (max-height: 360px) { :root { --err-scale: .36; } }
+@media (max-height: 320px) { :root { --err-scale: .34; } }
+
+.typed-error-display{
+  font-size: calc(1.2rem * var(--err-scale)) !important;
+  margin-top:  calc(0.5rem * var(--err-scale));
+  margin-bottom: calc(0.5rem * var(--err-scale));
+  line-height: 1.05;
+}
+
+.typed-error-display #typedLetter{
+  font-size: calc(1.4rem * var(--err-scale)) !important;
+  padding: calc(0.2rem * var(--err-scale)) calc(0.5rem * var(--err-scale));
+  border-radius: calc(4px * var(--err-scale));
+}
+
+/* Keep the bubble’s own context scaled (covers any em-based internals) */
+#typedErrorDisplay{ font-size: calc(1rem * var(--err-scale)); }
