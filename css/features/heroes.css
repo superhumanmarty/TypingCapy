@@ -445,3 +445,24 @@
 #proHero #highlightOptions {
   margin-top: .25rem !important;     /* was .6rem */
 }
+
+/* Place the Music row above the Sound row inside the SOUND hero */
+#soundHero #musicSettings { grid-column: 1 / -1; grid-row: 2; }
+#soundHero #soundSettings { grid-column: 1 / -1; grid-row: 3; }
+
+/* Highlight the pill when Music ≠ Off (matches your “on” styling) */
+.select-pill:has(select#musicSelector option:not([value="off"]):checked){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* Volume row look + disabled dim */
+#musicVolumeRow input[type="range"] {
+  width: 220px;
+  accent-color: var(--header-color);
+}
+#musicVolumeRow.disabled {
+  opacity: .55;
+  pointer-events: none;
+}

@@ -219,8 +219,40 @@
 
           <div class="hero-content">
             <div class="hero-title">SOUND</div>
+            <!-- NEW: Music dropdown + volume -->
+            <div id="musicSettings" class="plain">
+              <label for="musicSelector" class="mini-label">Music</label>
+              <div class="select-pill">
+                <select id="musicSelector" class="ui-select" aria-label="Music">
+                  <option value="off" selected>Off</option>
+                  <option value="holiday">Holiday</option>
+                  <option value="forest_sounds">Forest Sounds</option>
+                  <option value="eastern">Eastern</option>
+                  <option value="african">African</option>
+                  <option value="middle_eastern">Middle Eastern</option>
+                  <option value="classical">Classical</option>
+                  <option value="ocean_waves">Ocean Waves</option>
+                  <option value="piano">Piano</option>
+                  <option value="lofi">Lofi</option>
+                  <option value="guitar">Guitar</option>
+                  <option value="synthwave">Synthwave</option>
+                  <option value="spooky">Spooky</option>
+                  <option value="jazz">Jazz</option>
+                  <option value="zen">Zen</option>
+                  <option value="fantasy">Fantasy</option>
+                  <option value="ukelele">Ukelele</option>
+                </select>
+              </div>
+
+              <!-- volume slider sits UNDER the music dropdown -->
+              <div class="settings inline-setting" id="musicVolumeRow">
+                <label for="musicVolume">Volume</label>
+                <input type="range" id="musicVolume" min="0" max="100" value="50" step="1" tabindex="-1"/>
+              </div>
+            </div>
 
             <div id="soundSettings" class="plain">
+              <label for="soundSelector" class="mini-label">Typing</label>
               <div class="select-pill">
                 <select id="soundSelector" class="ui-select">
                   <option value="off" selected>Off</option>
