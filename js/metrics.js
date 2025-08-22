@@ -96,11 +96,9 @@ export function renderRunGraph(hostEl, durationMs) {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // theme colors
-  const grid  = getCss('--box-border', '#7f1bfa');
-  const line  = getCss('--stats-color', '#a6e3a1');
-  const text  = getCss('--correct-color', '#ffffff');
-  const error = getCss('--incorrect-color', '#f75f5f');
+  // theme-aware palette with graceful fallbacks
+  const { grid, line, text, error } = getThemeColors();
+
 
   // pad inside canvas (extra left so labels don't clip)
   const P = { l: 52, r: 18, t: 14, b: 24 };
@@ -388,13 +386,31 @@ export function renderRunGraph(hostEl, durationMs) {
   ctx.lineTo(right, bottom);
   ctx.stroke();
 
+  function getThemeColors() {
+    // Prefer explicit chart tokens if your CSS defines them,
+    // else fall back to theme tokens, else to neutral palette.
+    const grid  = getCss('--chart-grid-color',
+                  getCss('--box-border',  '#596174'));   // neutral grey
+    const line  = getCss('--chart-line-color',
+                  getCss('--highlight-color',
+                  getCss('--stats-color', '#7fd1ff')));  // accent > stats > cyan
+    const text  = getCss('--chart-text-color',
+                  getCss('--correct-color','#eaf0f7'));  // soft white
+    const error = getCss('--chart-error-color',
+                  getCss('--incorrect-color', '#ff6b6b')); // friendly red
+    return { grid, line, text, error };
+  }
 
 
   // helpers
   function getCss(varName, fallback) {
-    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    // Read vars from the element that actually inherits the theme (body/host),
+    // not from <html>.
+    const refEl = hostEl || document.body || document.documentElement;
+    const v = getComputedStyle(refEl).getPropertyValue(varName).trim();
     return v || fallback;
   }
+
   function withAlpha(rgbOrHex, a) {
     if (/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(rgbOrHex)) {
       const c = rgbToRgb(rgbOrHex);
