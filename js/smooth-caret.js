@@ -53,8 +53,13 @@ function createCaret(){
   CARET = document.createElement('div');
   CARET.className = 'smooth-caret';
   CARET.style.setProperty('--caret-w', `${SETTINGS.width}px`);
-  const col = SETTINGS.color || getComputedStyle(HOST).color || '#1f63ff';
-  CARET.style.setProperty('--caret-color', col);
+  // If a custom color is passed, use it; otherwise inherit from the theme.
+  if (SETTINGS.color != null && SETTINGS.color !== '') {
+    CARET.style.setProperty('--caret-color', SETTINGS.color);
+  } else {
+    CARET.style.removeProperty('--caret-color'); // let CSS variables control it
+  }
+
   if (SETTINGS.blink) CARET.classList.add('blink');
   HOST.appendChild(CARET);
   return CARET;

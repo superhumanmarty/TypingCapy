@@ -12,6 +12,7 @@ body.theme-capyparadise {
   --correct-color: #ffffff;
   --untyped-color: #cccccc;
   --highlight-color: #39ff14;
+  --caret-color: var(--highlight-color);
 }
 
 /* Theme: Cyberpunk */
@@ -27,6 +28,8 @@ body.theme-cyberpunk {
   --correct-color: #39ff14;
   --untyped-color: #888888;
   --highlight-color: #00ffff;
+  --caret-color: var(--highlight-color);
+
 }
 
 /* === NEW THEMES ========================================================= */

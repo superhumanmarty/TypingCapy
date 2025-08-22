@@ -25,7 +25,7 @@ function injectCSS() {
       transform: translate(var(--gx,-9999px), var(--gy,-9999px));
       background: var(--caret-color, #8fd8ff);
       border-radius:1px;
-      opacity:var(--gop,0);
+      opacity:calc(var(--gop,0) * 0.35);
       transition:
         transform var(--gdur,120ms) cubic-bezier(.22,.61,.36,1),
         opacity   80ms linear;
