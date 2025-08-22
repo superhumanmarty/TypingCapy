@@ -4,8 +4,10 @@ import { calculateAccuracy, getCurrentWord } from '../utils.js';
 import { updateHide } from '../hide.js';
 import {
   appendTyping, chars, currentIndex, startTime,
-  setCurrentIndex, setStartTime, originalLength
+  setCurrentIndex, setStartTime, originalLength,
+  maybePrune, pruneLeadingText
 } from '../engine.js';
+
 import { getHideMode, getHighlightMode } from '../settings.js';
 import { handleChar } from '../handlers/char.js';
 import { handleSpace } from '../handlers/space.js';
@@ -269,16 +271,22 @@ export async function handleKeyDown(e) {
   }
 
 
-  // Endless append near end
+  // Endless/timer: append a chunk when we near the end, then prune old stuff
   if (wordLimit === 0 && currentIndex >= originalLength - 50) {
     await appendTyping(textDisplay, hideControl);
     setWordsForHistoryFromChars();
+    maybePrune(refs.textDisplay, 80);   // keep ~80 words before the caret
   }
+
 
   // Re-apply highlight & hide
   const widx = getCurrentWord(chars, currentIndex);
   updateHighlight(getHighlightMode(highlightControl), widx, chars);
   updateHide(getHideMode(hideControl), widx, chars, refs.textDisplay);
+
+  // If the DOM has grown large for any reason, prune it down
+  maybePrune(refs.textDisplay, 80);
+
 }
 
 export function handleKeyUp(e) {

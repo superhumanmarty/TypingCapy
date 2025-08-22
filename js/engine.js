@@ -10,6 +10,69 @@ export let currentIndex = 0;
 export let startTime = 0;
 export let originalLength = 0;
 
+// --- add just below your exports ---
+const DEFAULT_ROLLING_BUFFER = 120;   // how many words to pre-render when NO word limit
+const APPEND_CHUNK_WORDS     = 80;    // words per append in endless/timer
+const MAX_CHARS_IN_DOM       = 4500;  // prune when DOM exceeds this many .char nodes
+const KEEP_WORDS_BEFORE      = 80;    // keep this many words before the caret
+
+export function pruneLeadingText(textDisplay, keepWordsBefore = KEEP_WORDS_BEFORE) {
+  // figure out the current word id
+  const curWord = getCurrentWord(chars, currentIndex);
+  const cutoffWord = Math.max(0, curWord - keepWordsBefore);
+  if (cutoffWord <= 0) return;
+
+  // find the first index we want to keep
+  let firstKeep = 0;
+  while (firstKeep < chars.length) {
+    if (firstKeep === currentIndex) break;
+    const w = Number(chars[firstKeep].dataset.word);
+    if (Number.isFinite(w) && w >= cutoffWord) break;
+    firstKeep++;
+  }
+  if (firstKeep <= 0) return;
+
+  // remove [0..firstKeep-1] from DOM and from chars
+  let removedBeforeCursor = 0;
+  for (let i = 0; i < firstKeep; i++) {
+    const n = chars[i];
+    if (i < currentIndex) removedBeforeCursor++;
+
+    const parent = n.parentNode;
+
+    // ✅ also remove the paired <br> we append after a newline span
+    if (n.classList && n.classList.contains('newline')) {
+      const br = n.nextSibling;
+      if (br && br.nodeName === 'BR') br.remove();
+    }
+
+    if (parent) parent.removeChild(n);
+
+    // clean up empty word wrappers
+    if (parent &&
+        parent.classList &&
+        parent.classList.contains('word-wrapper') &&
+        parent.childNodes.length === 0 &&
+        parent.parentNode) {
+      parent.parentNode.removeChild(parent);
+    }
+  }
+  chars.splice(0, firstKeep);
+
+  // fix cursor index & .current
+  currentIndex = Math.max(0, currentIndex - removedBeforeCursor);
+  document.querySelectorAll('.char.current').forEach(el => el.classList.remove('current'));
+  if (chars[currentIndex]) chars[currentIndex].classList.add('current');
+
+  originalLength = chars.length;
+}
+
+
+export function maybePrune(textDisplay, keepWordsBefore = KEEP_WORDS_BEFORE) {
+  if (chars.length > MAX_CHARS_IN_DOM) {
+    pruneLeadingText(textDisplay, keepWordsBefore);
+  }
+}
 
 export function setCurrentIndex(value) {
   currentIndex = value;
@@ -128,9 +191,15 @@ export async function initializeTyping(textDisplay, hideControl) {
   const preferredParagraphKey =
     (mode === 'paragraphs' && lang === 'eng') ? pickEnglishParagraphKey() : null;
 
+  // For word-limit mode, use the selected limit.
+  // For timer/endless (“off”), render a small rolling buffer to keep DOM tiny.
+  const effectiveWordCount =
+    (Number.isFinite(wordLimit) && wordLimit !== 1000) ? wordLimit : DEFAULT_ROLLING_BUFFER;
+
   const text = await generateText(
-    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn, wordLimit, preferredParagraphKey
+    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn, effectiveWordCount, preferredParagraphKey
   );
+
 
 
   
@@ -203,7 +272,7 @@ export async function appendTyping(textDisplay, hideControl) {
   let wordSize = wordSizeOrMode;
   if (wordSizeOrMode === 'paragraphs') { mode = 'paragraphs'; wordSize = null; }
 
-  const appendWordCount = 50;
+  const appendWordCount = APPEND_CHUNK_WORDS;
   const preferredParagraphKey =
     (mode === 'paragraphs' && lang === 'eng') ? pickEnglishParagraphKey() : null;
 
@@ -270,7 +339,7 @@ export async function appendTyping(textDisplay, hideControl) {
       }
     }
   }
-  
+
   textDisplay.appendChild(frag);
 
   
