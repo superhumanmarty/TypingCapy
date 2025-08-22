@@ -125,6 +125,11 @@ const SUBSET_LABELS = {
   'harry_potter': 'Harry Potter',
 };
 
+// Preferred default subset per “language” group
+const PREFERRED_SUBSET_DEFAULTS = {
+  goofy: 'alien',
+  fictional: 'klingon'
+};
 
 export function populateLanguageOptions(configs) {
   const languageSelector = document.getElementById('languageSelector');
@@ -176,14 +181,31 @@ export function updateUIForLanguage(configs) {
       if (hasSubsets) {
         const og2 = document.createElement('optgroup');
         og2.label = 'Subsets';
-        Object.entries(conf.subsets).forEach(([key, file]) => {
+        let firstOptionValue = null;
+
+        Object.entries(conf.subsets).forEach(([key, file], idx) => {
+          const value = `subset:${file}`;
           const opt = document.createElement('option');
-          opt.value = `subset:${file}`;          // consumed by promptGenerator
-          opt.textContent = SUBSET_LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          opt.value = value; // consumed by promptGenerator
+          opt.textContent =
+            SUBSET_LABELS[key] ||
+            key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          if (idx === 0) firstOptionValue = value;
           og2.appendChild(opt);
         });
+
         wordListSizeSelector.appendChild(og2);
+
+        // Preferred defaults for grouped languages
+        const prefKey = PREFERRED_SUBSET_DEFAULTS[lang];
+        if (prefKey && conf.subsets[prefKey]) {
+          wordListSizeSelector.value = `subset:${conf.subsets[prefKey]}`;
+        } else if (firstOptionValue && !wordListSizeSelector.value) {
+          // Fallback: ensure *something* is selected
+          wordListSizeSelector.value = firstOptionValue;
+        }
       }
+
     }
   } else {
     wordListSizeSettings?.classList.add('hidden');
