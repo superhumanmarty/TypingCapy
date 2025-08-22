@@ -162,6 +162,21 @@ export async function generateText(
     return out.join(' ').replace(/[\r\n]+/g, ' ').trim();
   }
 
+  // ----- Numbers-only language: use numbers_standalone.json -----
+  if (conf.type === 'numbers' || lang === 'numbers') {
+    // Load from data/numbers/ (not data/words/)
+    const file = conf.numbers_standalone || 'numbers_standalone.json';
+    const nums = await fetchJsonCached(`data/numbers/${file}`);
+
+    // Build output quickly
+    const out = new Array(wordCount);
+    for (let i = 0; i < wordCount; i++) {
+      out[i] = nums[Math.floor(Math.random() * nums.length)];
+    }
+    return out.join(sep).replace(/[\r\n]+/g, ' ').trim();
+  }
+
+
 
   // ----- Human languages -----
   // Decide which list to load:

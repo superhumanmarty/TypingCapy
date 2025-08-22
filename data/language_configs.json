@@ -45,6 +45,17 @@
   "r":      { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
   "sql":    { "type":"coding","word_lists":[],"punctuation_normal":null,"numbers_standalone":null,"symbols_always":null,"numbers_expressions":null,"paragraphs":null },
 
+  "numbers": {
+    "type": "numbers",
+    "word_lists": [],
+    "subsets": {},
+    "punctuation_normal": null,
+    "numbers_standalone": "numbers_standalone.json",
+    "symbols_always": null,
+    "numbers_expressions": null,
+    "paragraphs": null
+  },
+
   "goofy": {
     "type": "human",
     "word_lists": [],

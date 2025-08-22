@@ -74,7 +74,10 @@ const LANGUAGE_NAMES = {
 
   // new grouped “languages”
   'goofy': 'Goofy',
-  'fictional': 'Fictional'
+  'fictional': 'Fictional',
+
+  'numbers': 'Numbers'
+
 };
 
 const SUBSET_LABELS = {
