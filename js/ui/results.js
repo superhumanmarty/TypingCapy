@@ -38,20 +38,51 @@ export function buildResultsSettingsSummary() {
   wrap.innerHTML = '';
 
   const add = (label) => {
+    if (!label) return;
     const chip = document.createElement('span');
     chip.className = 'badge';
     chip.textContent = label;
     wrap.appendChild(chip);
   };
 
+  // ---- Language / subset / word-list chip(s) ----
   const langLabel = document.querySelector('#languageSelector option:checked')?.textContent?.trim();
-  if (langLabel) add(`Language: ${langLabel}`);
 
   const wls = document.getElementById('wordListSizeSelector');
-  if (isHuman && wls && wls.options?.length > 0) {
-    if (wls.value && !isNaN(parseInt(wls.value, 10))) add(`${wls.value} words`);
+  let selectedVal = '';
+  let selectedText = '';
+  if (wls && wls.options?.length > 0 && wls.selectedIndex >= 0) {
+    const opt = wls.options[wls.selectedIndex];
+    selectedVal  = String(opt?.value || '');
+    selectedText = (opt?.textContent || '').trim(); // e.g. "100 words" or "Nerd"
   }
 
+  const isSubset  = selectedVal.startsWith('subset:');
+  const isNumeric = /^\d+$/.test(selectedVal);
+
+  if (langKey === 'goofy' || langKey === 'fictional') {
+    // Goofy/Fictional: show ONLY the subset name
+    if (isSubset && selectedText) {
+      add(selectedText);
+    } else if (langLabel) {
+      // Fallback if no subset somehow selected
+      add(langLabel);
+    }
+  } else {
+    // Other languages (e.g., English, Indonesian, Russian):
+    // - numeric → "English 100 words"
+    // - subset  → "English Nerd" / "English Geography" / "English Finance Bro"
+    // - none    → "English"
+    if (isNumeric && langLabel && selectedText) {
+      add(`${langLabel} ${selectedText}`);
+    } else if (isSubset && langLabel && selectedText) {
+      add(`${langLabel} ${selectedText}`);
+    } else if (langLabel) {
+      add(langLabel);
+    }
+  }
+
+  // ---- Toggles (only for human langs and when visible) ----
   const togglesVisible = isHuman && !document.getElementById('togglesSettings')?.classList.contains('hidden');
   if (togglesVisible) {
     if (document.getElementById('numbersToggle')?.checked)      add('123');
@@ -60,6 +91,7 @@ export function buildResultsSettingsSummary() {
     if (document.getElementById('symbolsToggle')?.checked)      add('@#&');
   }
 
+  // ---- Timer & Word limit ----
   const tSel = document.getElementById('timerSelector');
   if (tSel && tSel.value !== 'off') {
     const sec = parseInt(tSel.value, 10);
@@ -69,6 +101,7 @@ export function buildResultsSettingsSummary() {
   const wlSel = document.getElementById('wordLimitSelector');
   if (wlSel && wlSel.value !== 'off') add(`Word limit: ${wlSel.value}`);
 
+  // ---- Misc ----
   if (document.getElementById('keyboardDiagramToggle')?.checked) add('Keyboard guide');
 
   const hideVal = document.getElementById('hideWordsSelector')?.value;
@@ -88,6 +121,7 @@ export function buildResultsSettingsSummary() {
     if (v) add(`End at ${v} errors`);
   }
 
+  // ---- Graph ----
   const host = document.getElementById('runGraph');
   if (host) {
     host.innerHTML = '';
@@ -96,6 +130,7 @@ export function buildResultsSettingsSummary() {
     renderRunGraph(host, null);
   }
 }
+
 
 export function removeLegacyResultsHints() {
   const rs = document.getElementById('resultsScreen');
