@@ -43,6 +43,57 @@ const punctCategories = {
   }
 };
 
+// tiny in-memory fetch cache so we don't re-fetch the same JSON
+const _jsonCache = new Map();
+async function fetchJsonCached(url){
+  if (_jsonCache.has(url)) return _jsonCache.get(url);
+  const p = fetch(url).then(r => r.json());
+  _jsonCache.set(url, p);
+  return p;
+}
+
+// sample k items from an array WITHOUT shuffling the whole array (O(k))
+function sampleWithoutReplacement(arr, k){
+  const n = arr.length;
+  if (k >= n) return arr.slice(0);
+  // Floyd's algorithm
+  const chosen = new Set();
+  for (let i = n - k; i < n; i++){
+    const t = Math.floor(Math.random() * (i + 1));
+    chosen.add(chosen.has(t) ? i : t);
+  }
+  const out = new Array(k);
+  let j = 0;
+  for (const idx of chosen) out[j++] = arr[idx];
+  return out;
+}
+
+// choose k unique gap positions (0..len) to insert evenly-ish
+function chooseKPositions(gaps, k){
+  k = Math.max(0, Math.min(k, gaps));
+  const chosen = new Set();
+  for (let i = gaps - k; i < gaps; i++){
+    const t = Math.floor(Math.random() * (i + 1));
+    chosen.add(chosen.has(t) ? i : t);
+  }
+  return Array.from(chosen).sort((a,b)=>a-b);
+}
+
+// inject k generated tokens into gaps uniformly
+function injectUniform(baseTokens, makeToken, k){
+  if (k <= 0) return baseTokens;
+  const gaps = baseTokens.length + 1;
+  const pos = chooseKPositions(gaps, k);
+  const out = [];
+  let last = 0;
+  for (const p of pos){
+    while (last < p) out.push(baseTokens[last++]);
+    out.push(makeToken());
+  }
+  while (last < baseTokens.length) out.push(baseTokens[last++]);
+  return out;
+}
+
 function resolvePunctLang(lang) {
   // Only rus/indo have custom punctuation; everyone else falls back to ENG
   return (lang === 'rus' || lang === 'indo' || lang === 'eng') ? lang : 'eng';
@@ -102,14 +153,15 @@ export async function generateText(
   // ----- Coding languages: pull tokens from a single file (no newlines) -----
   if (conf.type === 'coding') {
     const fileLang = encodeURIComponent(lang);
-    const snippets = await fetch(`data/words/words_${fileLang}.json`).then(res => res.json());
-    let text = '';
+    const snippets = await fetchJsonCached(`data/words/words_${fileLang}.json`);
+    // build array then join once (faster than += in a loop)
+    const out = new Array(wordCount);
     for (let i = 0; i < wordCount; i++) {
-      const tok = snippets[Math.floor(Math.random() * snippets.length)];
-      text += tok + ' ';
+      out[i] = snippets[Math.floor(Math.random() * snippets.length)];
     }
-    return text.replace(/[\r\n]+/g, ' ').trim();
+    return out.join(' ').replace(/[\r\n]+/g, ' ').trim();
   }
+
 
   // ----- Human languages -----
   // Decide which list to load:
@@ -117,29 +169,20 @@ export async function generateText(
   //  • ENG subset option     -> value is "subset:<filename.json>"
   //  • Others (single file)  -> words_<lang>.json
   const fileLang = encodeURIComponent(lang);
-  let words;
-
+  let srcWords;
   const sizeVal = (size == null) ? '' : String(size).trim();
 
   if (/^\d+$/.test(sizeVal)) {
-    words = await fetch(`data/words/words_${fileLang}_${sizeVal}.json`).then(r => r.json());
+    srcWords = await fetchJsonCached(`data/words/words_${fileLang}_${sizeVal}.json`);
   } else if (sizeVal.startsWith('subset:')) {
-    // named subset for any language
     const file = sizeVal.slice('subset:'.length);
-    words = await fetch(`data/words/${file}`).then(r => r.json());
-  } else if (lang === 'eng' && sizeVal.startsWith('subset:')) {
-    const file = sizeVal.slice('subset:'.length);
-    words = await fetch(`data/words/${file}`).then(r => r.json());
-  } else if (/^\d+$/.test(sizeVal)) {
-    // RUS / INDO numeric lists
-    words = await fetch(`data/words/words_${fileLang}_${sizeVal}.json`).then(r => r.json());
+    srcWords = await fetchJsonCached(`data/words/${file}`);
   } else {
-    // Single-lexicon human languages
-    words = await fetch(`data/words/words_${fileLang}.json`).then(r => r.json());
+    srcWords = await fetchJsonCached(`data/words/words_${fileLang}.json`);
   }
 
-  // Shuffle and trim to requested count
-  words = words.sort(() => Math.random() - 0.5).slice(0, wordCount);
+  // NEW: O(k) sampling — independent of dataset size
+  let words = sampleWithoutReplacement(srcWords, wordCount);
 
   // Capitalize first word if punctuation on for ENG/INDO/RUS
   if (punct && ['eng','indo','rus'].includes(lang) && words.length > 0) {
@@ -212,7 +255,7 @@ export async function generateText(
 
   // Advanced symbols (@ # &) — only if punctuation is on AND advSymbols requested
   if (punct && advSymbols && conf.symbols_always) {
-    const symbols = await fetch(`data/punctuation/${conf.symbols_always}`).then(res => res.json());
+    const symbols = await fetchJsonCached(`data/punctuation/${conf.symbols_always}`);
     const prefixSym = symbols.filter(s => s === '@' || s === '#');
     const prefixProb = 0.05;
     let arr = text.split(sep);
@@ -232,28 +275,28 @@ export async function generateText(
     text = arr.join(sep);
   }
 
-  // Numbers: standalone OR expressions (mutually exclusive)
+  // ---------- Numbers: proportional & uniform ----------
   if (numbers && conf.numbers_standalone) {
+    // split AFTER punctuation/quotes so we base ratios on what the player will see
+    let tokens = text.split(sep);
+
+    // tune these:
+    const RATIO_STANDALONE = 0.10;  // ~10% plain numbers when only 123 is on
+    const RATIO_EXPR       = 0.065; // ~6.5% inserts when += is on (expressions are often multi-word)
+
     if (numbersExpr && conf.numbers_expressions) {
-      const exprs = await fetch(`data/numbers/${conf.numbers_expressions}`).then(res => res.json());
-      let list = text.split(sep);
-      const insertCount = Math.max(1, Math.floor(wordCount / 15));
-      for (let i = 0; i < insertCount; i++) {
-        const insertPos = Math.floor(Math.random() * (list.length + 1));
-        list.splice(insertPos, 0, exprs[Math.floor(Math.random() * exprs.length)]);
-      }
-      text = list.join(sep);
+      const exprs = await fetchJsonCached(`data/numbers/${conf.numbers_expressions}`);
+      const target = Math.max(1, Math.round(tokens.length * RATIO_EXPR));
+      tokens = injectUniform(tokens, () => exprs[Math.floor(Math.random() * exprs.length)], target);
     } else {
-      const nums = await fetch(`data/numbers/${conf.numbers_standalone}`).then(res => res.json());
-      let list = text.split(sep);
-      const insertCount = Math.max(1, Math.floor(wordCount / 10));
-      for (let i = 0; i < insertCount; i++) {
-        const insertPos = Math.floor(Math.random() * (list.length + 1));
-        list.splice(insertPos, 0, nums[Math.floor(Math.random() * nums.length)]);
-      }
-      text = list.join(sep);
+      const nums = await fetchJsonCached(`data/numbers/${conf.numbers_standalone}`);
+      const target = Math.max(1, Math.round(tokens.length * RATIO_STANDALONE));
+      tokens = injectUniform(tokens, () => nums[Math.floor(Math.random() * nums.length)], target);
     }
+
+    text = tokens.join(sep);
   }
+
 
   return text;
 }

@@ -137,7 +137,8 @@ export async function initializeTyping(textDisplay, hideControl) {
   // Generate parts
   const parts = getParts(text);
   
-  // Build the DOM structure
+  // Build the DOM structure (FAST: fragment + single append)
+  const frag = document.createDocumentFragment();
   let widx = 0;
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
@@ -153,29 +154,29 @@ export async function initializeTyping(textDisplay, hideControl) {
         wordSpan.appendChild(span);
         chars.push(span);
       }
-      textDisplay.appendChild(wordSpan);
+      frag.appendChild(wordSpan);
       widx++;
     } else {
       if (part.text === '\n') {
         const span = document.createElement('span');
-        span.textContent = part.text;
+        span.textContent = '\n';
         span.className = 'char newline';
         span.dataset.word = -1;
         chars.push(span);
-        textDisplay.appendChild(span);
-        
-        const br = document.createElement('br');
-        textDisplay.appendChild(br);
+        frag.appendChild(span);
+        frag.appendChild(document.createElement('br'));
       } else if (part.text === ' ') {
         const span = document.createElement('span');
-        span.textContent = part.text;
+        span.textContent = ' ';
         span.className = 'char space';
         span.dataset.word = -1;
         chars.push(span);
-        textDisplay.appendChild(span);
+        frag.appendChild(span);
       }
     }
   }
+  textDisplay.appendChild(frag);
+
   
   originalLength = chars.length;
   
@@ -212,19 +213,28 @@ export async function appendTyping(textDisplay, hideControl) {
 
   const newParts = getParts(newText);
   
-  let widx = Math.max(...chars.map(c => Number(c.dataset.word) || 0)) + 1;
-  
+  // Compute next word index by scanning from tail (FAST)
+  let tail = chars.length - 1;
+  let lastWordId = -1;
+  while (tail >= 0) {
+    const v = Number(chars[tail].dataset.word);
+    if (Number.isFinite(v) && v >= 0) { lastWordId = v; break; }
+    tail--;
+  }
+  let widx = lastWordId + 1;
+
+  // Append using a fragment (single DOM write)
+  const frag = document.createDocumentFragment();
+
   // Append a typeable newline to separate paragraphs
   const newlineSpan = document.createElement('span');
   newlineSpan.textContent = '\n';
   newlineSpan.className = 'char newline';
   newlineSpan.dataset.word = -1;
   chars.push(newlineSpan);
-  textDisplay.appendChild(newlineSpan);
-  
-  const br = document.createElement('br');
-  textDisplay.appendChild(br);
-  
+  frag.appendChild(newlineSpan);
+  frag.appendChild(document.createElement('br'));
+
   // Now append the new paragraph's parts
   for (let part of newParts) {
     if (part.type === 'word') {
@@ -239,29 +249,30 @@ export async function appendTyping(textDisplay, hideControl) {
         wordSpan.appendChild(span);
         chars.push(span);
       }
-      textDisplay.appendChild(wordSpan);
+      frag.appendChild(wordSpan);
       widx++;
     } else {
       if (part.text === '\n') {
         const span = document.createElement('span');
-        span.textContent = part.text;
+        span.textContent = '\n';
         span.className = 'char newline';
         span.dataset.word = -1;
         chars.push(span);
-        textDisplay.appendChild(span);
-        
-        const br2 = document.createElement('br');
-        textDisplay.appendChild(br2);
+        frag.appendChild(span);
+        frag.appendChild(document.createElement('br'));
       } else if (part.text === ' ') {
         const span = document.createElement('span');
-        span.textContent = part.text;
+        span.textContent = ' ';
         span.className = 'char space';
         span.dataset.word = -1;
         chars.push(span);
-        textDisplay.appendChild(span);
+        frag.appendChild(span);
       }
     }
   }
+  
+  textDisplay.appendChild(frag);
+
   
   originalLength = chars.length;
   
