@@ -369,3 +369,19 @@ html, body {
 .is-on::after,
 .split-half.is-on::after { content: none !important; }
 
+/* Hide order: word bar → timer (wee bit sooner) → live stats (later) */
+
+/* Word limit bar (unchanged) */
+@media (max-height: 760px){
+  html body .container .typing-panel #wordProgress { display: none !important; }
+}
+
+/* Timer — hide a weeee bit sooner than before (was 740px) */
+@media (max-height: 752px){
+  html body .container .typing-panel #timerDisplay { display: none !important; }
+}
+
+/* Live stats — hide later (only when very short; was 640px) */
+@media (max-height: 600px){
+  html body .container .typing-panel #stats { display: none !important; }
+}
