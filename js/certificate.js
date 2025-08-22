@@ -224,73 +224,200 @@ export async function generateCertificate(fullName) {
     return;
   }
 
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-  const M = 56;
+  // Fonts for the HTML->canvas render
+  ensureInterFontLinked();
+  ensureSignatureFontLinked();
+  try {
+    if (document.fonts && document.fonts.load) {
+      await Promise.allSettled([
+        document.fonts.load('400 16px Inter'),
+        document.fonts.load('800 16px Inter'),
+        document.fonts.load('400 32px "Great Vibes"')
+      ]);
+      await document.fonts.ready;
+    }
+  } catch (_) {}
+
+  // Landscape A4
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const maxW = pageW - 2 * M;
-  let y = M;
 
-  // Title with name (colored)
-  doc.setFont('times', 'bold');
-  doc.setFontSize(20);
-  doc.setTextColor(0, 0, 0);
-  doc.text('Certificate of Typing Performance for', pageW / 2, y, { align: 'center' });
-  y += 26;
-
-  doc.setFontSize(26);
-  doc.setTextColor(31, 99, 255);
-  doc.text(fullName || 'Typist', pageW / 2, y, { align: 'center' });
-  y += 12;
-  doc.setDrawColor(180);
-  doc.line(M, y, pageW - M, y);
-  y += 24;
-
-  // Issued on (US 12-hour time)
-  doc.setFont('times', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`Issued on ${formatDateTimeUS()}`, pageW / 2, y, { align: 'center' });
-  y += 28;
-
-  // Final WPM / Accuracy row
   const finalWpm = readFinalWpm();
   const finalAcc = readFinalAccuracy();
-  doc.setFont('times', 'bold');
-  doc.setFontSize(16);
-  const resText = [
-    `Final WPM: ${Number.isFinite(finalWpm) ? finalWpm : '—'}`,
-    `Accuracy: ${Number.isFinite(finalAcc) ? `${finalAcc}%` : '—'}`
-  ].join('    |    ');
-  doc.text(resText, pageW / 2, y, { align: 'center' });
-  y += 24;
+  const issued   = formatDateTimeUS();
+  const chips    = getActiveSettingsChips();
 
-  // Active Settings (chips already filtered to only “on” things)
-  const chips = getActiveSettingsChips();
-  if (chips.length) {
-    doc.setFont('times', 'bold'); doc.setFontSize(14); doc.text('Active Settings', M, y); y += 14;
-    doc.setFont('times', 'normal'); doc.setFontSize(11);
-    const colW = maxW >= 500 ? maxW / 2 : maxW;
-    let colX = M, colY = y;
-    const perCol = Math.ceil(chips.length / (colW === maxW ? 1 : 2));
-    chips.forEach((label, i) => {
-      const idx = i % perCol;
-      if (i && idx === 0) { colX = M + colW + 18; colY = y; }
-      if (colY + 16 > pageH - M) { doc.addPage(); colY = M; }
-      doc.text(`• ${label}`, colX, colY);
-      colY += 16;
-    });
-    y = Math.max(colY, y) + 8;
-  }
+  // Safe text for HTML
+  const esc = s => (s || '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
 
-  // Footer rule
-  doc.setDrawColor(180);
-  doc.line(M, pageH - M, pageW - M, pageH - M);
+  // Hidden, pixel-perfect frame that matches the PDF size
+  const frame = document.createElement('div');
+  frame.id = 'capy-cert-frame';
+  frame.style.cssText = `
+    position: fixed;
+    left: -100000px; top: 0;
+    width: ${pageW}px; height: ${pageH}px;
+    background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+  `;
 
-  // Save
+  // Inline CSS just for this frame
+  const style = document.createElement('style');
+  style.textContent = `
+    #capy-cert-frame, #capy-cert-frame * { box-sizing: border-box; }
+
+    .capy-cert-wrap {
+      position: relative;
+      width: calc(100% - 96px);
+      height: calc(100% - 96px);
+      /* ⬇⬇ extra bottom padding to make room for the settings row */
+      padding: 28px 36px 88px;
+      margin: 0 auto;
+      border: 2px solid #e2e2e2;
+      border-radius: 18px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      background:
+        radial-gradient(1200px 600px at 50% -200px, #f7fafc 0%, transparent 60%),
+        #fff;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      color: #111;
+      gap: 8pt;
+    }
+
+    .capy-logo {
+      position: absolute;
+      top: 16pt;
+      left: 16pt;
+      width: 72pt;
+      height: auto;
+      opacity: .95;
+    }
+
+    .capy-title {
+      font-weight: 800;
+      font-size: 30pt;
+      letter-spacing: .5px;
+      margin-bottom: 4pt;
+    }
+
+    .capy-sub {
+      font-size: 14pt;
+      opacity: .85;
+      margin-bottom: 6pt;
+    }
+
+    .capy-name {
+      font-family: "Great Vibes", "Inter", cursive;
+      font-size: 62pt;
+      line-height: 1;
+      color: #000;            /* black as requested */
+      font-weight: 800;       /* some script fonts ignore weight, but we keep it */
+      margin: 6pt 0 2pt 0;
+      text-shadow: 0 0 0.01px #000;
+    }
+
+    .capy-metrics {
+      font-size: 16pt;
+      font-weight: 700;
+      opacity: .95;
+      margin-top: 2pt;
+    }
+
+    .capy-issued {
+      font-size: 12pt;
+      opacity: .75;
+      margin-top: 10pt;
+    }
+
+    .capy-rule {
+      width: min(55%, 640px);
+      height: 0;
+      border-top: 2px solid #cfcfcf;
+      margin: 10pt auto 12pt;
+    }
+
+    .capy-frame-rule {
+      position: absolute;
+      inset: 14px;
+      border: 1px solid #efefef;
+      border-radius: 14px;
+      pointer-events: none;
+    }
+
+    /* centered bottom settings, small & subtle */
+    .capy-settings {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 12pt;
+      max-width: 80%;
+      text-align: center;
+      font-size: 9pt;
+      line-height: 1.3;
+      color: #6b7280; /* slate-500 */
+      padding: 0 6pt;
+      word-break: break-word;
+    }
+  `;
+  frame.appendChild(style);
+
+  // Content HTML
+  const nameText = esc(fullName || 'Typist');
+  const wpmText  = Number.isFinite(finalWpm) ? finalWpm : '—';
+  const accText  = Number.isFinite(finalAcc) ? `${finalAcc}%` : '—';
+
+  // settings line (no title, centered)
+  const settingsBlock = chips.length
+    ? `<div class="capy-settings">${esc(chips.join(' · '))}</div>`
+    : '';
+
+  frame.insertAdjacentHTML('beforeend', `
+    <div class="capy-cert-wrap">
+      <img class="capy-logo" src="logo.png" alt="Logo">
+      <div class="capy-frame-rule"></div>
+
+      <div class="capy-title">Certificate of Typing Performance</div>
+      <div class="capy-sub">This certifies that</div>
+
+      <div class="capy-name">${nameText}</div>
+
+      <div class="capy-sub">has achieved</div>
+      <div class="capy-rule"></div>
+
+      <div class="capy-metrics">Final WPM: ${wpmText} &nbsp; • &nbsp; Accuracy: ${accText}</div>
+      <div class="capy-issued">Issued on ${esc(issued)}</div>
+
+      ${settingsBlock}
+    </div>
+  `);
+
+  document.body.appendChild(frame);
+
+  // Snapshot the HTML cert so web fonts show up correctly
+  const canvas = await window.html2canvas(frame, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#FFFFFF',
+    logging: false
+  });
+
+  // Clean up the DOM copy
+  frame.remove();
+
+  // Drop the image into the PDF full-bleed
+  const img = canvas.toDataURL('image/png');
+  doc.addImage(img, 'PNG', 0, 0, pageW, pageH);
+
   const fn = `typing-certificate-${sanitizeFilePart(fullName)}.pdf`;
   doc.save(fn);
 }
+
+
 
 // Also put it on window as a safety rope for inline callers
 window.capyGenerateCertificate = generateCertificate;
@@ -303,6 +430,17 @@ function ensureInterFontLinked() {
   link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap';
   document.head.appendChild(link);
 }
+
+function ensureSignatureFontLinked() {
+  if (document.getElementById('capy-signature-font')) return;
+  const link = document.createElement('link');
+  link.id = 'capy-signature-font';
+  link.rel = 'stylesheet';
+  // Great Vibes = elegant signature vibe; falls back to cursive if blocked
+  link.href = 'https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap';
+  document.head.appendChild(link);
+}
+
 
 // --- nice in-game name dialog ----------------------------------------------
 function ensureCertificateNameDialogStyles() {
