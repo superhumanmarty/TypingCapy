@@ -385,3 +385,4 @@ html, body {
 @media (max-height: 600px){
   html body .container .typing-panel #stats { display: none !important; }
 }
+
