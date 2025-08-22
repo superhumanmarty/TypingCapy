@@ -54,12 +54,14 @@ export function updateHide(mode, widx, chars, textDisplay) {
 
   // BEFORE typing: blink the first word(s) by opacity (visible/invisible)
   if (!anyTyped) {
+    // ✅ NEW: always clear ALL old blink classes first,
+    // then (re)start blink together for the current targets.
+    clearPreBlink(chars);
+
     if (mode === 'current' || mode === 'currentNext') {
       const targets = new Set([widx]);
       if (mode === 'currentNext') targets.add(widx + 1);
       syncBlinkForTargets(chars, targets, textDisplay);
-    } else {
-      clearPreBlink(chars);
     }
     return; // no actual hiding until typing starts
   }
@@ -128,6 +130,7 @@ export function updateHide(mode, widx, chars, textDisplay) {
     if (hideSet.has(w) && !typed) c.classList.add('hidden-word');
   });
 }
+
 
 // Clear a word from the revealed set when it's completed successfully
 export function clearRevealedWord(wordIdx) {
