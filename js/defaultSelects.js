@@ -37,18 +37,60 @@ const setDefaultWhenReady = (selectId, preferValues = [], preferTextContains = [
   mo.observe(sel, { childList: true, subtree: true });
 };
 
-// Defaults you asked for:
+// Defaults you asked for (force even if something is already selected)
 document.addEventListener('DOMContentLoaded', () => {
-  // Language: prefer eng/en/English
-  setDefaultWhenReady('languageSelector',
-  ['eng','en','en-US','english'],
-  ['english']
+  const tl = s => String(s || '').trim().toLowerCase();
+
+  // Force-select by value/text (tries multiple possible IDs)
+  const forceSelect = (idCandidates, preferValues = [], preferTextContains = []) => {
+    const sel = idCandidates.map(id => document.getElementById(id)).find(Boolean);
+    if (!sel || !sel.options || !sel.options.length) return;
+
+    const opts = Array.from(sel.options);
+    const byValue = opts.find(o => preferValues.map(tl).includes(tl(o.value)));
+    const byText  = opts.find(o => preferTextContains.some(t => tl(o.text).includes(tl(t))));
+    const choice = byValue || byText;
+    if (!choice) return;
+
+    sel.value = choice.value; // force it even if something was preselected
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
+  // Language: English
+  forceSelect(
+    ['languageSelector', 'languageSelect'],
+    ['eng', 'en', 'en-us', 'english'],
+    ['english']
   );
 
-
-  // Word list size: prefer 500 (or “500 words”)
-  setDefaultWhenReady('wordListSizeSelector',
-    ['500'],
-    ['500']
+  // Word list size: English "100 most common words"
+  forceSelect(
+    ['wordListSizeSelector', 'wordListSelector', 'wordCountSelector'],
+    ['100', 'subset:eng:top100'],
+    ['100 most', '100 words', 'top 100', 'most common']
   );
+
+  // Theme: Cafe Capy — force the select AND ensure the body class
+  const applyCafeCapy = () => {
+    forceSelect(
+      ['themeSelector', 'themeSelect'],
+      ['cafe-capy', 'cafecapy', 'cafe_capy'],
+      ['cafe capy', 'capy cafe']
+    );
+
+    // If no listener ran yet, ensure the class directly
+    const hasThemeClass = Array.from(document.body.classList).some(c => c.startsWith('theme-'));
+    if (!/theme-cafe-capy/.test(document.body.className)) {
+      // remove any existing theme-* class to avoid conflicts
+      if (hasThemeClass) {
+        document.body.classList.forEach(c => { if (c.startsWith('theme-')) document.body.classList.remove(c); });
+      }
+      document.body.classList.add('theme-cafe-capy');
+    }
+  };
+
+  // Run now and again on the next tick (wins races with other init code)
+  applyCafeCapy();
+  setTimeout(applyCafeCapy, 0);
 });
+
