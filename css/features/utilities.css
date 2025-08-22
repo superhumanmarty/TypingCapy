@@ -407,3 +407,23 @@ html, body {
   grid-column: 1 / -1;
 }
 
+
+/* Ultra-thin, theme-colored left rail (inherits --box-border) */
+@media (min-width: 1101px){
+  #ad-left{
+    background: var(--box-border) !important; /* match settings edge color */
+    flex: 0 0 6px !important;
+    width: 1px !important;
+    max-width: 1px !important;
+    min-width: 1px !important;
+
+    border-right: none !important;  /* avoid double edge line */
+    padding: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important; /* keep it inert */
+  }
+  #ad-left .ad-slot{ display: none !important; } /* hide any content inside */
+
+  /* tiny breathing room since container gap is 0 */
+  .typing-panel{ margin-left: .5rem !important; }
+}
