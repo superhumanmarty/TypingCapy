@@ -31,6 +31,9 @@ import { scheduleHUD } from '../ui/hud.js';
 
 const WARMUP_MS = 2000;
 
+// measured monospace line width & off-screen trigger
+const LINE_CHARS = 44;          // characters per line you measured
+const TRIGGER_AHEAD_LINES = 2;  // append when 2 lines remain (keeps new text off-screen)
 
 
 function maybeHitErrorCap() {
@@ -271,12 +274,15 @@ export async function handleKeyDown(e) {
   }
 
 
-  // Endless/timer: append a chunk when we near the end, then prune old stuff
-  if (wordLimit === 0 && currentIndex >= originalLength - 50) {
+  // Endless/timer: append when ~2 lines (88 chars) remain so the new text is off-screen
+  const remainingAhead = originalLength - currentIndex; // in chars (nodes)
+  if (wordLimit === 0 && remainingAhead <= LINE_CHARS * TRIGGER_AHEAD_LINES) {
     await appendTyping(textDisplay, hideControl);
     setWordsForHistoryFromChars();
-    maybePrune(refs.textDisplay, 80);   // keep ~80 words before the caret
+    maybePrune(refs.textDisplay, 80);   // keep ~80 words behind the caret
   }
+
+
 
 
   // Re-apply highlight & hide
