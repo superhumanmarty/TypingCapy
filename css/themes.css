@@ -522,3 +522,12 @@ body.theme-neutral {
   --highlight-color: #4dccff; /* friendly blue */
   --caret-color: #4dccff;
 }
+
+/* Theme-driven action accent (used by CERTIFICATE button + dialog) */
+:root,
+body[class*="theme-"] {
+  /* Prefer highlight → stats → header → border → neutral */
+  --action-accent: var(--highlight-color, var(--stats-color, var(--header-color, var(--box-border, #1f63ff))));
+  --action-contrast: #fff; /* text color on accent */
+  --action-ring: color-mix(in srgb, var(--action-accent) 45%, transparent);
+}

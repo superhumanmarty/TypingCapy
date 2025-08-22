@@ -123,9 +123,12 @@ function ensureCertificateButtonStyles() {
     font-weight: 700;
     letter-spacing: .02em;
     line-height: 1;
-    border: 1px solid rgba(255,255,255,.16);
-    background: var(--accent, var(--primary, #1f63ff));
-    color: #fff;
+    /* derive from theme; slightly darkened so white text always pops */
+    background:
+      linear-gradient(rgba(0,0,0,.32), rgba(0,0,0,.32)),
+      var(--action-accent, #1f63ff);
+    color: var(--action-contrast, #fff);
+    border: 1px solid color-mix(in srgb, var(--action-accent, #1f63ff) 70%, transparent);
     box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
     transition: transform .06s ease, box-shadow .12s ease, filter .12s ease;
   }
@@ -138,15 +141,25 @@ function ensureCertificateButtonStyles() {
     transform: translateY(0);
     box-shadow: 0 4px 14px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.04);
   }
+  #downloadCertificateButton.certificate-btn:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 3px var(--action-ring, rgba(31,99,255,.35)),
+      0 6px 18px rgba(0,0,0,.25),
+      inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+
   /* Keep spacing consistent in the results actions row */
   .results-actions #downloadCertificateButton.certificate-btn { margin-left: .5rem; }
   #downloadCertificateButton.certificate-btn .icon { font-size: 1.05rem; opacity: .95; }
+
   @media (max-width: 520px) {
     /* Allow it to stretch and look good on narrow screens */
     #downloadCertificateButton.certificate-btn { width: 100%; justify-content: center; }
     .results-actions #downloadCertificateButton.certificate-btn { margin-left: 0; margin-top: .5rem; }
   }
-  /* Floating fallback positioning */
+
+  /* Floating fallback positioning (same accent) */
   #downloadCertificateButton.certificate-fab {
     position: fixed;
     right: 16px;
@@ -156,6 +169,7 @@ function ensureCertificateButtonStyles() {
   `;
   document.head.appendChild(s);
 }
+
 
 
 // Tries the explicit tag first, then common ids/classes, then a heading fallback.
@@ -335,7 +349,7 @@ function ensureCertificateNameDialogStyles() {
     display: block;
     width: 100%;
     max-width: 100%;
-    box-sizing: border-box;          /* <— fixes the overflow */
+    box-sizing: border-box;
     padding: 14px 16px;
     border-radius: 12px;
     background: #0b1220;
@@ -343,13 +357,12 @@ function ensureCertificateNameDialogStyles() {
     border: 1px solid rgba(255,255,255,.18);
     outline: none;
     font-size: 1rem;
-    -webkit-appearance: none;        /* Safari: consistent sizing */
+    -webkit-appearance: none;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
   }
-
   .capy-cert-input:focus {
-    border-color: var(--accent, var(--primary, #1f63ff));
-    box-shadow: 0 0 0 3px rgba(31,99,255,.25);
+    border-color: var(--action-accent, #1f63ff);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-accent, #1f63ff) 35%, transparent);
   }
   .capy-cert-input.invalid {
     border-color: #f75f5f;
@@ -360,20 +373,32 @@ function ensureCertificateNameDialogStyles() {
     display: flex; gap: .5rem; justify-content: flex-end; margin-top: 14px;
   }
 
-  /* buttons (fallback styles in case your global .btn styles aren’t present) */
   .capy-btn {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 10px 14px; border-radius: 9999px; border: 1px solid rgba(255,255,255,.16);
     background: rgba(255,255,255,.06); color: #fff; font-weight: 700; cursor: pointer;
   }
   .capy-btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
+
+  /* on-theme primary button */
   .capy-btn.primary {
-    background: var(--accent, var(--primary, #1f63ff));
+  background:
+    linear-gradient(rgba(0,0,0,.32), rgba(0,0,0,.32)),
+    var(--action-accent, #1f63ff);
+    border-color: color-mix(in srgb, var(--action-accent, #1f63ff) 70%, transparent);
     box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+    color: var(--action-contrast, #fff);
+  }
+  .capy-btn.primary:focus {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--action-accent, #1f63ff) 35%, transparent),
+      0 6px 18px rgba(0,0,0,.25),
+      inset 0 0 0 1px rgba(255,255,255,.06);
   }
   `;
   document.head.appendChild(s);
 }
+
 
 /** Opens a pretty modal asking for the name. Resolves string or null. */
 function askNameForCertificate() {
