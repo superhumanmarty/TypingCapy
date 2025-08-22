@@ -407,6 +407,7 @@ html, body {
   grid-column: 1 / -1;
 }
 
+/* TEMPORARY ADS BANNER HIDE BELOW */
 
 /* Ultra-thin, theme-colored left rail (inherits --box-border) */
 @media (min-width: 1101px){

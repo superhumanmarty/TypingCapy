@@ -99,6 +99,37 @@ function resolvePunctLang(lang) {
   return (lang === 'rus' || lang === 'indo' || lang === 'eng') ? lang : 'eng';
 }
 
+// Use English-style capitalization after punctuation for:
+// - any human language EXCEPT Russian
+// - Fictional / Goofy subsets EXCEPT: Ook!, Brainf***, Binary, Faces
+function shouldCapLikeEnglish(lang, size){
+  const conf = (window.configs && window.configs[lang]) || null;
+
+  // If we can't resolve config, fall back to the safe minimum we know: ENG/INDO
+  if (!conf) return (lang === 'eng' || lang === 'indo');
+
+  // Only human languages get this behavior
+  if (conf.type !== 'human') return false;
+
+  // Russian explicitly excluded
+  if (lang === 'rus') return false;
+
+  // Block specific “goofy” subsets that aren't word-capitalization friendly
+  const blockedSubsetFiles = new Set([
+    'words_ook.json',
+    'words_brainf.json',
+    'words_binary.json',
+    'words_faces.json',
+  ]);
+  if (typeof size === 'string' && size.startsWith('subset:')) {
+    const file = size.slice('subset:'.length);
+    if (blockedSubsetFiles.has(file)) return false;
+  }
+
+  // Everyone else (ENG, INDO, Fictional, other Goofy subsets) uses English-style caps
+  return true;
+}
+
 function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
@@ -199,8 +230,8 @@ export async function generateText(
   // NEW: O(k) sampling — independent of dataset size
   let words = sampleWithoutReplacement(srcWords, wordCount);
 
-  // Capitalize first word if punctuation on for ENG/INDO/RUS
-  if (punct && ['eng','indo','rus'].includes(lang) && words.length > 0) {
+  // Capitalize first word for all eligible human languages/subsets (English rules)
+  if (punct && shouldCapLikeEnglish(lang, size) && words.length > 0) {
     words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
   }
 
@@ -252,7 +283,7 @@ export async function generateText(
         const list = isSentenceEnd ? endSentence : endClause;
         if (list.length > 0) {
           words[i - 1] += list[Math.floor(Math.random() * list.length)];
-          if (['eng','indo','rus'].includes(lang) && i < words.length) {
+          if (shouldCapLikeEnglish(lang, size) && i < words.length) {
             words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
           }
         }
