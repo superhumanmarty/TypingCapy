@@ -164,13 +164,14 @@ export function updateUIForLanguage(configs) {
         og.label = 'Word lists';
         conf.word_lists.forEach((size, index) => {
           const opt = document.createElement('option');
-          opt.value = String(size);              // e.g., "500"
-          opt.textContent = `${size} words`;
+          opt.value = String(size); // e.g., "500"
+          opt.textContent = `${size} most common words`;
           if (index === 0) opt.selected = true;
           og.appendChild(opt);
         });
         wordListSizeSelector.appendChild(og);
       }
+
 
       if (hasSubsets) {
         const og2 = document.createElement('optgroup');
