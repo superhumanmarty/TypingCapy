@@ -2,6 +2,7 @@
 import { startApp } from './start.js';
 import { wireGlobalListeners } from './global-listeners.js';
 import { setupMusic } from '../music.js';
+import { setupSoundVolumeUI } from '../sound.js';
 
 import {
   enhanceSelect,
@@ -85,6 +86,7 @@ export async function boot({ configs }) {
     .forEach(id => enhanceSelect(id, { small: true }));
 
   setupMusic();
+  setupSoundVolumeUI();
 
   populateLanguageOptions(configs);
   updateUIForLanguage(configs);
@@ -98,16 +100,18 @@ export async function boot({ configs }) {
   wireMouseOnlySelects();
   wireSettingsRefocus(refocusToGame);
 
-  // Make the music volume slider "mouse-only": blur on release so typing works immediately
+  // Make both volume sliders "mouse-only": blur on release so typing works immediately
   {
-    const vol = document.getElementById('musicVolume'); // <- use your slider's id
-    if (vol) {
-      const blurBack = () => { try { vol.blur(); } catch(_) {} refocusToGame?.(); };
-      vol.addEventListener('pointerup', blurBack);
-      vol.addEventListener('touchend', blurBack, { passive: true });
-      vol.addEventListener('change', blurBack); // keyboard or programmatic changes
-    }
+    ['musicVolume','soundVolume'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const blurBack = () => { try { el.blur(); } catch(_) {} refocusToGame?.(); };
+      el.addEventListener('pointerup', blurBack);
+      el.addEventListener('touchend', blurBack, { passive: true });
+      el.addEventListener('change', blurBack);
+    });
   }
+
 
   wireGlobalListeners({
     textDisplay,
