@@ -377,7 +377,7 @@ html, body {
 }
 
 /* Timer — hide a weeee bit sooner than before (was 740px) */
-@media (max-height: 740px){
+@media (max-height: 780px){
   html body .container .typing-panel #timerDisplay { display: none !important; }
 }
 
