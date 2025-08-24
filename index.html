@@ -6,29 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Keybara</title>
 
-  <!-- START: Social preview (controls the image on LinkedIn/Twitter/Slack/etc.) -->
-  <link rel="canonical" href="https://keybara.io/">
-
-  <!-- Open Graph -->
-  <meta property="og:site_name" content="Keybara">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://keybara.io/">
-  <meta property="og:title" content="Keybara – Train your typing speed">
-  <meta property="og:description" content="A clean, fast typing trainer. Improve WPM and accuracy with smart modes.">
-  <meta property="og:image" content="https://keybara.io/capy.png?v=2">
-  <meta property="og:image:secure_url" content="https://keybara.io/capy.png?v=2">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Keybara capybara mascot">
-
-  <!-- Twitter / X -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Keybara – Train your typing speed">
-  <meta name="twitter:description" content="A clean, fast typing trainer. Improve WPM and accuracy with smart modes.">
-  <meta name="twitter:image" content="https://keybara.io/capy.png?v=2">
-  <!-- END: Social preview -->
-
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-M8NL0LT13W"></script>
   <script>
@@ -44,13 +21,13 @@
   <link rel="stylesheet" href="css/themes.css" />
   <link rel="stylesheet" href="css/edge-soft.css" />
   <link rel="stylesheet" href="css/animations.css" />
+  <!-- NEW: focus-mode styles -->
   <link rel="stylesheet" href="css/focus-mode.css" />
 
-  <!-- Favicon / app icons (unchanged) -->
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="/capy.png?v=1">
   <link rel="apple-touch-icon" href="/capy.png?v=1">
 </head>
-
 <body tabindex="0"> <!-- make body focusable -->
   <div class="container">
     <aside id="ad-left">
@@ -433,7 +410,7 @@
       <div class="pregame-hint" id="preGameShiftTabHint">
         <span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new text
       </div>
-
+      
       <!-- Error bubble (shown only on incorrect key when toggle is ON) -->
       <div id="typedErrorDisplay" class="typed-error-display hidden" aria-live="polite">
         <div class="typed-error-label">You typed:</div>
