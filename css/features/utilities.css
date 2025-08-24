@@ -435,3 +435,10 @@ html, body {
   font-weight: 600;
   letter-spacing: .2px;
 }
+
+/* Raise live WPM/Accuracy HUD by ~1cm (1cm ≈ 37.8px) */
+:root { --hud-raise: 38px; }
+
+.typing-panel #stats {
+  top: calc(clamp(120px, 18vh, 260px) - var(--hud-raise)) !important;
+}
