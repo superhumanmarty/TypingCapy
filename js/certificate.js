@@ -216,6 +216,46 @@ function findTargetSection(rs) {
 
 
 // ---------- generator ----------
+function isSafariLike() {
+  const ua = navigator.userAgent;
+  const isIOS = /iP(ad|hone|od)/.test(ua);
+  const isSafari = /^((?!chrome|android|crios|fxios|edgios|opr).)*safari/i.test(ua);
+  return isIOS || isSafari;
+}
+
+/** Save in a way Safari/iOS accepts */
+async function savePdfSmart(doc, filename) {
+  try {
+    if (doc.save.length >= 2) {
+      await doc.save(filename, { returnPromise: true });
+      return;
+    }
+  } catch (_) {}
+
+  try {
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.rel = 'noopener';
+    if (isSafariLike()) a.target = '_blank';   // iOS may ignore download attr
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 4000);
+    return;
+  } catch (_) {}
+
+  try {
+    const dataUrl = doc.output('dataurlstring');
+    window.open(dataUrl, '_blank', 'noopener');
+  } catch (e) {
+    alert('Your browser blocked the automatic download. A new tab will open with the PDF—use Share → Save to Files.');
+    const dataUrl = doc.output('dataurlstring');
+    location.href = dataUrl;
+  }
+}
+
 
 export async function generateCertificate(fullName) {
   const { jsPDF } = window.jspdf || {};
@@ -378,7 +418,7 @@ export async function generateCertificate(fullName) {
 
   frame.insertAdjacentHTML('beforeend', `
     <div class="capy-cert-wrap">
-      <img class="capy-logo" src="logo.png" alt="Logo">
+      <img class="capy-logo" src="logo.png" alt="Logo" crossorigin="anonymous">
       <div class="capy-frame-rule"></div>
 
       <div class="capy-title">Certificate of Typing Performance</div>
@@ -414,7 +454,7 @@ export async function generateCertificate(fullName) {
   doc.addImage(img, 'PNG', 0, 0, pageW, pageH);
 
   const fn = `typing-certificate-${sanitizeFilePart(fullName)}.pdf`;
-  doc.save(fn);
+  await savePdfSmart(doc, fn);
 }
 
 
