@@ -112,8 +112,9 @@ body.game-ended .focus-hint {
 /* Force the focus-mode corner hints to use the settings/UI font */
 .typing-panel .focus-hint,
 body.focus-mode .focus-hint,
-body.focus-mode #escHint,
-body.focus-mode #tabHint {
+body.focus-mode #hintEsc,
+body.focus-mode #hintTab,
+body.focus-mode #hintShiftTab {
   font-family: var(--ui-font) !important;
   font-weight: 800;          /* matches the settings pill look */
   letter-spacing: .02em;
@@ -121,6 +122,7 @@ body.focus-mode #tabHint {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 /* === Corner focus-hint responsive shrink (ESC/TAB) ===================== */
 :root { --focus-hint-scale: 1; }
@@ -153,4 +155,14 @@ body.focus-mode #tabHint {
   font-size: 0.95em;
   padding: 0.1em 0.35em;
   border-radius: 0.4em;
+}
+
+/* Stack "SHIFT TAB" directly under the right-corner TAB hint */
+:root { --focus-hint-stack-gap: 8px; }
+/* Approx height of one hint row; respects your scaling var */
+:root { --focus-hint-row: calc(40px * var(--focus-hint-scale)); }
+
+#hintShiftTab {
+  right: 12px;
+  top: calc(12px + var(--focus-hint-row) + var(--focus-hint-stack-gap));
 }

@@ -430,8 +430,9 @@
       <div id="resultsScreen" class="results-screen hidden">
         <!-- Hints FIRST -->
         <div class="results-hints" id="resultsHints">
-          <div class="hint"><span class="keycap esc">ESC</span> for new game</div>
+          <div class="hint"><span class="keycap esc">ESC</span> for new game mode</div>
           <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
+          <div class="hint"><span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game</div>
         </div>
 
         <!-- Chips placeholder (the JS will populate this) -->
@@ -460,8 +461,12 @@
   </div>
 
   <!-- Focus-mode hint labels (visible only in focus mode) -->
-  <div class="focus-hint left"  id="hintEsc"><span class="keycap esc">ESC</span> for new game</div>
+  <div class="focus-hint left"  id="hintEsc"><span class="keycap esc">ESC</span> for new game mode</div>
   <div class="focus-hint right" id="hintTab"><span class="keycap tab">TAB</span> to retry</div>
+  <div class="focus-hint right" id="hintShiftTab">
+    <span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game
+  </div>
+
 
 
   <script type="module" src="./js/focusMode.js"></script>

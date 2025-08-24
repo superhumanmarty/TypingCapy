@@ -663,35 +663,50 @@ export function setupCertificate() {
     if (!rs) return false;
     if (rs.querySelector('#downloadCertificateButton')) return true;
 
+    // Ensure an actions row lives directly under the graph pill
+    let actions = rs.querySelector('.results-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'results-actions';
+
+      const graph = rs.querySelector('#runGraph, .run-graph');
+      if (graph && graph.parentNode) {
+        // insert just after the graph pill
+        graph.parentNode.insertBefore(actions, graph.nextSibling);
+      } else {
+        const stats = rs.querySelector('.results-stats');
+        if (stats && stats.parentNode) {
+          stats.parentNode.insertBefore(actions, stats.nextSibling);
+        } else {
+          rs.appendChild(actions);
+        }
+      }
+    }
+
     const btn = document.createElement('button');
     btn.id = 'downloadCertificateButton';
     btn.type = 'button';
     btn.className = 'btn btn-primary certificate-btn';
     btn.innerHTML = '<span class="icon" aria-hidden="true">🏅</span><span>CERTIFICATE</span>';
     btn.setAttribute('aria-label', 'Download certificate as PDF');
-
-    (rs.querySelector('.results-actions') ||
-     rs.querySelector('.results-buttons') ||
-     rs.querySelector('.results-stats')?.parentElement ||
-     rs
-    ).appendChild(btn);
+    actions.appendChild(btn);
 
     btn.addEventListener('click', async () => {
-      if (_certGenerating) return;           // prevent double-fires
+      if (_certGenerating) return;
       _certGenerating = true;
       try {
         const fullName = await askNameForCertificate();
         if (!fullName) return;
-        await generateCertificate(fullName); // called once
+        await generateCertificate(fullName);
       } finally {
         _certGenerating = false;
       }
     });
 
-
     tagTargetGlobally();
     return true;
   };
+
 
   // Floating fallback button if we can't place inline
   const ensureFloatingButton = () => {

@@ -285,3 +285,17 @@ body.game-ended #resultsScreen {
     margin-bottom: 0.75rem;
   }
 }
+
+/* Row under the graph for action buttons (e.g., CERTIFICATE) */
+.results-screen .results-actions {
+  margin-top: 1rem;      /* <-- the comfy space you're after */
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .6rem .75rem;
+}
+
+/* Neutralize old inline margin rule */
+.results-actions #downloadCertificateButton.certificate-btn {
+  margin-left: 0;
+}

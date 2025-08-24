@@ -231,6 +231,32 @@ async function softResetSameText() {
   unlockGame();
 }
 
+/** SHIFT+TAB: same settings, brand-new text; remain in focus mode */
+async function restartNewTextSameSettings() {
+  stopGhost();
+  resetTimer();
+  showInitialProgress();
+  ensureResultsHidden();
+  resetHistory();
+
+  const el = textDisplayEl();
+  await initializeTyping(el, hideCtl());   // fresh text based on current controls
+  await nextFrame();
+
+  rebuildCharsFromDOM();
+  snapshotRunBaseline();                   // new baseline for future TAB retries
+  sanitizeExistingText(el);
+
+  resetStatsUI();
+  reapplyHideHighlightPreGame();
+  placeCaretAtStart();
+  scrollTextToTop();
+  forceTimerVisibleIfOn();
+  forceTextVisible();
+  forceStatsVisible();
+  unlockGame();
+}
+
 /** Quit to settings and immediately regenerate fresh text (based on current controls) */
 async function regenerateNewTextAndExitFocus() {
   // return to settings/ad first
@@ -282,11 +308,13 @@ function injectResultsShortcutsStyles() {
   if (document.getElementById(id)) return;
 
   const css = `
+    /* always hide the legacy restart button */
     #resultsScreen .restart-button,
     .results-screen .restart-button,
     #resultsScreen #restartButton,
     .results-screen #restartButton { display: none !important; }
 
+    /* style only the JS fallback block */
     .results-shortcuts {
       display: flex;
       flex-direction: column;
@@ -298,7 +326,8 @@ function injectResultsShortcutsStyles() {
       font-weight: 800;
       color: var(--correct-color);
     }
-    .results-shortcuts .secondary {
+    .results-shortcuts .secondary,
+    .results-shortcuts .tertiary {
       font-size: 1.05rem;
       color: var(--untyped-color);
     }
@@ -311,10 +340,21 @@ function injectResultsShortcutsStyles() {
 }
 
 
-
 function ensureResultsShortcuts() {
   const rs = resultsEl();
   if (!rs) return;
+
+  // If your static block exists, make sure the copy matches the new phrasing
+  const staticHints = rs.querySelector('#resultsHints');
+  if (staticHints) {
+    const hints = staticHints.querySelectorAll('.hint');
+    if (hints[0]) hints[0].innerHTML = '<span class="keycap esc">ESC</span> for new game mode';
+    if (hints[1]) hints[1].innerHTML = '<span class="keycap tab">TAB</span> to retry';
+    if (hints[2]) hints[2].innerHTML = '<span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game';
+    return;
+  }
+
+  // Fallback: inject our own block with the same copy
   if (rs.querySelector('.results-shortcuts')) return;
 
   const wrap = document.createElement('div');
@@ -322,15 +362,22 @@ function ensureResultsShortcuts() {
 
   const primary = document.createElement('div');
   primary.className = 'primary';
-  primary.textContent = 'ESC to go back to settings and change stuff';
+  primary.textContent = 'ESC for new game mode';
 
   const secondary = document.createElement('div');
   secondary.className = 'secondary';
-  secondary.textContent = 'TAB to play the same game';
+  secondary.textContent = 'TAB to retry';
 
-  wrap.append(primary, secondary);
+  const tertiary = document.createElement('div');
+  tertiary.className = 'tertiary';
+  tertiary.textContent = 'SHIFT TAB for new game';
+
+  wrap.append(primary, secondary, tertiary);
   rs.appendChild(wrap);
 }
+
+
+
 
 function observeResultsScreen() {
   const rs = resultsEl();
@@ -345,30 +392,41 @@ function observeResultsScreen() {
 
 async function onKeydown(e) {
   if (isEditingThreshold()) return;
+
   // Enter focus mode on first meaningful typing key
   if (!inFocusMode && isTypingKey(e)) {
     enterFocusMode();
-    return; // let this keystroke flow to existing handlers
+    return; // let the keystroke flow
   }
 
-  // Allow ESC even if not in focus mode (e.g., safety)
-  if (!inFocusMode && e.key !== 'Escape') return;
+  // Allow shortcuts if we're in focus mode OR the results screen is visible
+  const resultsVisible = !!(resultsEl() && !resultsEl().classList.contains('hidden'));
+  if (!inFocusMode && !resultsVisible && e.key !== 'Escape') return;
 
-  // ESC: quit (or at results) -> settings + regenerate new text immediately
+  // ESC: quit to settings + fresh text
   if (e.key === 'Escape') {
     e.preventDefault();
     await exitFocusMode({ quit: true });
     return;
   }
 
-  // TAB: restart same text; reset view to very top immediately
+  // SHIFT+TAB: same settings, NEW text (stay in focus mode / also works on results)
+  if (e.key === 'Tab' && e.shiftKey) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    await restartNewTextSameSettings();
+    return;
+  }
+
+  // TAB: same settings, SAME text (soft reset)
   if (e.key === 'Tab') {
-    e.preventDefault();               // keep focus here
-    e.stopImmediatePropagation();     // <-- block main.js TAB handler
+    e.preventDefault();
+    e.stopImmediatePropagation();
     await restartSameGame();
     return;
   }
 }
+
 
 // Always wire the focus-mode key handler first.
 window.addEventListener('keydown', onKeydown, { capture: true, passive: false });
