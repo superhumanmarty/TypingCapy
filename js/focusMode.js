@@ -389,9 +389,16 @@ function observeResultsScreen() {
 }
 
 /* ----------------- Key handling ----------------- */
-
 async function onKeydown(e) {
   if (isEditingThreshold()) return;
+
+  // Allow SHIFT+TAB on the pre-game/settings screen to generate new text (same settings)
+  if (!inFocusMode && e.key === 'Tab' && e.shiftKey) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    await restartNewTextSameSettings();
+    return;
+  }
 
   // Enter focus mode on first meaningful typing key
   if (!inFocusMode && isTypingKey(e)) {
@@ -410,7 +417,7 @@ async function onKeydown(e) {
     return;
   }
 
-  // SHIFT+TAB: same settings, NEW text (stay in focus mode / also works on results)
+  // SHIFT+TAB: same settings, NEW text (works in focus mode and on results)
   if (e.key === 'Tab' && e.shiftKey) {
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -426,6 +433,7 @@ async function onKeydown(e) {
     return;
   }
 }
+
 
 
 // Always wire the focus-mode key handler first.

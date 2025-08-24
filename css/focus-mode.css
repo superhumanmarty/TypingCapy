@@ -45,10 +45,12 @@ body.focus-mode .settings-panel {
 
 /* Let the typing area expand and animate into the center */
 .typing-panel {
+  position: relative; /* ← makes the pre-game hint anchor to the panel */
   transition:
     transform var(--focus-transition) ease,
     max-width var(--focus-transition) ease;
 }
+
 
 /* Center/limit the game; keep it animatable */
 body.focus-mode .typing-panel {
@@ -165,4 +167,48 @@ body.focus-mode #hintShiftTab {
 #hintShiftTab {
   right: 12px;
   top: calc(12px + var(--focus-hint-row) + var(--focus-hint-stack-gap));
+}
+
+/* ===== Pre-game top-center hint INSIDE the typing panel ===== */
+
+.typing-panel .pregame-hint{
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  z-index: 20; /* under the global fixed corner hints (z 50) */
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--box-border);
+  background: color-mix(in srgb, var(--box-bg) 85%, transparent);
+  color: var(--correct-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  font-family: var(--ui-font) !important;
+  font-weight: 800;
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  opacity: 1;
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none; /* purely informational */
+}
+
+/* Scale with your existing focus-hint responsiveness */
+.typing-panel .pregame-hint{
+  font-size: calc(0.95rem * var(--focus-hint-scale)) !important;
+  padding: calc(0.35rem * var(--focus-hint-scale))
+           calc(0.60rem * var(--focus-hint-scale)) !important;
+  border-radius: calc(8px * var(--focus-hint-scale)) !important;
+}
+
+/* Fade it away when a run starts (focus mode) or results are up */
+body.focus-mode .typing-panel .pregame-hint,
+body.game-ended .typing-panel .pregame-hint{
+  opacity: 0;
+  transform: translate(-50%, -12px);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .typing-panel .pregame-hint{ transition: none !important; }
 }
