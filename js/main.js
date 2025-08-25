@@ -4,7 +4,7 @@ import { loadConfigs } from './app/config.js';
 import { boot } from './app/boot.js';
 import { EVT } from './app/events.js';
 import { initSmoothCaret } from './smooth-caret.js';
-
+import { wireImmersePillUI } from './ui/immerse.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const configs = await loadConfigs();
@@ -12,6 +12,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   await boot({ configs });       // make sure selects are populated first
 
   enhancePillSelects();          // then enhance them
+
+  // ⬇️ Build the pill (under Theme) and wire fullscreen + ESC lock
+  wireImmersePillUI({ target: document.documentElement });
 
   window.dispatchEvent(new Event(EVT.READY));
   document.body.tabIndex = 0;
