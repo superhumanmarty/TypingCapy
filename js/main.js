@@ -5,6 +5,7 @@ import { boot } from './app/boot.js';
 import { EVT } from './app/events.js';
 import { initSmoothCaret } from './smooth-caret.js';
 import { wireImmersePillUI } from './ui/immerse.js';
+import { initThemePersistence } from './app/persist-state.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const configs = await loadConfigs();
@@ -13,8 +14,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   enhancePillSelects();          // then enhance them
 
+  // Theme persistence: restore saved theme and start saving changes
+  initThemePersistence();
+  
   // ⬇️ Build the pill (under Theme) and wire fullscreen + ESC lock
-  wireImmersePillUI({ target: document.documentElement });
+  wireImmersePillUI({ target: document.documentElement });                                     
 
   window.dispatchEvent(new Event(EVT.READY));
   document.body.tabIndex = 0;
