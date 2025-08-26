@@ -3,14 +3,14 @@
 /* Timer Display — overlay above stats/words (no layout shift) */
 .timer-display{
   position: absolute;
-  top: 13.5rem;               
+  top: 13rem;               
   left: calc(50% - 6px);
   transform: translateX(-50%);
   z-index: 18;
   margin: 0;
 
-  /* bigger, responsive */
-  font-size: clamp(1.6rem, 1.1rem + 3vw, 3.2rem);
+  /* smaller + still responsive */
+  font-size: clamp(1.3rem, 1rem + 2.2vw, 2.6rem);
   line-height: 1;
   letter-spacing: .02em;
   color: var(--stats-color);
@@ -19,6 +19,5 @@
 }
 
 .timer-display.hidden {
-  display: none;                /* fully remove overlay when hidden */
+  display: none; /* fully remove overlay when hidden */
 }
-
