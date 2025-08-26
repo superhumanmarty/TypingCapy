@@ -1,0 +1,11 @@
+pbpaste | while IFS= read -r f; do
+  case "$f" in
+    *.html|*.css|*.js|*.json) : ;;
+    *) continue;;
+  esac
+  [ -f "$f" ] || continue
+  size=$(wc -c < "$f" 2>/dev/null || echo 0)
+  [ "$size" -le 500000 ] || continue
+  printf "\n\n/* ===== %s ===== */\n" "$f"
+  cat "$f"
+done | pbcopy
