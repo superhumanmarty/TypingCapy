@@ -3,7 +3,7 @@
 /* Timer Display — overlay above stats/words (no layout shift) */
 .timer-display{
   position: absolute;
-  top: 13rem;               
+  top: 13.5rem;               
   left: calc(50% - 6px);
   transform: translateX(-50%);
   z-index: 18;
