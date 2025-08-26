@@ -348,9 +348,18 @@ function ensureResultsShortcuts() {
   const staticHints = rs.querySelector('#resultsHints');
   if (staticHints) {
     const hints = staticHints.querySelectorAll('.hint');
-    if (hints[0]) hints[0].innerHTML = '<span class="keycap esc">ESC</span> for new game mode';
-    if (hints[1]) hints[1].innerHTML = '<span class="keycap tab">TAB</span> to retry';
-    if (hints[2]) hints[2].innerHTML = '<span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game';
+    if (hints[0]) {
+      hints[0].innerHTML =
+        '<span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> / ' +
+        '<span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode';
+    }
+    if (hints[1]) {
+      hints[1].innerHTML = '<span class="keycap tab">TAB</span> to retry';
+    }
+    if (hints[2]) {
+      hints[2].innerHTML =
+        '<span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game';
+    }
     return;
   }
 
@@ -362,19 +371,23 @@ function ensureResultsShortcuts() {
 
   const primary = document.createElement('div');
   primary.className = 'primary';
-  primary.textContent = 'ESC for new game mode';
+  primary.innerHTML =
+    '<span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> / ' +
+    '<span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode';
 
   const secondary = document.createElement('div');
   secondary.className = 'secondary';
-  secondary.textContent = 'TAB to retry';
+  secondary.innerHTML = '<span class="keycap tab">TAB</span> to retry';
 
   const tertiary = document.createElement('div');
   tertiary.className = 'tertiary';
-  tertiary.textContent = 'SHIFT TAB for new game';
+  tertiary.innerHTML =
+    '<span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game';
 
   wrap.append(primary, secondary, tertiary);
   rs.appendChild(wrap);
 }
+
 
 
 
@@ -389,10 +402,15 @@ function observeResultsScreen() {
 }
 
 /* ----------------- Key handling ----------------- */
+/* ----------------- Key handling ----------------- */
 async function onKeydown(e) {
   if (isEditingThreshold()) return;
 
-  // Allow SHIFT+TAB on the pre-game/settings screen to generate new text (same settings)
+  // Helper: only Alt/Option + Enter (no Ctrl/Meta/Shift)
+  const isAltEnter =
+    e.key === 'Enter' && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey;
+
+  // Allow Shift+Tab on the pre-game/settings screen to generate new text (same settings)
   if (!inFocusMode && e.key === 'Tab' && e.shiftKey) {
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -403,16 +421,17 @@ async function onKeydown(e) {
   // Enter focus mode on first meaningful typing key
   if (!inFocusMode && isTypingKey(e)) {
     enterFocusMode();
-    return; // let the keystroke flow
+    // let the keystroke flow
   }
 
   // Allow shortcuts if we're in focus mode OR the results screen is visible
   const resultsVisible = !!(resultsEl() && !resultsEl().classList.contains('hidden'));
-  if (!inFocusMode && !resultsVisible && e.key !== 'Escape') return;
+  if (!inFocusMode && !resultsVisible && !isAltEnter) return;
 
-  // ESC: quit to settings + fresh text
-  if (e.key === 'Escape') {
+  // Alt/Option + Enter: quit to settings + fresh text  (replaces ESC)
+  if (isAltEnter) {
     e.preventDefault();
+    e.stopImmediatePropagation();
     await exitFocusMode({ quit: true });
     return;
   }
@@ -433,6 +452,7 @@ async function onKeydown(e) {
     return;
   }
 }
+
 
 
 

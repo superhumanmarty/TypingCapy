@@ -436,7 +436,10 @@
       <div id="resultsScreen" class="results-screen hidden">
         <!-- Hints FIRST -->
         <div class="results-hints" id="resultsHints">
-          <div class="hint"><span class="keycap esc">ESC</span> for new game mode</div>
+          <div class="hint">
+            <span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> /
+            <span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode
+          </div>
           <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
           <div class="hint"><span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game</div>
         </div>
@@ -467,7 +470,10 @@
   </div>
 
   <!-- Focus-mode hint labels (visible only in focus mode) -->
-  <div class="focus-hint left"  id="hintEsc"><span class="keycap esc">ESC</span> for new game mode</div>
+  <div class="focus-hint left" id="hintEsc">
+    <span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> /
+    <span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode
+  </div>
   <div class="focus-hint right" id="hintTab"><span class="keycap tab">TAB</span> to retry</div>
   <div class="focus-hint right" id="hintShiftTab">
     <span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game
@@ -482,7 +488,7 @@
   <script type="module" src="./js/defaultSelects.js"></script>
   <script src="./js/on-states.js" defer></script>
   <script type="module" src="./js/ui/stats-polish.js"></script>
-  
+
 
 </body>
 </html>

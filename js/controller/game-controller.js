@@ -191,7 +191,15 @@ export async function handleKeyDown(e) {
   handleKeyboardState(e);
   if (isGameEnded()) return;
 
+  // Block Alt/Option+Enter so Enter-as-Space never runs here
+  if (e.key === 'Enter' && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    return;
+  }
+
   const k = e.key;
+
   if (k !== 'Backspace' && k !== ' ' && k !== 'Enter' && k.length !== 1) return;
   e.preventDefault();
 
