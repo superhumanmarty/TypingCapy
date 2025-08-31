@@ -91,10 +91,12 @@ body.focus-mode .focus-hint {
   #ad-left,
   .settings-panel,
   .typing-panel,
-  .focus-hint {
+  .focus-hint,
+  .pregame-pill {                  /* NEW */
     transition: none !important;
   }
 }
+
 
 /* Hide the top ESC/TAB hints when the results overlay is up */
 body.game-ended .focus-hint {
@@ -211,4 +213,102 @@ body.game-ended .typing-panel .pregame-hint{
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .typing-panel .pregame-hint{ transition: none !important; }
+}
+
+/* --- Pre-game pills ---------------------------------------------------- */
+.typing-panel { position: relative; }
+
+/* Base pill look (similar feel to the SHIFT+TAB pregame hint) */
+.pregame-pill {
+  position: absolute;
+  top: 8px;
+  z-index: 1000;
+  height: 32px;                     /* compact like the SHIFT+TAB hint */
+  padding: 6px 10px;                /* small, pill-like */
+  border-radius: 9999px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-decoration: none;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  display: inline-flex;                        /* NEW: keep in DOM for anim */
+  opacity: 0;                                  /* NEW: hidden by default */
+  transform: translateY(-6px);                 /* NEW: slide up like hint */
+  pointer-events: none;                        /* NEW: non-interactive hidden */
+  visibility: hidden;                          /* NEW: avoid focus/hover */
+  transition: opacity 220ms ease,
+              transform 220ms ease;            /* NEW: same feel as hint */
+}
+
+/* Animate in only during pre-game (not focus mode, not results) */
+body:not(.focus-mode):not(.game-ended) .pregame-pill {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+
+/* Placement */
+.pill-left  { left: 12px; }
+.pill-right { right: 12px; }
+
+/* Images inside the pills */
+.pregame-pill img {
+  display: block;
+  height: 100%;
+  border-radius: 10px; /* gently rounded to match overall style */
+}
+
+/* Special case: image-only pill — bottom of the image touches the bottom of the pill */
+.pill-imgonly { padding-bottom: 0; }           /* remove bottom padding so image can touch */
+.pill-imgonly img { align-self: flex-end; }    /* anchor to the bottom edge */
+
+/* Label text */
+.pregame-pill .pill-text {
+  white-space: nowrap;
+  letter-spacing: .01em;
+}
+
+/* 1) Clip anything that spills outside the pill */
+.pregame-pill {
+  overflow: hidden;            /* <-- key for hiding overflow */
+}
+
+
+
+/* === Marty pill (final) — same height/feel as the pre-game hint === */
+:root { --marty-avatar: 26px; }  /* adjust to taste */
+
+#martyPill {
+  height: 32px;             /* EXACT match to .pregame-pill base */
+  padding: 6px 10px;        /* match .pregame-pill padding for same feel */
+  /* rest (background, border, gap, etc.) inherited from .pregame-pill */
+}
+
+#martyPill .pill-avatar {
+  width: var(--marty-avatar);
+  height: var(--marty-avatar) !important; /* override generic img height */
+  border-radius: 50% !important;          /* circular avatar */
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  flex-shrink: 0;
+}
+
+#martyPill .pill-text {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
 }
