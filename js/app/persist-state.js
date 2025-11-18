@@ -31,7 +31,13 @@ function readSavedTheme() {
 }
 
 function saveTheme(val) {
-  try { if (val != null) localStorage.setItem(THEME_KEY, String(val)); } catch {}
+  try {
+    if (val == null) {
+      localStorage.removeItem(THEME_KEY);
+    } else {
+      localStorage.setItem(THEME_KEY, String(val));
+    }
+  } catch {}
 }
 
 /**
@@ -53,9 +59,16 @@ export function initThemePersistence() {
     setTimeout(() => applyThemeValue(sel, saved), 60);
   } else {
     // No saved theme yet—remember the current one for the next visit
-    if (sel.value) saveTheme(sel.value);
+    if (sel.value && sel.value !== 'random') saveTheme(sel.value);
   }
 
   // Keep it up-to-date whenever user changes the theme
-  sel.addEventListener('change', () => saveTheme(sel.value));
+  sel.addEventListener('change', () => {
+    if (sel.dataset.randomApply === '1') return;
+    if (sel.value === 'random') {
+      saveTheme(null);
+      return;
+    }
+    saveTheme(sel.value);
+  });
 }

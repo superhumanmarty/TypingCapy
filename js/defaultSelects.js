@@ -70,27 +70,70 @@ document.addEventListener('DOMContentLoaded', () => {
     ['100 most', '100 words', 'top 100', 'most common']
   );
 
-  // Theme: Minimalist — force the select AND ensure the body class
-  const applyMinimalist = () => {
-    forceSelect(
-      ['themeSelector', 'themeSelect'],
-      ['minimalist'],
-      ['minimalist']
-    );
+  // Theme: if "Random" is selected, pick a random actual theme on load
+  const themeIds = ['themeSelector', 'themeSelect'];
+  const resolveThemeSelect = () => themeIds.map(id => document.getElementById(id)).find(Boolean);
 
-    // If no listener ran yet, ensure the class directly
-    const hasThemeClass = Array.from(document.body.classList).some(c => c.startsWith('theme-'));
-    if (!/theme-minimalist/.test(document.body.className)) {
-      // remove any existing theme-* class to avoid conflicts
-      if (hasThemeClass) {
-        document.body.classList.forEach(c => { if (c.startsWith('theme-')) document.body.classList.remove(c); });
+  const setRandomOptionLabel = (themeSel) => {
+    const randomOpt = themeSel?.querySelector('option[value="random"]');
+    if (randomOpt) randomOpt.textContent = 'Random';
+  };
+
+  const applyRandomTheme = () => {
+    const themeSel = resolveThemeSelect();
+    if (!themeSel || !themeSel.options?.length) return false;
+
+    const opts = Array.from(themeSel.options).filter(o => o && o.value && o.value !== 'random');
+    if (!opts.length) return false;
+
+    const randomOption = opts[Math.floor(Math.random() * opts.length)];
+
+    themeSel.dataset.randomResolved = randomOption.value;
+    themeSel.dataset.randomApply = '1';
+    themeSel.value = randomOption.value;
+    themeSel.dispatchEvent(new Event('change', { bubbles: true }));
+    themeSel.dataset.randomApply = '';
+
+    setRandomOptionLabel(themeSel);
+    themeSel.value = 'random';
+    return randomOption.value;
+  };
+
+  const initTheme = () => {
+    const themeSel = resolveThemeSelect();
+    if (!themeSel) return;
+
+    const onChange = () => {
+      if (themeSel.dataset.randomApply === '1') return;
+      if (themeSel.value === 'random') {
+        applyRandomTheme();
+      } else {
+        themeSel.dataset.randomResolved = '';
+        setRandomOptionLabel(themeSel);
       }
-      document.body.classList.add('theme-minimalist');
+    };
+
+    themeSel.addEventListener('change', onChange);
+
+    if (themeSel.value === 'random') {
+      applyRandomTheme();
+    } else if (!themeSel.value) {
+      themeSel.value = 'minimalist';
+      themeSel.dispatchEvent(new Event('change', { bubbles: true }));
     }
   };
 
-  // Run now and again on the next tick (wins races with other init code)
-  applyMinimalist();
-  setTimeout(applyMinimalist, 0);
+  const themeSelImmediate = resolveThemeSelect();
+  if (themeSelImmediate) {
+    initTheme();
+  } else {
+    const mo = new MutationObserver(() => {
+      if (resolveThemeSelect()) {
+        initTheme();
+        mo.disconnect();
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
 });
 

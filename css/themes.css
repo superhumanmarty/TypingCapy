@@ -336,19 +336,6 @@ body.theme-neutral {
   --caret-color: #4dccff;
 }
 
-/* Dawn Gradient */
-body.theme-dawn {
-  background: linear-gradient(135deg, #1c112b 0%, #3f1f50 30%, #ffb199 70%, #ffebc7 100%);
-  --box-bg: #1b1121;
-  --box-border: #ffb38f;
-  --header-color: #ffe7d6;
-  --stats-color: #ffe0b5;
-  --correct-color: #ffffff;
-  --untyped-color: #f4d8cc;
-  --highlight-color: #ff8b70;
-  --caret-color: #ff8b70;
-}
-
 /* Midnight Glow */
 body.theme-midnight {
   background: radial-gradient(circle at top, #12284c 0%, #050a1c 60%, #02030a 100%);

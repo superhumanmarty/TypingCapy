@@ -148,7 +148,8 @@ export async function boot({ configs }) {
 
   // Theme + keyboard diagram
   bindThemeSelectors(themeSelector, colorPickers);
-  document.body.className = `theme-${themeSelector.value}`;
+  const resolvedTheme = themeSelector?.dataset?.randomResolved || themeSelector?.value || 'minimalist';
+  document.body.className = `theme-${resolvedTheme}`;
   setupKeyboardDiagram();
   wireKeyboardVisibility(positionKeyboardDiagram);
 
