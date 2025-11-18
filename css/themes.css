@@ -274,9 +274,9 @@ body.theme-city {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/city.png');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
   --box-bg: #0b1440;          /* navy */
-  --box-border: #ff8c4b;      /* warm orange edge */
-  --header-color: #ffad80;    /* warm ui */
-  --stats-color: #ffcae1;     /* pinkish bright */
+  --box-border: #131c38;      /* deeper navy edge */
+  --header-color: #c5d3ed;    /* softer cool white */
+  --stats-color: #97a8cf;     /* darker pastel blue */
   --correct-color: #ffffff;
   --untyped-color: #d3d6e8;
   --highlight-color: #ff2b8f; /* hot pink */

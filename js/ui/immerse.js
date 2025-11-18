@@ -11,7 +11,7 @@ export function wireImmersePillUI({ target = document.documentElement } = {}) {
   btn.id = 'immersePill';
   btn.type = 'button';
   btn.className = 'pill option';
-  btn.textContent = 'Immerse';
+  btn.textContent = 'Full Screen';
   btn.setAttribute('aria-pressed', 'false');
 
   // Place directly under THEME dropdown pill
