@@ -273,7 +273,7 @@ body.theme-coffee {
 body.theme-city {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/city.png');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0b1440;          /* navy */
+  --box-bg: #07010f;          /* navy */
   --box-border: #131c38;      /* deeper navy edge */
   --header-color: #c5d3ed;    /* softer cool white */
   --stats-color: #97a8cf;     /* darker pastel blue */
