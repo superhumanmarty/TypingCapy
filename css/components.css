@@ -74,6 +74,52 @@
 #stats { color: var(--stats-color); font-size: 0.9rem; }
 #stats span { margin-right: 1rem; }
 
+.shortcut-pills{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.4rem;
+  font-size: 0.85em;
+  line-height: 1;
+  vertical-align: middle;
+  font-family: var(--ui-font, inherit);
+}
+
+.shortcut-pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.05em;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+.shortcut-pill.symbol{
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+.shortcut-symbol{
+  font-size: 1.4em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.15rem;
+}
+
+.focus-hint .shortcut-pills,
+.pregame-hint .shortcut-pills,
+.results-hints .shortcut-pills{
+  margin-left: 0.6rem;
+}
+
 .char.extra {
   color: var(--incorrect-color);
 }

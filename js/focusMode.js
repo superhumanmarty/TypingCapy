@@ -32,8 +32,8 @@ const SHORTCUT_KEYS = {
 
 const SHORTCUT_LABELS = {
   [SHORTCUTS.NEW_MODE]: 'Settings (Ctrl/Cmd+I)',
-  [SHORTCUTS.RETRY]: 'Retry (Ctrl/Cmd+;)',
-  [SHORTCUTS.NEW_WORDS]: 'New words (Ctrl/Cmd+J)'
+  [SHORTCUTS.RETRY]: '<span class="shortcut-symbol" aria-hidden="true">⟳</span>Same Words (Ctrl/Cmd+;)',
+  [SHORTCUTS.NEW_WORDS]: '<span class="shortcut-symbol" aria-hidden="true">⟳</span>New Words (Ctrl/Cmd+J)'
 };
 
 const RESULTS_SHORTCUT_ORDER = [
@@ -97,7 +97,7 @@ function wireShortcutButtons(root = document) {
       btn.type = 'button';
     }
     btn.classList.add('shortcut-button');
-    btn.textContent = SHORTCUT_LABELS[action];
+    btn.innerHTML = SHORTCUT_LABELS[action];
 
     if (btn.dataset.shortcutWired === '1') return;
     btn.addEventListener('click', onShortcutButtonClick);
