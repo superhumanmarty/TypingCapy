@@ -271,10 +271,11 @@
 
 .settings-hero .hero-title {
   font-weight: 800;
-  font-size: 1.05rem;
-  line-height: 1.15;
+  font-size: clamp(0.9rem, 0.75rem + 0.5vw, 1.1rem);
+  line-height: 1.05;
   color: var(--correct-color);
   margin: 0 0 .25rem 0;
+  white-space: nowrap;
 }
 
 /* inside the big pill, make controls fill its width */
@@ -368,9 +369,11 @@
 #soundHero  .hero-title,
 #noobHero   .hero-title,
 #proHero    .hero-title {
-  font-size: 1.4rem;   /* was 1.05rem; ~1.8× for balance with the 3× icon */
-  line-height: 1.1;
-  margin: 0 0 .4rem 0;
+  font-size: clamp(0.95rem, 0.75rem + 0.45vw, 1.25rem);
+  line-height: 1.05;
+  margin: 0 0 .35rem 0;
+  letter-spacing: .08em;
+  white-space: nowrap;
 }
 
 /* Keep form controls readable; no change to their size */
@@ -392,7 +395,7 @@
   #soundHero  .hero-title,
   #noobHero   .hero-title,
   #proHero    .hero-title {
-    font-size: 1.5rem;
+    font-size: clamp(0.95rem, 0.75rem + 0.45vw, 1.15rem);
   }
 }
 
