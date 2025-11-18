@@ -260,12 +260,12 @@
 <div class="hero-content">
 <div class="hero-title">NOOB</div>
 <!-- keyboard diagram -->
-<div class="settings pill pill-single keyboard-pill" id="keyboardDiagramSettings" role="button" tabindex="-1">
+                <div class="settings pill pill-single keyboard-pill" id="keyboardDiagramSettings" role="button" tabindex="-1" title="A diagram showing proper finger placement to type your fastest">
 <input class="pill-toggle" hidden="" id="keyboardDiagramToggle" type="checkbox"/>
 <img alt="Keyboard guide" class="keyboard-pill-img" src="keyboard_and_hand/default.png"/>
 </div>
 <!-- “You typed: x” pill -->
-<div aria-pressed="false" class="settings pill pill-preview" id="typedErrorsPill" role="button" tabindex="-1">
+                <div aria-pressed="false" class="settings pill pill-preview" id="typedErrorsPill" role="button" tabindex="-1" title="Shows the character you typed when you type incorrectly">
 <input hidden="" id="showTypedErrorsToggle" type="checkbox"/>
 <div aria-hidden="true" class="typed-preview">
 <div class="te-label">You typed:</div>
@@ -283,7 +283,7 @@
 <div class="hero-title">PRO</div>
 <!-- Hide -->
 <div class="pill-row" id="hidePillRow">
-<div class="settings pill pill-wide transparent-text" id="hidePill" role="button" tabindex="-1">
+                <div class="settings pill pill-wide transparent-text" id="hidePill" role="button" tabindex="-1" title="Hide word(s) you are typing to force you to look ahead while you type">
 <div class="pill-title"><span class="muted">Hide</span></div>
 <div id="hideChoiceLabel"></div>
 </div>
@@ -295,7 +295,7 @@
 </div>
 <!-- Highlight -->
 <div class="pill-row" id="highlightPillRow">
-<div class="settings pill pill-wide neon-green-text" id="highlightPill" role="button" tabindex="-1">
+                <div class="settings pill pill-wide neon-green-text" id="highlightPill" role="button" tabindex="-1" title="Highlight word(s) ahead to help you look ahead while you type">
 <div class="pill-title"><span class="neon">Highlight</span></div>
 <div id="highlightChoiceLabel"></div>
 </div>
@@ -306,7 +306,7 @@
 </div>
 </div>
 <!-- Ghost -->
-<div aria-pressed="false" class="settings pill" id="ghostCursorSettings" role="button" tabindex="-1">
+            <div aria-pressed="false" class="settings pill" id="ghostCursorSettings" role="button" tabindex="-1" title="A Ghost Caret that races you, going at the speed you enter">
 <input hidden="" id="ghostModeToggle" type="checkbox"/>
 <div class="ghost-title">
 <span class="ghost-word">Ghost</span>
