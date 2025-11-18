@@ -1,7 +1,7 @@
 /* css/features/limits.css */
 
-/* Unified icon area height for all three cards (closed state) */
-:root { --limit-icon-h: 100px; } /* tweak this number to match your Endless card */
+/* Unified button height for all three cards */
+:root { --limit-icon-h: 82px; }
 
 /* ==== GAME LIMITS hero (no icon) ==== */
 #limitsHero {
@@ -21,8 +21,8 @@
 #limitsHero .limits-grid {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: .5rem;
+  grid-template-columns: 1fr;
+  gap: .65rem;
   margin-top: .4rem;
 }
 
@@ -60,6 +60,25 @@
   padding: 0;
   border: 0;
   background: transparent;
+  border-radius: 12px;
+}
+
+#limitsHero .limit-btn .btn-label{
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: clamp(0.72rem, 0.64rem + 0.4vw, 1.05rem);
+  letter-spacing: .06em;
+  color: var(--correct-color);
+  padding: 0 .5rem;
+  text-align: center;
+  line-height: 1.1;
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
 }
 
 
@@ -203,26 +222,13 @@
   box-shadow: inset 0 0 0 1px var(--header-color);
 }
 
-/* === GAME LIMITS: hide title & captions; maximize icons === */
+/* === GAME LIMITS: hide title & captions; focus on the toggle text === */
 #limitsHero .hero-title { 
   display: none !important; 
 }
 
-#limitsHero .limit-btn .btn-label { 
-  display: none !important; 
-}
-
-/* shrink card padding so the icon can grow */
 #limitsHero .limit-cell{
-  padding: .25rem !important;
-}
-
-#limitsHero .limit-btn img{
-  display: block;
-  width: 100%;
-  height: 100%;          /* fill the fixed icon area */
-  max-width: 100%;
-  object-fit: contain;   /* keep proportions */
+  padding: .6rem !important;
 }
 
 /* ==== GAME LIMITS: left-align the inline dropdown value ==== */
@@ -235,6 +241,7 @@
   direction: ltr;          /* prevent accidental RTL flipping */
   padding-left: .9rem;     /* space before text */
   padding-right: 2.2rem;   /* keep clear of chevron on the right */
+  writing-mode: horizontal-tb;
 }
 
 /* Enhanced select (custom button) case */
@@ -243,6 +250,7 @@
   text-align: left;
   padding-left: .9rem;
   padding-right: 2.2rem;   /* same chevron gap */
+  writing-mode: horizontal-tb;
 }
 
 /* Ensure the chevron never blocks clicks or text */
@@ -266,6 +274,7 @@
   text-align: left;
   text-align-last: left;            /* Firefox/Edge */
   direction: ltr;
+  writing-mode: horizontal-tb;
 }
 
 /* If you’re using the enhanced pill select, keep its label left too */
@@ -274,4 +283,5 @@
   text-align: left;
   padding-left: .9rem;
   padding-right: 2.2rem;
+  writing-mode: horizontal-tb;
 }
