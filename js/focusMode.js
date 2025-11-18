@@ -1,8 +1,8 @@
 // js/focusMode.js
 // Focus Mode controller
 // - Enters on first real typing key
-// - Ctrl/Cmd+L: quit to settings/ad layout and regenerate new text immediately
-// - Ctrl/Cmd+K: restart same text, same settings, scroll to top instantly and show pre-game look
+// - Ctrl/Cmd+I: quit to settings/ad layout and regenerate new text immediately
+// - Ctrl/Cmd+;: restart same text, same settings, scroll to top instantly and show pre-game look
 // - Ctrl/Cmd+J: regenerate new text with the current settings
 // - Also: replaces the "Start New Session" button in results with shortcut pills (CSS injected here)
 
@@ -25,14 +25,14 @@ const SHORTCUTS = {
 };
 
 const SHORTCUT_KEYS = {
-  [SHORTCUTS.NEW_MODE]: 'l',
-  [SHORTCUTS.RETRY]: 'k',
+  [SHORTCUTS.NEW_MODE]: 'i',
+  [SHORTCUTS.RETRY]: ';',
   [SHORTCUTS.NEW_WORDS]: 'j'
 };
 
 const SHORTCUT_LABELS = {
-  [SHORTCUTS.NEW_MODE]: 'Settings (Ctrl/Cmd+L)',
-  [SHORTCUTS.RETRY]: 'Retry (Ctrl/Cmd+K)',
+  [SHORTCUTS.NEW_MODE]: 'Settings (Ctrl/Cmd+I)',
+  [SHORTCUTS.RETRY]: 'Retry (Ctrl/Cmd+;)',
   [SHORTCUTS.NEW_WORDS]: 'New words (Ctrl/Cmd+J)'
 };
 
