@@ -44,12 +44,22 @@
     #timerDisplay{
       position: static !important;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      margin: clamp(6px, 1vh, 16px) 0 0;
       text-align: center;
       align-self: center;
       transform: translateX(-14px);
+      color: #ffd45c;
+      text-shadow:
+        0 10px 30px rgba(0,0,0,.35),
+        0 0 20px rgba(255,210,120,.45);
+    }
+    #timerDisplay #timeRemaining{
+      font-size: clamp(26px, min(6vw, 6vh), 96px);
+      font-weight: 800;
+      letter-spacing: .045em;
     }
 
     /* Center live stats */
@@ -72,7 +82,7 @@
       font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-weight: 800;
       line-height: 1;
-      font-size: clamp(18px, min(4.5vw, 4.5vh), 64px);
+      font-size: clamp(22px, min(5.4vw, 5.4vh), 80px);
       display: inline-block;
       text-align: center;
     }
@@ -85,11 +95,11 @@
       display: block;
       content: '';
       font-weight: 700;
-      font-size: clamp(12px, 1.6vw, 14px);
+      font-size: clamp(13px, 1.9vw, 17px);
       line-height: 1.15;
       letter-spacing: .02em;
-      opacity: .9;
-      margin-bottom: 6px;
+      opacity: .92;
+      margin-bottom: clamp(6px, 0.9vh, 12px);
     }
     #wpm::before { content: 'WPM'; }
     #accuracy::before { content: 'Accuracy'; }
@@ -110,7 +120,7 @@
       font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-weight: 800;
       line-height: 1;
-      font-size: clamp(28px, 4.2vw, 48px);
+      font-size: clamp(32px, 5vw, 60px);
       text-align: center;
       display: inline-block;
     }
@@ -118,11 +128,11 @@
       display: block;
       content: '';
       font-weight: 700;
-      font-size: clamp(12px, 1.6vw, 14px);
+      font-size: clamp(13px, 1.8vw, 16px);
       line-height: 1.15;
       letter-spacing: .02em;
       opacity: .9;
-      margin-bottom: 6px;
+      margin-bottom: clamp(6px, 0.8vh, 10px);
     }
     #finalWPM::before{ content: 'WPM'; }
     #finalAccuracy::before{ content: 'Accuracy'; }
