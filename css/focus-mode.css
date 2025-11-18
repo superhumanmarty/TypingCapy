@@ -61,6 +61,27 @@ body.focus-mode .typing-panel {
   transform: none !important;     /* cancel any previous transforms */
 }
 
+/* Shared styling for clickable shortcut pills */
+.shortcut-button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  position: relative;
+  isolation: isolate;
+}
+
+.shortcut-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--correct-color) 75%, white);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--correct-color) 20%, transparent);
+}
+
 /* Focus mode hints (top-left/top-right) */
 .focus-hint {
   position: fixed;
@@ -68,15 +89,23 @@ body.focus-mode .typing-panel {
   z-index: 50;
   padding: 0.35rem 0.6rem;
   font-size: 0.95rem;
-  border-radius: 8px;
-  border: 1px solid var(--box-border);
-  background: color-mix(in srgb, var(--box-bg) 85%, transparent);
-  color: var(--correct-color);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--correct-color) 65%, white);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--correct-color) 70%, transparent) 0%,
+      color-mix(in srgb, var(--stats-color, #67d) 80%, transparent) 60%,
+      color-mix(in srgb, var(--highlight-color, #ffc857) 70%, transparent) 100%);
+  color: #050a16;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    0 0 18px color-mix(in srgb, var(--stats-color, #6ae) 45%, transparent);
   opacity: 0;
   transform: translateY(-6px);
   transition: opacity 220ms ease, transform 220ms ease;
-  pointer-events: none; /* purely informational */
+  pointer-events: none;
 }
 .focus-hint.left  { left: 12px; }
 .focus-hint.right { right: 12px; }
@@ -84,6 +113,7 @@ body.focus-mode .typing-panel {
 body.focus-mode .focus-hint {
   opacity: 0.92;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Respect reduced motion */
@@ -116,9 +146,9 @@ body.game-ended .focus-hint {
 /* Force the focus-mode corner hints to use the settings/UI font */
 .typing-panel .focus-hint,
 body.focus-mode .focus-hint,
-body.focus-mode #hintEsc,
-body.focus-mode #hintTab,
-body.focus-mode #hintShiftTab {
+body.focus-mode #hintNewMode,
+body.focus-mode #hintRetry,
+body.focus-mode #hintNewWords {
   font-family: var(--ui-font) !important;
   font-weight: 800;          /* matches the settings pill look */
   letter-spacing: .02em;
@@ -128,7 +158,7 @@ body.focus-mode #hintShiftTab {
 }
 
 
-/* === Corner focus-hint responsive shrink (ESC/TAB) ===================== */
+/* === Corner focus-hint responsive shrink ================================= */
 :root { --focus-hint-scale: 1; }
 
 /* Step down as viewport height gets shorter */
@@ -161,12 +191,12 @@ body.focus-mode #hintShiftTab {
   border-radius: 0.4em;
 }
 
-/* Stack "SHIFT TAB" directly under the right-corner TAB hint */
+/* Stack the “new words” hint under the retry hint */
 :root { --focus-hint-stack-gap: 8px; }
 /* Approx height of one hint row; respects your scaling var */
 :root { --focus-hint-row: calc(40px * var(--focus-hint-scale)); }
 
-#hintShiftTab {
+#hintNewWords {
   right: 12px;
   top: calc(12px + var(--focus-hint-row) + var(--focus-hint-stack-gap));
 }
@@ -180,11 +210,19 @@ body.focus-mode #hintShiftTab {
   transform: translate(-50%, -6px);
   z-index: 20; /* under the global fixed corner hints (z 50) */
   padding: 0.35rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid var(--box-border);
-  background: color-mix(in srgb, var(--box-bg) 85%, transparent);
-  color: var(--correct-color);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--correct-color) 65%, white);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--correct-color) 70%, transparent) 0%,
+      color-mix(in srgb, var(--stats-color, #67d) 80%, transparent) 60%,
+      color-mix(in srgb, var(--highlight-color, #ffc857) 70%, transparent) 100%);
+  color: #050a16;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    0 0 18px color-mix(in srgb, var(--stats-color, #6ae) 45%, transparent);
   font-family: var(--ui-font) !important;
   font-weight: 800;
   letter-spacing: .02em;
@@ -192,7 +230,7 @@ body.focus-mode #hintShiftTab {
   -moz-osx-font-smoothing: grayscale;
   opacity: 1;
   transition: opacity 220ms ease, transform 220ms ease;
-  pointer-events: none; /* purely informational */
+  pointer-events: auto;
 }
 
 /* Scale with your existing focus-hint responsiveness */
@@ -208,6 +246,7 @@ body.focus-mode .typing-panel .pregame-hint,
 body.game-ended .typing-panel .pregame-hint{
   opacity: 0;
   transform: translate(-50%, -12px);
+  pointer-events: none;
 }
 
 /* Respect reduced motion */
@@ -218,12 +257,12 @@ body.game-ended .typing-panel .pregame-hint{
 /* --- Pre-game pills ---------------------------------------------------- */
 .typing-panel { position: relative; }
 
-/* Base pill look (similar feel to the SHIFT+TAB pregame hint) */
+/* Base pill look (matches the pregame shortcut hint) */
 .pregame-pill {
   position: absolute;
   top: 8px;
   z-index: 1000;
-  height: 32px;                     /* compact like the SHIFT+TAB hint */
+  height: 32px;                     /* compact like the shortcut hint */
   padding: 6px 10px;                /* small, pill-like */
   border-radius: 9999px;
   background: rgba(0,0,0,.35);

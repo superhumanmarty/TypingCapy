@@ -77,7 +77,7 @@ export async function boot({ configs }) {
 
   // --- Start base layer ---
   startApp({ textDisplay, hideControl, highlightControl });
-
+  
   // --- Enhance selects + populate language ---
   ['languageSelector','wordListSizeSelector'].forEach(id => enhanceSelect(id, { small: true }));
   enhanceSelect('themeSelector');

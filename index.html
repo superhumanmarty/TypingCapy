@@ -407,9 +407,26 @@
     <div class="typing-panel">
 
       <!-- Pre-game top-center hint (inside typing panel) -->
-      <div class="pregame-hint" id="preGameShiftTabHint">
-        <span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new text
-      </div>
+      <button
+        type="button"
+        class="pregame-hint"
+        id="preGameShortcutNewWords"
+        data-shortcut-action="newWords"
+      >
+        New words (Ctrl/Cmd+J)
+      </button>
+      
+      <a
+        id="martyPill"
+        class="pregame-pill pill-right"
+        href="https://martyhendricks.notion.site/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open Marty’s Notion page"
+      >
+        <img class="pill-avatar" src="marty.png" alt="" />
+        <span class="pill-text">Marty</span>
+      </a>
 
       <!-- Error bubble (shown only on incorrect key when toggle is ON) -->
       <div id="typedErrorDisplay" class="typed-error-display hidden" aria-live="polite">
@@ -436,12 +453,15 @@
       <div id="resultsScreen" class="results-screen hidden">
         <!-- Hints FIRST -->
         <div class="results-hints" id="resultsHints">
-          <div class="hint">
-            <span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> /
-            <span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode
-          </div>
-          <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
-          <div class="hint"><span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game</div>
+          <button type="button" class="hint" data-shortcut-action="newMode">
+            Settings (Ctrl/Cmd+D)
+          </button>
+          <button type="button" class="hint" data-shortcut-action="retry">
+            Retry (Ctrl/Cmd+K)
+          </button>
+          <button type="button" class="hint" data-shortcut-action="newWords">
+            New words (Ctrl/Cmd+J)
+          </button>
         </div>
 
         <!-- Chips placeholder (the JS will populate this) -->
@@ -470,14 +490,30 @@
   </div>
 
   <!-- Focus-mode hint labels (visible only in focus mode) -->
-  <div class="focus-hint left" id="hintEsc">
-    <span class="keycap opt">⌥</span> <span class="keycap enter">ENTER</span> /
-    <span class="keycap alt">ALT</span> <span class="keycap enter">ENTER</span> for new game mode
-  </div>
-  <div class="focus-hint right" id="hintTab"><span class="keycap tab">TAB</span> to retry</div>
-  <div class="focus-hint right" id="hintShiftTab">
-    <span class="keycap shift">SHIFT</span> <span class="keycap tab">TAB</span> for new game
-  </div>
+  <button
+    type="button"
+    class="focus-hint left"
+    id="hintNewMode"
+    data-shortcut-action="newMode"
+  >
+    Settings (Ctrl/Cmd+D)
+  </button>
+  <button
+    type="button"
+    class="focus-hint right"
+    id="hintRetry"
+    data-shortcut-action="retry"
+  >
+    Retry (Ctrl/Cmd+K)
+  </button>
+  <button
+    type="button"
+    class="focus-hint right"
+    id="hintNewWords"
+    data-shortcut-action="newWords"
+  >
+    New words (Ctrl/Cmd+J)
+  </button>
 
   
   <script type="module" src="./js/focusMode.js"></script>
