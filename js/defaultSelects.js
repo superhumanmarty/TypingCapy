@@ -70,27 +70,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ['100 most', '100 words', 'top 100', 'most common']
   );
 
-  // Theme: Cafe Capy — force the select AND ensure the body class
-  const applyCafeCapy = () => {
+  // Theme: Minimalist — force the select AND ensure the body class
+  const applyMinimalist = () => {
     forceSelect(
       ['themeSelector', 'themeSelect'],
-      ['cafe-capy', 'cafecapy', 'cafe_capy'],
-      ['cafe capy', 'capy cafe']
+      ['minimalist'],
+      ['minimalist']
     );
 
     // If no listener ran yet, ensure the class directly
     const hasThemeClass = Array.from(document.body.classList).some(c => c.startsWith('theme-'));
-    if (!/theme-cafe-capy/.test(document.body.className)) {
+    if (!/theme-minimalist/.test(document.body.className)) {
       // remove any existing theme-* class to avoid conflicts
       if (hasThemeClass) {
         document.body.classList.forEach(c => { if (c.startsWith('theme-')) document.body.classList.remove(c); });
       }
-      document.body.classList.add('theme-cafe-capy');
+      document.body.classList.add('theme-minimalist');
     }
   };
 
   // Run now and again on the next tick (wins races with other init code)
-  applyCafeCapy();
-  setTimeout(applyCafeCapy, 0);
+  applyMinimalist();
+  setTimeout(applyMinimalist, 0);
 });
 

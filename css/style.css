@@ -236,34 +236,6 @@ body {
   color: var(--incorrect-color);
 }
 
-/* Theme: Capy Paradise */
-body.theme-capyparadise {
-  background-image: url('../backgrounds/capyparadise.png');
-  background-size: cover;
-  background-position: center;
-  --box-bg: #0a1f44;       /* dark blue typing box */
-  --box-border: #66aaff;   /* light‑blue border */
-  --header-color: #66aaff; /* title & theme text */
-  --stats-color: #aaddff;  /* WPM & accuracy */
-  --correct-color: #ffffff;/* typed text */
-  --untyped-color: #cccccc;/* yet‑to‑type text */
-  --highlight-color: #39ff14;
-}
-
-/* Theme: Cyberpunk */
-body.theme-cyberpunk {
-  background-image: url('../backgrounds/cyberpunk.png');
-  background-size: cover;
-  background-position: center;
-  --box-bg: #000000;       /* black typing box */
-  --box-border: #ff00ff;   /* neon pink border */
-  --header-color: #ff00ff; /* title & theme text */
-  --stats-color: #39ff14;  /* WPM & accuracy in neon green */
-  --correct-color: #39ff14;/* typed text */
-  --untyped-color: #888888;/* yet‑to‑type text */
-  --highlight-color: #00ffff;
-}
-
 /* — look-ahead "color" only, no background box — */
 .ahead1,
 .ahead2 {

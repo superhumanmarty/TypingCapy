@@ -1,71 +1,10 @@
 /* css/themes.css */
-/* Theme: Capy Paradise */
-body.theme-capyparadise {
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/capyparadise.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: scroll; /* was: fixed */
-  --box-bg: #0a1f44;
-  --box-border: #66aaff;
-  --header-color: #66aaff;
-  --stats-color: #aaddff;
-  --correct-color: #ffffff;
-  --untyped-color: #cccccc;
-  --highlight-color: #39ff14;
-  --caret-color: var(--highlight-color);
-}
-
-/* Theme: Cyberpunk */
-body.theme-cyberpunk {
-  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../backgrounds/cyberpunk.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: scroll; /* was: fixed */
-  --box-bg: #000000;
-  --box-border: #ff00ff;
-  --header-color: #ff00ff;
-  --stats-color: #39ff14;
-  --correct-color: #39ff14;
-  --untyped-color: #888888;
-  --highlight-color: #00ffff;
-  --caret-color: var(--highlight-color);
-
-}
-
 /* === NEW THEMES ========================================================= */
 /* All use a dark overlay so text is crisp, fill full screen, and scroll.  */
 /* Cursor color picks up --caret-color.                                     */
 
-/* Christian */
-body.theme-christian {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/christian.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0b1a3a;          /* deep navy */
-  --box-border: #d7e2ff;      /* cool warm-white edge */
-  --header-color: #f6f1e3;    /* warm white for headings/settings */
-  --stats-color: #b8e1ff;     /* bright, readable */
-  --correct-color: #ffffff;
-  --untyped-color: #ccd4e6;   /* lighter but below white */
-  --highlight-color: #ffd166; /* warm gold pop */
-  --caret-color: #ffd166;
-}
-
-/* Roman 1 */
-body.theme-roman-1 {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/roman1.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #2a0b0b;          /* dark red base */
-  --box-border: #d4a017;      /* gold edge */
-  --header-color: #ffcf4a;    /* gold for labels */
-  --stats-color: #ffe08a;
-  --correct-color: #ffffff;
-  --untyped-color: #e1cfcf;
-  --highlight-color: #ffd700;  /* vivid gold highlight */
-  --caret-color: #ffd700;
-}
-
-/* Roman 2 */
-body.theme-roman-2 {
+/* Historic */
+body.theme-historic {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/roman2.png');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
   --box-bg: #0f241b;          /* green-blue dark */
@@ -76,20 +15,6 @@ body.theme-roman-2 {
   --untyped-color: #cfe7db;
   --highlight-color: #ffa348;  /* brownish orange pop */
   --caret-color: #ffa348;
-}
-
-/* Murica */
-body.theme-murica {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/america.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0b1440;          /* navy */
-  --box-border: #d71921;      /* flag red edge */
-  --header-color: #5aa2ff;    /* bright blue ui */
-  --stats-color: #fff8da;     /* warm white */
-  --correct-color: #ffffff;
-  --untyped-color: #cfd6e8;
-  --highlight-color: #ff3b3b; /* neon red */
-  --caret-color: #ff3b3b;
 }
 
 /* Vaporwave */
@@ -106,8 +31,8 @@ body.theme-vaporwave {
   --caret-color: #00f0ff;
 }
 
-/* Brazil */
-body.theme-brazil {
+/* Nature */
+body.theme-nature {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/brazil.jpg');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
   --box-bg: #0d2417;          /* dark green */
@@ -118,20 +43,6 @@ body.theme-brazil {
   --untyped-color: #cfe5d6;
   --highlight-color: #ffb347; /* a little reddish orange */
   --caret-color: #ffb347;
-}
-
-/* HD Capy */
-body.theme-hd-capy {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/capybara_real.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #19210e;          /* earthy dark */
-  --box-border: #caa15a;      /* yellowish brown */
-  --header-color: #8ed0ff;    /* light blue */
-  --stats-color: #bfffd0;     /* soft green */
-  --correct-color: #ffffff;
-  --untyped-color: #dcd9cc;
-  --highlight-color: #7cff4f; /* neon lime */
-  --caret-color: #7cff4f;
 }
 
 /* Boba Capy */
@@ -160,20 +71,6 @@ body.theme-creepy {
   --untyped-color: #b9d6d8;
   --highlight-color: #00ffd1; /* glowing aqua */
   --caret-color: #00ffd1;
-}
-
-/* Forest */
-body.theme-forest {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/forest.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0f220f;
-  --box-border: #2fa54a;
-  --header-color: #b7ffb7;
-  --stats-color: #c9ffd2;
-  --correct-color: #ffffff;
-  --untyped-color: #d1e7d1;
-  --highlight-color: #7cff4f;
-  --caret-color: #7cff4f;
 }
 
 /* Coral Reef */
@@ -246,76 +143,6 @@ body.theme-japan {
   --caret-color: #ff5fa2;
 }
 
-/* Anime */
-body.theme-anime {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/anime_capy.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #23140f;
-  --box-border: #f2a65a;      /* orangish-yellow */
-  --header-color: #ff8aa1;    /* orangish-pink */
-  --stats-color: #ffd6a5;
-  --correct-color: #ffffff;
-  --untyped-color: #ead9d1;
-  --highlight-color: #ffd166; /* bright amber */
-  --caret-color: #ffd166;
-}
-
-/* Russian Capy */
-body.theme-russian-capy {
-  background-image: linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.4)), url('../backgrounds/russian_capy.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0a0a0a;
-  --box-border: #3b3b3b;
-  --header-color: #d3d9e2;    /* cool white */
-  --stats-color: #b8c0cc;
-  --correct-color: #f5f7fb;
-  --untyped-color: #bfc3cd;
-  --highlight-color: #ff4d4d; /* strong accent */
-  --caret-color: #ff4d4d;
-}
-
-/* Toast Capy */
-body.theme-toast-capy {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/toast_capy.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #2b1d0e;
-  --box-border: #bd8a2e;
-  --header-color: #ffe9a3;
-  --stats-color: #ffe3b0;
-  --correct-color: #ffffff;
-  --untyped-color: #e9dcc5;
-  --highlight-color: #ffb23f;
-  --caret-color: #ffb23f;
-}
-
-/* Creepy Capy */
-body.theme-creepy-capy {
-  background-image: linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.3)), url('../backgrounds/creepy_capy.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #051616;
-  --box-border: #0d6b66;      /* very dark blue-green edge */
-  --header-color: #a8fff3;    /* light blueish green */
-  --stats-color: #7affd5;
-  --correct-color: #eaffff;
-  --untyped-color: #c6e6e4;
-  --highlight-color: #00ffc6; /* neon mint */
-  --caret-color: #00ffc6;
-}
-
-/* Wood */
-body.theme-wood {
-  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/wood.jpg');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #20150f;
-  --box-border: #8a5a33;
-  --header-color: #e8d1b0;
-  --stats-color: #fff0d6;
-  --correct-color: #ffffff;
-  --untyped-color: #e1d3c2;
-  --highlight-color: #8cff7a; /* mossy pop */
-  --caret-color: #8cff7a;
-}
-
 /* Middle East */
 body.theme-middle-east {
   background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/arab.jpg');
@@ -384,20 +211,6 @@ body.theme-earth-from-space {
   --untyped-color: #cad7ea;
   --highlight-color: #00e5ff; /* space cyan */
   --caret-color: #00e5ff;
-}
-
-/* Cafe Capy */
-body.theme-cafe-capy {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/cafe_capy.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #231914;
-  --box-border: #9b6b48;
-  --header-color: #f6eadb;    /* warm white */
-  --stats-color: #d0ffe8;
-  --correct-color: #ffffff;
-  --untyped-color: #e6d8c7;
-  --highlight-color: #21d4b4; /* mint/teal pop */
-  --caret-color: #21d4b4;
 }
 
 /* Cottage */
@@ -521,6 +334,45 @@ body.theme-neutral {
   --untyped-color: #d2d6db;
   --highlight-color: #4dccff; /* friendly blue */
   --caret-color: #4dccff;
+}
+
+/* Dawn Gradient */
+body.theme-dawn {
+  background: linear-gradient(135deg, #1c112b 0%, #3f1f50 30%, #ffb199 70%, #ffebc7 100%);
+  --box-bg: #1b1121;
+  --box-border: #ffb38f;
+  --header-color: #ffe7d6;
+  --stats-color: #ffe0b5;
+  --correct-color: #ffffff;
+  --untyped-color: #f4d8cc;
+  --highlight-color: #ff8b70;
+  --caret-color: #ff8b70;
+}
+
+/* Midnight Glow */
+body.theme-midnight {
+  background: radial-gradient(circle at top, #12284c 0%, #050a1c 60%, #02030a 100%);
+  --box-bg: #060816;
+  --box-border: #243b6b;
+  --header-color: #9fc6ff;
+  --stats-color: #72f5ff;
+  --correct-color: #ffffff;
+  --untyped-color: #cfd7ef;
+  --highlight-color: #6ce5ff;
+  --caret-color: #6ce5ff;
+}
+
+/* Sage Mist */
+body.theme-sage {
+  background: linear-gradient(160deg, #071610 0%, #123224 40%, #284f3d 100%);
+  --box-bg: #0d1f18;
+  --box-border: #4a7c64;
+  --header-color: #d3f6e2;
+  --stats-color: #b2f1d2;
+  --correct-color: #ffffff;
+  --untyped-color: #cfe4d8;
+  --highlight-color: #7cf6c4;
+  --caret-color: #7cf6c4;
 }
 
 /* Theme-driven action accent (used by CERTIFICATE button + dialog) */
