@@ -4,6 +4,13 @@
 :root {
   /* tweakable timing */
   --focus-transition: 320ms;
+
+  /* focus-hint sizing tokens */
+  --focus-hint-font-base: clamp(0.7rem, 0.55rem + 0.35vw, 1.05rem);
+  --focus-hint-pad-y: clamp(0.28rem, 0.18rem + 0.35vw, 0.48rem);
+  --focus-hint-pad-x: clamp(0.42rem, 0.3rem + 0.5vw, 0.75rem);
+  --focus-hint-radius-base: clamp(14px, 9px + 1vw, 26px);
+  --focus-hint-border-base: clamp(1.6px, 1px + 0.25vw, 2.8px);
 }
 
 /* Smooth transitions for the three columns */
@@ -87,10 +94,14 @@ body.focus-mode .typing-panel {
   position: fixed;
   top: 12px;
   z-index: 50;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.95rem;
-  border-radius: 999px;
-  border: 2px solid color-mix(in srgb, var(--correct-color) 65%, white);
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--correct-color) 65%, white);
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
     linear-gradient(120deg,
@@ -106,6 +117,10 @@ body.focus-mode .typing-panel {
   transform: translateY(-6px);
   transition: opacity 220ms ease, transform 220ms ease;
   pointer-events: none;
+  white-space: normal;
+  text-align: center;
+  max-width: min(42vw, calc(360px * var(--focus-hint-width-scale)));
+  line-height: 1.15;
 }
 .focus-hint.left  { left: 12px; }
 .focus-hint.right { right: 12px; }
@@ -159,7 +174,11 @@ body.focus-mode #hintNewWords {
 
 
 /* === Corner focus-hint responsive shrink ================================= */
-:root { --focus-hint-scale: 1; }
+:root {
+  --focus-hint-scale: 1;
+  --focus-hint-width-scale: 1;
+  --focus-hint-tall-scale: 1;
+}
 
 /* Step down as viewport height gets shorter */
 @media (max-height: 900px) { :root { --focus-hint-scale: .95; } }
@@ -173,13 +192,56 @@ body.focus-mode #hintNewWords {
 @media (max-height: 420px) { :root { --focus-hint-scale: .58; } }
 @media (max-height: 380px) { :root { --focus-hint-scale: .55; } }
 @media (max-height: 340px) { :root { --focus-hint-scale: .52; } }
+@media (max-height: 300px) { :root { --focus-hint-scale: .48; } }
+
+/* Slightly shrink when the window is extra tall */
+@media (min-height: 920px)  { :root { --focus-hint-tall-scale: .96; } }
+@media (min-height: 1080px) { :root { --focus-hint-tall-scale: .92; } }
+@media (min-height: 1240px) { :root { --focus-hint-tall-scale: .88; } }
+@media (min-height: 1400px) { :root { --focus-hint-tall-scale: .84; } }
+
+/* Width-based scale */
+@media (min-width: 1400px) { :root { --focus-hint-width-scale: 1.05; } }
+@media (min-width: 1600px) { :root { --focus-hint-width-scale: 1.1; } }
+
+@media (max-width: 1080px) { :root { --focus-hint-width-scale: 0.97; } }
+@media (max-width: 920px)  { :root { --focus-hint-width-scale: 0.93; } }
+@media (max-width: 780px)  { :root { --focus-hint-width-scale: 0.9; } }
+@media (max-width: 660px)  { :root { --focus-hint-width-scale: 0.96; } }
+@media (max-width: 560px)  { :root { --focus-hint-width-scale: 1.1; } }
+@media (max-width: 500px)  { :root { --focus-hint-width-scale: 1.28; } }
+@media (max-width: 440px)  { :root { --focus-hint-width-scale: 1.48; } }
+@media (max-width: 380px)  { :root { --focus-hint-width-scale: 1.7; } }
+@media (max-width: 340px)  { :root { --focus-hint-width-scale: 1.9; } }
+
+/* Tall + narrow: trim size a touch when height maxed but width tiny */
+@media (min-height: 1080px) and (max-width: 620px) {
+  :root {
+    --focus-hint-width-scale: 0.86;
+    --focus-hint-pad-y: clamp(0.2rem, 0.14rem + 0.18vw, 0.34rem);
+  }
+}
+@media (min-height: 1080px) and (max-width: 520px) {
+  :root {
+    --focus-hint-width-scale: 0.79;
+    --focus-hint-pad-y: clamp(0.18rem, 0.12rem + 0.16vw, 0.3rem);
+  }
+}
+@media (min-height: 1080px) and (max-width: 440px) {
+  :root {
+    --focus-hint-width-scale: 0.7;
+    --focus-hint-pad-y: clamp(0.16rem, 0.11rem + 0.14vw, 0.28rem);
+  }
+}
 
 /* Apply the scale without moving them from the corners */
 .focus-hint{
-  font-size: calc(0.95rem * var(--focus-hint-scale)) !important;
-  padding: calc(0.35rem * var(--focus-hint-scale))
-           calc(0.60rem * var(--focus-hint-scale)) !important;
-  border-radius: calc(8px * var(--focus-hint-scale)) !important;
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
   /* keep them in the corners; don't change top/left/right */
 }
 
@@ -194,7 +256,7 @@ body.focus-mode #hintNewWords {
 /* Stack the “new words” hint under the retry hint */
 :root { --focus-hint-stack-gap: 8px; }
 /* Approx height of one hint row; respects your scaling var */
-:root { --focus-hint-row: calc(40px * var(--focus-hint-scale)); }
+:root { --focus-hint-row: calc(40px * var(--focus-hint-scale) * var(--focus-hint-tall-scale)); }
 
 #hintNewWords {
   right: 12px;
@@ -209,9 +271,13 @@ body.focus-mode #hintNewWords {
   left: 50%;
   transform: translate(-50%, -6px);
   z-index: 20; /* under the global fixed corner hints (z 50) */
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  border: 2px solid color-mix(in srgb, var(--correct-color) 65%, white);
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--correct-color) 65%, white);
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
     linear-gradient(120deg,
@@ -231,14 +297,19 @@ body.focus-mode #hintNewWords {
   opacity: 1;
   transition: opacity 220ms ease, transform 220ms ease;
   pointer-events: auto;
+  white-space: normal;
+  max-width: min(60vw, calc(420px * var(--focus-hint-width-scale)));
+  text-align: center;
 }
 
 /* Scale with your existing focus-hint responsiveness */
 .typing-panel .pregame-hint{
-  font-size: calc(0.95rem * var(--focus-hint-scale)) !important;
-  padding: calc(0.35rem * var(--focus-hint-scale))
-           calc(0.60rem * var(--focus-hint-scale)) !important;
-  border-radius: calc(8px * var(--focus-hint-scale)) !important;
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
 }
 
 /* Fade it away when a run starts (focus mode) or results are up */
