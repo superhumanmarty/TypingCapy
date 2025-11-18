@@ -15,7 +15,7 @@
   line-height: var(--lh);
   height: calc(var(--lh) * 3);
 
-  font-size: 1.75rem;
+  font-size: clamp(1.1rem, 0.88rem + 1.4vh, 1.8rem);
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;

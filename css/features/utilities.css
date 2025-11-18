@@ -88,11 +88,31 @@ html, body { overflow-x: hidden; }
 
 /* 5) Font-size guards so content stays legible while scaling */
 #textDisplay {
-  /* cap between 1.3rem and 1.75rem, fluid in between */
-  font-size: clamp(1.3rem, 1.0rem + 1.2vw, 1.75rem);
+  /* respond to height, not width */
+  font-size: clamp(1.05rem, 0.85rem + 1.45vh, 1.85rem);
 }
 #stats { font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.1rem); }
 .keyboard-diagram img { max-height: clamp(220px, 40vh, 500px); }
+
+body:not(.game-ended) .typing-panel{
+  padding-top: clamp(110px, 18vh, 210px);
+  padding-bottom: clamp(60px, 12vh, 170px);
+  box-sizing: border-box;
+}
+
+@media (max-height: 600px){
+  body:not(.game-ended) .typing-panel{
+    padding-top: clamp(95px, 17vh, 180px);
+    padding-bottom: clamp(48px, 11vh, 150px);
+  }
+}
+
+@media (max-height: 460px){
+  body:not(.game-ended) .typing-panel{
+    padding-top: clamp(80px, 15vh, 150px);
+    padding-bottom: clamp(36px, 10vh, 120px);
+  }
+}
 
 /* When the ad hides (<1100px), this still works — no changes needed */
 
@@ -369,23 +389,6 @@ html, body {
 .is-on::after,
 .split-half.is-on::after { content: none !important; }
 
-/* Hide order: word bar → timer (wee bit sooner) → live stats (later) */
-
-/* Word limit bar (unchanged) */
-@media (max-height: 760px){
-  html body .container .typing-panel #wordProgress { display: none !important; }
-}
-
-/* Timer — hide a weeee bit sooner than before (was 740px) */
-@media (max-height: 780px){
-  html body .container .typing-panel #timerDisplay { display: none !important; }
-}
-
-/* Live stats — hide later (only when very short; was 640px) */
-@media (max-height: 600px){
-  html body .container .typing-panel #stats { display: none !important; }
-}
-
 /* Tiny label above the Music / Typing dropdowns — centered & nudged up */
 .mini-label {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
@@ -436,9 +439,56 @@ html, body {
   letter-spacing: .2px;
 }
 
-/* Raise live WPM/Accuracy HUD by ~1cm (1cm ≈ 37.8px) */
-:root { --hud-raise: 38px; }
+/* Keep timer/progress/stats clustered and centered */
+.typing-hud {
+  position: absolute;
+  top: clamp(70px, 13vh, 240px);
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 0.9vh, 20px);
+  width: clamp(200px, min(30vw, 52vh), 520px);
+  max-width: 100%;
+  padding: 0 0.5rem;
+  z-index: 18;
+  pointer-events: none;
+}
 
-.typing-panel #stats {
-  top: calc(clamp(120px, 18vh, 260px) - var(--hud-raise)) !important;
+.typing-hud > *{
+  pointer-events: auto;
+  width: 100%;
+}
+
+@media (max-width: 768px), (max-height: 620px){
+  .typing-hud{
+    top: clamp(62px, 12.5vh, 210px);
+    width: clamp(190px, min(48vw, 48vh), 360px);
+    gap: clamp(5px, 0.8vh, 16px);
+  }
+}
+
+@media (max-width: 560px), (max-height: 520px){
+  .typing-hud{
+    top: clamp(52px, 11.5vh, 170px);
+    width: clamp(180px, min(64vw, 44vh), 320px);
+    gap: clamp(4px, 0.7vh, 12px);
+  }
+}
+
+@media (max-width: 420px), (max-height: 440px){
+  .typing-hud{
+    top: clamp(44px, 10.5vh, 150px);
+    width: clamp(170px, min(78vw, 40vh), 300px);
+    gap: clamp(3px, 0.6vh, 10px);
+  }
+}
+
+@media (max-width: 360px), (max-height: 400px){
+  .typing-hud{
+    top: clamp(40px, 10vh, 138px);
+    width: clamp(160px, min(84vw, 36vh), 280px);
+  }
 }

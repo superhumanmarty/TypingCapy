@@ -182,6 +182,7 @@
 
 /* When the game has ended, hide the live game UI completely */
 body.game-ended #textDisplay,
+body.game-ended #typingHud,
 body.game-ended #stats,
 body.game-ended #timerDisplay,
 body.game-ended #wordProgress,

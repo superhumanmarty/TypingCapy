@@ -1,21 +1,40 @@
 /* css/features/progress-word-limit.css */
 
 /* Word Progress Bar */
-.word-progress {
-  margin-bottom: 1rem;
-  width: 200px; /* Smaller width for "little bar" */
-  height: 20px; /* Thicker to avoid line look */
-  background: var(--box-bg);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 0 auto; /* Center it */
-  min-height: 20px; /* Reserve space */
+:root{
+  --wl-width: 460px;
+  --wl-height: 30px;
 }
+
+.word-progress {
+  position: relative;
+  z-index: 17;
+  width: min(var(--wl-width), 100%);
+  max-width: 100%;
+  height: clamp(12px, min(2.2vw, 2.4vh), var(--wl-height));
+  min-height: clamp(12px, min(2.2vw, 2.4vh), var(--wl-height));
+  background: var(--box-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.typing-hud #wordProgress{
+  width: 100%;
+  max-width: none;
+}
+
 .word-progress-fill {
   height: 100%;
   background: var(--stats-color);
   width: 0%;
   transition: width 0.3s ease;
+}
+.word-progress-fill::after{
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 .word-progress.hidden {
   visibility: hidden; /* Hide but reserve space */
@@ -35,42 +54,40 @@ body.game-ended #wordProgressFill {
   display: none !important;
 }
 
-/* === Bigger + slightly higher Word Limit bar (only the bar) === */
-/* 1cm ≈ 37.8px; round to 38px */
-:root{
-  --wl-raise: 38px;      /* how much to lift it */
-  --wl-width: 420px;     /* make it a lot wider */
-  --wl-height: 32px;     /* and taller */
-}
-
-#wordProgress{
-  position: relative;
-  z-index: 17;                    /* under error bubble (20), under timer (18) */
-  width: min(var(--wl-width), 90vw);
-  height: var(--wl-height);
-  min-height: var(--wl-height);
-  border-radius: 10px;
-  margin: 0 auto;                 /* stay centered */
-  will-change: transform;
-}
-
 /* keep fill full-height after we made it taller */
 #wordProgressFill,
 .word-progress-fill{
   height: 100%;
 }
 
-/* If the app uses zoom (Chromium): just translate up ~1cm */
-@supports (zoom: 1) {
-  .typing-panel > #wordProgress{
-    transform: translateY(calc(-1 * var(--wl-raise))) !important;
+@media (min-width: 1400px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(14px, min(1.6vw, 2.8vh), 36px);
+    min-height: clamp(14px, min(1.6vw, 2.8vh), 36px);
   }
 }
 
-/* If the app uses the transform-scale fallback: include the scale, too */
-@supports not (zoom: 1) {
-  .typing-panel > #wordProgress{
-    transform: translateY(calc(-1 * var(--wl-raise))) scale(var(--game-scale)) !important;
-    transform-origin: top center;
+@media (max-width: 640px), (max-height: 560px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(10px, min(1.8vw, 1.8vh), 20px);
+    min-height: clamp(10px, min(1.8vw, 1.8vh), 20px);
+  }
+}
+
+@media (max-width: 480px), (max-height: 460px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(8px, min(1.6vw, 1.4vh), 16px);
+    min-height: clamp(8px, min(1.6vw, 1.4vh), 16px);
+  }
+}
+
+@media (max-width: 360px), (max-height: 400px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(7px, min(1.4vw, 1.2vh), 14px);
+    min-height: clamp(7px, min(1.4vw, 1.2vh), 14px);
   }
 }

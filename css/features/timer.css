@@ -2,22 +2,46 @@
 
 /* Timer Display — overlay above stats/words (no layout shift) */
 .timer-display{
-  position: absolute;
-  top: 13.5rem;               
-  left: calc(50% - 6px);
-  transform: translateX(-50%);
-  z-index: 18;
   margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-self: center;
+  transform: translateX(-14px);
 
-  /* smaller + still responsive */
-  font-size: clamp(1.3rem, 1rem + 2.2vw, 2.6rem);
-  line-height: 1;
+  /* flexible sizing */
+  font-size: clamp(1rem, min(0.85rem + 1.6vw, 3.6vh), 2.4rem);
+  line-height: 1.08;
   letter-spacing: .02em;
   color: var(--stats-color);
   font-weight: 800;
-  text-align: center;
 }
 
 .timer-display.hidden {
   display: none; /* fully remove overlay when hidden */
+}
+
+@media (min-width: 1400px){
+  .timer-display{
+    font-size: clamp(1.1rem, min(0.95rem + 1.8vw, 4vh), 2.8rem);
+  }
+}
+
+@media (max-width: 640px), (max-height: 560px){
+  .timer-display{
+    font-size: clamp(0.9rem, min(0.75rem + 1.2vw, 2.8vh), 1.8rem);
+  }
+}
+
+@media (max-width: 480px), (max-height: 460px){
+  .timer-display{
+    font-size: clamp(0.84rem, min(0.68rem + 0.95vw, 2.2vh), 1.45rem);
+  }
+}
+
+@media (max-width: 360px), (max-height: 400px){
+  .timer-display{
+    font-size: clamp(0.78rem, min(0.62rem + 0.85vw, 1.9vh), 1.3rem);
+  }
 }
