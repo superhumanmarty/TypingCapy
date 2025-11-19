@@ -5,7 +5,6 @@
 let HOST = null;
 let CARET = null;
 let ANIM = null;
-let OBS_HOST = null;
 let OBS_BODY = null;
 let RAF = 0;
 let ARMED = false; // false => next update snaps (no fly-in)
@@ -298,23 +297,6 @@ function onCapyTextReady(){ ARMED = false; schedule({ immediate:true }); }
 function onCapyRunReset(){ ARMED = false; schedule({ immediate:true }); }
 function onCapyTimeup(){ hide(); ARMED = false; }
 
-function watchHost(){
-  if (OBS_HOST) OBS_HOST.disconnect();
-  OBS_HOST = new MutationObserver((list) => {
-    ensureCaretInDOM();
-    for (const m of list) {
-      if (m.type === 'attributes' && m.attributeName === 'class' && isChar(m.target)) { schedule(); return; }
-      if (m.type === 'childList') { schedule(); return; }
-    }
-  });
-  OBS_HOST.observe(HOST, {
-    attributes: true,
-    attributeFilter: ['class'],
-    childList: true,
-    subtree: true
-  });
-}
-
 function watchBody(){
   if (OBS_BODY) OBS_BODY.disconnect();
   OBS_BODY = new MutationObserver(() => {
@@ -333,7 +315,6 @@ function wire(){
   window.addEventListener('capy:textReady', onCapyTextReady);
   window.addEventListener('capy:runReset', onCapyRunReset);
   window.addEventListener('capy:timeup', onCapyTimeup);
-  watchHost();
   watchBody();
 }
 
@@ -345,7 +326,6 @@ function unwire(){
   window.removeEventListener('capy:textReady', onCapyTextReady);
   window.removeEventListener('capy:runReset', onCapyRunReset);
   window.removeEventListener('capy:timeup', onCapyTimeup);
-  if (OBS_HOST) { OBS_HOST.disconnect(); OBS_HOST = null; }
   if (OBS_BODY) { OBS_BODY.disconnect(); OBS_BODY = null; }
 }
 
