@@ -129,8 +129,12 @@ main {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-weight: 600;
+  padding: 0.18rem 0.65rem;
+  font-weight: 500;
+  font-size: clamp(0.62rem, 0.68rem + 0.2vw, 0.78rem);
+  line-height: 1.25;
+  text-align: center;
+  word-break: break-word;
 }
 
 a {
