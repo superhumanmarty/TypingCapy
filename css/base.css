@@ -176,34 +176,73 @@ body {
 }
 
 .settings-panel {
-  overflow-y: auto; /* Make scrollable if too tall */
-  max-height: 100vh; /* Prevent overflowing the viewport */
-  padding: 1rem; /* Add some internal padding for sleekness */
-  background: var(--box-bg); /* Subtle background */
-  border-right: 1px solid var(--box-border); /* Visual separation from typing area */
-  border-radius: 8px; /* Rounded corners for modern look */
+  position: relative;
+  overflow: hidden;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(255,255,255,.05)) 0%,
+      color-mix(in srgb, var(--box-bg) 78%, rgba(0,0,0,.55)) 100%);
+  box-shadow:
+    0 28px 60px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(14px);
+}
+.settings-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% -10%,
+      color-mix(in srgb, var(--highlight-color, var(--stats-color, #6ae)) 32%, transparent) 0%,
+      transparent 55%);
+  opacity: .45;
+  pointer-events: none;
 }
 
 .settings-group {
   margin-bottom: 1.5rem; /* More space between groups */
-  padding: 1rem; /* Internal padding */
-  background: rgba(255, 255, 255, 0.05); /* Very subtle highlight */
-  border-radius: 6px; /* Sleek rounding */
-  border: 1px solid var(--box-border); /* Light border for definition */
+  padding: 1rem;
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(255,255,255,.06)) 0%,
+      color-mix(in srgb, var(--box-bg) 72%, rgba(0,0,0,.6)) 100%);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 14px 32px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter: blur(8px);
+}
+.settings-group::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--highlight-color, var(--stats-color, #7de)) 18%, transparent);
+  opacity: .35;
+  pointer-events: none;
 }
 
 .settings-group h4 {
   margin: 0 0 0.75rem 0; /* Tight spacing under heading */
   font-size: 1rem; /* Not too large */
-  font-weight: bold;
-  color: var(--header-color); /* Match theme */
+  font-weight: 700;
+  color: color-mix(in srgb, var(--header-color) 90%, #fff);
   text-transform: uppercase; /* Sleek, modern feel */
   letter-spacing: 0.5px; /* Subtle spacing */
 }
 
 .settings label {
-  margin-right: 0.75rem; /* Reduce horizontal spacing */
-  white-space: nowrap; /* Prevent wrapping for sleekness */
+  margin-right: 0.75rem;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--correct-color) 90%, rgba(255,255,255,.75));
+  font-weight: 600;
 }
 
 .settings span { margin-right: 0.5rem; }
