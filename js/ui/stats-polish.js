@@ -51,10 +51,10 @@
       text-align: center;
       align-self: center;
       transform: translateX(-14px);
-      color: #ffd45c;
+      color: var(--timer-hud-color, var(--timer-color, var(--highlight-color, #ffd45c)));
       text-shadow:
         0 10px 30px rgba(0,0,0,.35),
-        0 0 20px rgba(255,210,120,.45);
+        0 0 20px currentColor;
     }
     #timerDisplay #timeRemaining{
       font-size: clamp(26px, min(6vw, 6vh), 96px);
