@@ -6,8 +6,44 @@
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;          /* remove the padded “card” look */
-  margin: 2rem 0;                 /* keep some vertical breathing room */
+  margin: 2rem auto;              /* keep some vertical breathing room and center */
   text-align: center;
+  width: min(960px, 96vw);
+  --results-screen-scale: 1;
+  transform-origin: top center;
+  transform: scale(var(--results-screen-scale));
+}
+
+@media (max-width: 1400px) {
+  .results-screen { --results-screen-scale: 0.96; }
+}
+
+@media (max-width: 1220px) {
+  .results-screen { --results-screen-scale: 0.9; }
+}
+
+@media (max-width: 1060px) {
+  .results-screen { --results-screen-scale: 0.84; }
+}
+
+@media (max-width: 920px) {
+  .results-screen { --results-screen-scale: 0.78; }
+}
+
+@media (max-width: 780px) {
+  .results-screen { --results-screen-scale: 0.72; }
+}
+
+@media (max-width: 660px) {
+  .results-screen { --results-screen-scale: 0.68; }
+}
+
+@media (max-width: 560px) {
+  .results-screen { --results-screen-scale: 0.64; }
+}
+
+@media (max-width: 460px) {
+  .results-screen { --results-screen-scale: 0.6; }
 }
 
 
