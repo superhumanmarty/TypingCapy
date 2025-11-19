@@ -7,7 +7,7 @@
 body.theme-historic {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/roman2.png');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #020d07;          /* very deep evergreen */
+  --box-bg: #04160c;          /* very deep evergreen */
   --box-border: #0f2e1b;      /* forest edge */
   --header-color: #58d69d;    /* muted jade */
   --stats-color: #2f8d5c;
@@ -307,7 +307,7 @@ body.theme-coffee {
   --caret-color: #00d3ff;
 }
 
-/* City */ı
+/* City */
 /* Brutalist */
 body.theme-brutalist {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/brutalist_img.jpg');
