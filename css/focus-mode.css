@@ -397,28 +397,3 @@ body:not(.focus-mode):not(.game-ended) .pregame-pill {
 
 
 
-/* === Marty pill (final) — same height/feel as the pre-game hint === */
-:root { --marty-avatar: 26px; }  /* adjust to taste */
-
-#martyPill {
-  height: 32px;             /* EXACT match to .pregame-pill base */
-  padding: 6px 10px;        /* match .pregame-pill padding for same feel */
-  /* rest (background, border, gap, etc.) inherited from .pregame-pill */
-}
-
-#martyPill .pill-avatar {
-  width: var(--marty-avatar);
-  height: var(--marty-avatar) !important; /* override generic img height */
-  border-radius: 50% !important;          /* circular avatar */
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  flex-shrink: 0;
-}
-
-#martyPill .pill-text {
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-               "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  font-weight: 700;
-  letter-spacing: .01em;
-}
