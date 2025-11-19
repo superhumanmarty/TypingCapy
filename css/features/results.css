@@ -132,6 +132,11 @@
 .keycap.esc { color: var(--header-color); border-color: var(--header-color); }
 .keycap.tab { color: var(--stats-color);  border-color: var(--stats-color);  }
 
+/* Grow the top action buttons slightly on the results overlay */
+.results-screen {
+  --results-hint-scale: 1.2;
+}
+
 /* Layout for the hints inside the results screen */
 .results-screen .results-hints{
   display: flex;
@@ -145,10 +150,14 @@
 .results-screen .results-hints .hint{
   color: #030712;
   font-weight: 800;
-  font-size: 1rem;
-  border: 2px solid color-mix(in srgb, var(--correct-color) 70%, white);
+  font-size: calc(1rem * var(--results-hint-scale, 1));
+  border-width: calc(2px * var(--results-hint-scale, 1));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--correct-color) 70%, white);
   border-radius: 9999px;
-  padding: .55rem 1.25rem;
+  padding:
+    calc(.55rem * var(--results-hint-scale, 1))
+    calc(1.25rem * var(--results-hint-scale, 1));
   background:
     radial-gradient(circle at top, rgba(255,255,255,0.45), transparent 60%),
     linear-gradient(125deg,

@@ -11,6 +11,7 @@
   --focus-hint-pad-x: clamp(0.42rem, 0.3rem + 0.5vw, 0.75rem);
   --focus-hint-radius-base: clamp(14px, 9px + 1vw, 26px);
   --focus-hint-border-base: clamp(1.6px, 1px + 0.25vw, 2.8px);
+  --focus-hint-context-scale: 0.8;      /* 20% smaller shortcut buttons */
 }
 
 /* Smooth transitions for the three columns */
@@ -95,11 +96,11 @@ body.focus-mode .typing-panel {
   top: 12px;
   z-index: 50;
   padding:
-    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale))
-    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
-  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
-  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
-  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
   border-style: solid;
   border-color: color-mix(in srgb, var(--correct-color) 65%, white);
   background:
@@ -236,12 +237,12 @@ body.focus-mode #hintNewWords {
 
 /* Apply the scale without moving them from the corners */
 .focus-hint{
-  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
   padding:
-    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale))
-    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
-  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
-  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
   /* keep them in the corners; don't change top/left/right */
 }
 
@@ -254,9 +255,17 @@ body.focus-mode #hintNewWords {
 }
 
 /* Stack the “new words” hint under the retry hint */
-:root { --focus-hint-stack-gap: 8px; }
+:root { --focus-hint-stack-gap: 16px; }
 /* Approx height of one hint row; respects your scaling var */
-:root { --focus-hint-row: calc(40px * var(--focus-hint-scale) * var(--focus-hint-tall-scale)); }
+:root {
+  --focus-hint-row: calc(
+    42px
+    * var(--focus-hint-scale)
+    * var(--focus-hint-tall-scale)
+    * var(--focus-hint-width-scale)
+    * var(--focus-hint-context-scale)
+  );
+}
 
 #hintNewWords {
   right: 12px;
@@ -272,10 +281,10 @@ body.focus-mode #hintNewWords {
   transform: translate(-50%, -6px);
   z-index: 20; /* under the global fixed corner hints (z 50) */
   padding:
-    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale))
-    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
-  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
-  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale));
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
   border-style: solid;
   border-color: color-mix(in srgb, var(--correct-color) 65%, white);
   background:
@@ -304,12 +313,12 @@ body.focus-mode #hintNewWords {
 
 /* Scale with your existing focus-hint responsiveness */
 .typing-panel .pregame-hint{
-  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
   padding:
-    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale))
-    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
-  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
-  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale)) !important;
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
 }
 
 /* Fade it away when a run starts (focus mode) or results are up */
