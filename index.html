@@ -28,6 +28,7 @@
 <link href="/capy.png?v=1" rel="apple-touch-icon"/>
 </head>
 <body tabindex="0"> <!-- make body focusable -->
+<main class="page-main">
 <div class="container">
 <aside id="ad-left">
 <div class="ad-slot">ads</div>
@@ -432,6 +433,14 @@
 <button class="focus-hint right" data-shortcut-action="newWords" id="hintNewWords" type="button">
 <span aria-hidden="true" class="shortcut-symbol">⟳</span>New Words (Ctrl/Cmd+J)
   </button>
+</main>
+<footer class="site-footer" aria-label="Footer navigation">
+  <nav class="site-footer__links">
+    <a href="./about.html">About</a>
+    <a href="./contact.html">Contact</a>
+    <a href="./privacy.html">Privacy</a>
+  </nav>
+</footer>
 <script src="./js/focusMode.js" type="module"></script>
 <script src="./js/main.js" type="module"></script>
 <!-- PDF + DOM to image (UMD builds; expose window.jspdf and window.html2canvas) -->
