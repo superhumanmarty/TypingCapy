@@ -204,6 +204,12 @@ body {
   pointer-events: none;
 }
 
+.settings-panel__spacer {
+  height: clamp(140px, 18vh, 220px);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
 .settings-group {
   margin-bottom: 1.5rem; /* More space between groups */
   padding: 1rem;
