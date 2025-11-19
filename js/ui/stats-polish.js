@@ -53,8 +53,8 @@
       transform: translateX(-14px);
       color: var(--timer-hud-color, var(--timer-color, var(--highlight-color, #ffd45c)));
       text-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        0 0 20px currentColor;
+        0 2px 8px rgba(0,0,0,.24),
+        0 0 4px color-mix(in srgb, currentColor 40%, transparent);
     }
     #timerDisplay #timeRemaining{
       font-size: clamp(26px, min(6vw, 6vh), 96px);
