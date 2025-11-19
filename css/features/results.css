@@ -323,32 +323,26 @@ body.game-ended #resultsScreen {
     min-width: auto !important;
   }
 }
+
 /* ===============================
-   RESULTS: enable vertical scroll on short heights
-   (no resizing; just allow scrolling when necessary)
+   RESULTS: allow vertical scroll at any size
    =============================== */
 
-/* When the app is showing results and the viewport is short,
-   let the results area scroll independently. */
-@media (max-height: 720px){
-  /* Make the right-hand panel itself scroll if needed */
-  body.game-ended .typing-panel{
-    overflow-y: auto !important;
-    max-height: 100dvh;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding-block: 8px; /* tiny breathing room so the first/last element aren't flush */
-  }
+body.game-ended .typing-panel{
+  overflow-y: auto !important;
+  max-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-block: 8px; /* tiny breathing room so the first/last element aren't flush */
+}
 
-  /* Also allow the results box to scroll internally if it’s taller than the panel */
-  body.game-ended #resultsScreen{
-    max-height: calc(100dvh - 16px);  /* match the 8px padding above/below */
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable both-edges;
-    touch-action: pan-y;
-  }
+body.game-ended #resultsScreen{
+  max-height: calc(100dvh - 16px);  /* match the 8px padding above/below */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+  touch-action: pan-y;
 }
 
 /* If the window is *very* short, trim vertical margins so more fits before scrolling */
