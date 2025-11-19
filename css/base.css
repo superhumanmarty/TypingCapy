@@ -171,8 +171,8 @@ body {
 .settings {
   display: flex;
   flex-direction: column; /* Stack labels vertically if needed */
-  gap: 0.25rem; /* Tighter internal spacing */
-  font-size: 0.85rem; /* Slightly smaller for simplicity */
+  gap: 0.16rem; /* Tighter internal spacing */
+  font-size: 0.72rem; /* Slightly smaller for simplicity */
 }
 
 .settings-panel {
@@ -180,7 +180,7 @@ body {
   overflow: hidden;
   overflow-y: auto;
   max-height: 100vh;
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
   background:
@@ -191,6 +191,10 @@ body {
     0 28px 60px rgba(0,0,0,.45),
     inset 0 1px 0 rgba(255,255,255,.08);
   backdrop-filter: blur(14px);
+  flex: 0 0 clamp(100px, 8vw, 140px);
+  max-width: clamp(100px, 8vw, 140px);
+  min-width: clamp(90px, 6vw, 120px);
+  font-size: 0.82rem;
 }
 .settings-panel::before {
   content: '';
@@ -211,8 +215,8 @@ body {
 }
 
 .settings-group {
-  margin-bottom: 1.5rem; /* More space between groups */
-  padding: 1rem;
+  margin-bottom: 1rem; /* More space between groups */
+  padding: 0.68rem;
   position: relative;
   background:
     linear-gradient(180deg,
@@ -259,13 +263,21 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.settings-panel :is(button, .pill, .limit-btn, select, input) {
+  font-size: 0.85em;
+}
+
+.settings-panel :is(button, .pill, .limit-btn) {
+  padding: clamp(0.1rem, 0.08rem + 0.18vw, 0.32rem) clamp(0.3rem, 0.24rem + 0.3vw, 0.55rem);
+}
+
 /* Ensure custom inputs (like numbers) align nicely */
 .settings input[type="number"] {
   background: var(--body-bg);
   border: 1px solid var(--untyped-color);
   border-radius: 4px;
   color: var(--correct-color);
-  padding: 0.2rem 0.4rem;
+  padding: 0.12rem 0.24rem;
 }
 
 .typing-panel {
@@ -284,8 +296,9 @@ body {
   border: 1px solid var(--untyped-color);
   border-radius: 4px;
   color: var(--correct-color);
-  padding: 0.2rem 0.4rem;
+  padding: 0.12rem 0.24rem;
   font-family: monospace;
+  font-size: 0.85em;
 }
 
 .subtoggle.hidden { display: none; }
