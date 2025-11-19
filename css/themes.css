@@ -7,14 +7,25 @@
 body.theme-historic {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/roman2.png');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0f241b;          /* green-blue dark */
-  --box-border: #2f8f57;      /* emerald edge */
-  --header-color: #49c07e;    /* fresh green */
-  --stats-color: #9be7c0;
-  --correct-color: #ffffff;
-  --untyped-color: #cfe7db;
-  --highlight-color: #ffa348;  /* brownish orange pop */
-  --caret-color: #ffa348;
+  --box-bg: #020d07;          /* very deep evergreen */
+  --box-border: #0f2e1b;      /* forest edge */
+  --header-color: #58d69d;    /* muted jade */
+  --stats-color: #2f8d5c;
+  --correct-color: #eefcf4;
+  --untyped-color: #8ca795;
+  --highlight-color: #a1602b;  /* aged bronze */
+  --caret-color: #a1602b;
+}
+
+body.theme-historic .settings-hero {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(0,0,0,.45)) 0%,
+      color-mix(in srgb, var(--box-bg) 86%, rgba(0,0,0,.65)) 100%);
+  border-color: color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 16px 32px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
 }
 
 /* Vaporwave */
@@ -63,14 +74,14 @@ body.theme-boba-capy {
 body.theme-creepy {
   background-image: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.78)), url('../backgrounds/creepy.jpg');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #031517;          /* near black / blue-green */
-  --box-border: #0bb0a7;      /* eerie teal edge */
-  --header-color: #9bf6ff;
-  --stats-color: #7fffe3;
-  --correct-color: #eaffff;
-  --untyped-color: #b9d6d8;
-  --highlight-color: #00ffd1; /* glowing aqua */
-  --caret-color: #00ffd1;
+  --box-bg: #010204;          /* void teal */
+  --box-border: #052226;      /* abyss teal edge */
+  --header-color: #7ff0e6;
+  --stats-color: #29c5b0;
+  --correct-color: #dbfff6;
+  --untyped-color: #7ca6a2;
+  --highlight-color: #20f5c3; /* ghostly glow */
+  --caret-color: #20f5c3;
 }
 
 /* Coral Reef */
@@ -113,6 +124,29 @@ body.theme-italy-coast {
   --untyped-color: #d6dde6;
   --highlight-color: #00e0ff; /* aqua pop */
   --caret-color: #00e0ff;
+}
+
+body.theme-italy-coast .settings-panel {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 96%, rgba(255,255,255,.04)) 0%,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(0,0,0,.4)) 55%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.6)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+body.theme-italy-coast .settings-group {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 90%, rgba(255,255,255,.03)) 0%,
+      color-mix(in srgb, var(--box-bg) 78%, rgba(0,0,0,.45)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
 }
 
 /* Wet Capy */
@@ -189,14 +223,14 @@ body.theme-castle {
 body.theme-city-night {
   background-image: linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.76)), url('../backgrounds/japan_night.jpg');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #0b0830;
-  --box-border: #7f39fb;      /* purple neon */
-  --header-color: #a78bfa;
-  --stats-color: #8ef0ff;
-  --correct-color: #ffffff;
-  --untyped-color: #cfd3ef;
-  --highlight-color: #ff2b4a; /* neon red */
-  --caret-color: #ff2b4a;
+  --box-bg: #030018;          /* darker purple */
+  --box-border: #1a0742;      /* violet edge */
+  --header-color: #c1a2ff;
+  --stats-color: #6ac2ff;
+  --correct-color: #f6f4ff;
+  --untyped-color: #9fa8d8;
+  --highlight-color: #ff2f8c; /* neon magenta */
+  --caret-color: #ff2f8c;
 }
 
 /* Earth from Space */
@@ -231,14 +265,14 @@ body.theme-cottage {
 body.theme-dark-academia {
   background-image: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.78)), url('../backgrounds/dark_academia.jpg');
   background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #121212;          /* charcoal */
-  --box-border: #6a4b3c;      /* dark brown */
-  --header-color: #e8decf;    /* parchment */
-  --stats-color: #ffe2a2;
-  --correct-color: #ffffff;
-  --untyped-color: #d0d0d0;
-  --highlight-color: #ffcf75; /* gold pop */
-  --caret-color: #ffcf75;
+  --box-bg: #040404;          /* ink black */
+  --box-border: #20160d;      /* worn leather */
+  --header-color: #d4c8b6;    /* parchment */
+  --stats-color: #8b7159;     /* muted brown */
+  --correct-color: #f4eee3;
+  --untyped-color: #888079;
+  --highlight-color: #7a5130; /* warm brown accent */
+  --caret-color: #7a5130;
 }
 
 /* Space */
@@ -269,20 +303,7 @@ body.theme-coffee {
   --caret-color: #00d3ff;
 }
 
-/* City */
-body.theme-city {
-  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/city.png');
-  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
-  --box-bg: #07010f;          /* navy */
-  --box-border: #131c38;      /* deeper navy edge */
-  --header-color: #c5d3ed;    /* softer cool white */
-  --stats-color: #97a8cf;     /* darker pastel blue */
-  --correct-color: #ffffff;
-  --untyped-color: #d3d6e8;
-  --highlight-color: #ff2b8f; /* hot pink */
-  --caret-color: #ff2b8f;
-}
-
+/* City */ı
 /* Brutalist */
 body.theme-brutalist {
   background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/brutalist_img.jpg');
@@ -295,6 +316,29 @@ body.theme-brutalist {
   --untyped-color: #d8d8d8;
   --highlight-color: #93ff6f; /* lime pop */
   --caret-color: #93ff6f;
+}
+
+body.theme-brutalist .settings-panel {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 97%, rgba(255,255,255,.02)) 0%,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(0,0,0,.4)) 55%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.65)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+body.theme-brutalist .settings-group {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(255,255,255,.02)) 0%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.45)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
 }
 
 /* Minimalist (solid background) */
