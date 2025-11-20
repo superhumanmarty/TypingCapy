@@ -28,6 +28,13 @@
 <link href="/capy.png?v=1" rel="apple-touch-icon"/>
 </head>
 <body tabindex="0"> <!-- make body focusable -->
+<div aria-hidden="true" class="device-warning hidden" id="deviceWarning" role="dialog">
+  <div class="device-warning__box" role="document">
+    <h2>Heads up!</h2>
+    <p>Keybara.io only works on phones and tablets if you have a Bluetooth keyboard connected.</p>
+    <button class="device-warning__button" id="deviceWarningContinue" type="button">Okay, got it</button>
+  </div>
+</div>
 <main class="page-main">
 <div class="container">
 <aside id="ad-left">
@@ -446,5 +453,6 @@
 <script src="./js/defaultSelects.js" type="module"></script>
 <script defer="" src="./js/on-states.js"></script>
 <script src="./js/ui/stats-polish.js" type="module"></script>
+<script src="./js/device-warning.js" type="module"></script>
 </body>
 </html>
