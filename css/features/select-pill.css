@@ -264,3 +264,63 @@
 /* perf hint for the animated popup */
 .pill-select-menu { will-change: transform, opacity; }
 
+/* === Use Inter for all settings selects & their menus === */
+:root{
+  --ui-font: "Inter", ui-sans-serif, system-ui, -apple-system,
+             "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Closed pill (native select text) */
+.select-pill select.ui-select,
+#limitsHero .select-pill select.ui-select,
+#timerInlineSelect,
+#wordLimitInlineSelect {
+  font-family: var(--ui-font) !important;
+  font-weight: 700;
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enhanced pill: visible button text + popup options */
+.select-pill .pill-select-btn,
+.pill-select-menu,
+.pill-select-menu .pill-option {
+  font-family: var(--ui-font) !important;
+  font-weight: 700;
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Some browsers honor this for the native dropdown list */
+.select-pill select.ui-select option {
+  font-family: var(--ui-font);
+}
+
+/* --- Pill select popup animation --- */
+.pill-select-menu {
+  /* your JS sets position/size; we animate only visuals */
+  opacity: 0;
+  transform: translateY(-6px) scale(.98);
+  transform-origin: top left;
+  transition: opacity 140ms ease, transform 160ms cubic-bezier(.2,.7,.2,1);
+  pointer-events: none;            /* clicks only when open */
+  z-index: 10000;                  /* above settings panel */
+  will-change: transform, opacity; /* smoothness hint */
+}
+
+.pill-select-menu[data-side="up"] {
+  transform-origin: bottom left;   /* open-up feels natural */
+  transform: translateY(6px) scale(.98);
+}
+
+.pill-select-menu.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-select-menu { transition: none !important; }
+}

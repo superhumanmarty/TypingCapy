@@ -1,6 +1,8 @@
 // js/app/boot.js
 import { startApp } from './start.js';
 import { wireGlobalListeners } from './global-listeners.js';
+import { setupMusic } from '../music.js';
+import { setupSoundVolumeUI } from '../sound.js';
 
 import {
   enhanceSelect,
@@ -46,7 +48,7 @@ import { resetGameLock, setWordsForHistoryFromChars } from '../controller/game-c
 import { getCurrentWord } from '../utils.js';
 import { updateHide } from '../hide.js';
 import { updateHighlight } from '../highlight.js';
-import { resetMetrics, setAvgOverrideForRun } from '../metrics.js';
+import { resetMetrics, setAvgOverrideForRun, getLiveWPM } from '../metrics.js';
 import { resetHistory } from '../history.js';
 
 import { wireKeyboardVisibility } from '../ui/keyboard-visibility.js';
@@ -54,6 +56,7 @@ import { setupGhost } from '../ghost.js';
 import { enforceTimerVisibility, setTimerLabelToFull } from '../ui/timer-hud.js';
 import { initHideHighlightWatchers } from '../ui/hide-highlight-watchers.js';
 import { initPills } from '../ui/pills-init.js';
+import { setupHUD } from '../ui/hud.js';
 
 export async function boot({ configs }) {
   // --- DOM refs ---
@@ -70,14 +73,20 @@ export async function boot({ configs }) {
   const wpmSpan = document.getElementById('wpm');
   const accSpan = document.getElementById('accuracy');
 
+  setupHUD({ wpmSpan, accSpan, getLiveWPM, warmupMs: 2000 });
+
   // --- Start base layer ---
   startApp({ textDisplay, hideControl, highlightControl });
-
+  
   // --- Enhance selects + populate language ---
   ['languageSelector','wordListSizeSelector'].forEach(id => enhanceSelect(id, { small: true }));
   enhanceSelect('themeSelector');
-  ['timerSelector','wordLimitSelector','soundSelector','hideWordsSelector','highlightAheadSelector']
+  enhanceSelect('musicSelector');   // ensure the new music dropdown is wired like others
+  ['timerSelector','wordLimitSelector','musicSelector','soundSelector','hideWordsSelector','highlightAheadSelector']
     .forEach(id => enhanceSelect(id, { small: true }));
+
+  setupMusic();
+  setupSoundVolumeUI();
 
   populateLanguageOptions(configs);
   updateUIForLanguage(configs);
@@ -90,6 +99,19 @@ export async function boot({ configs }) {
   enforceWordLimitAvailability();
   wireMouseOnlySelects();
   wireSettingsRefocus(refocusToGame);
+
+  // Make both volume sliders "mouse-only": blur on release so typing works immediately
+  {
+    ['musicVolume','soundVolume'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const blurBack = () => { try { el.blur(); } catch(_) {} refocusToGame?.(); };
+      el.addEventListener('pointerup', blurBack);
+      el.addEventListener('touchend', blurBack, { passive: true });
+      el.addEventListener('change', blurBack);
+    });
+  }
+
 
   wireGlobalListeners({
     textDisplay,
@@ -126,7 +148,8 @@ export async function boot({ configs }) {
 
   // Theme + keyboard diagram
   bindThemeSelectors(themeSelector, colorPickers);
-  document.body.className = `theme-${themeSelector.value}`;
+  const resolvedTheme = themeSelector?.dataset?.randomResolved || themeSelector?.value || 'minimalist';
+  document.body.className = `theme-${resolvedTheme}`;
   setupKeyboardDiagram();
   wireKeyboardVisibility(positionKeyboardDiagram);
 

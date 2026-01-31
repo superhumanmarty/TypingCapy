@@ -1,0 +1,11 @@
+And know that language_configs.json its the mega json that configures a bunch of language, word, punctuation, numbers, symbols, etc. data to generate the text that the user/player types 
+caps_lock.png, shift.png, shift_caps_lock.png, and default.png are all images that serve as a keyboard/hand/finger proper typing guide, they're in the 'keyboard_and_hand' folder
+capyparadise.png and cyberpunk.png are backgrounds used in themes, theyre in the 'backgrounds' folder 
+char.js, backspace.js, extra.js, and space.js are in the 'handlers' subfolder 
+and all javascript files are in the 'js' folder 
+all css files are in the 'css' folder 
+i also have a folder called 'settings_images' where i keep images that i implement in my settings column: lang.png theme.png sound.png endless.png word_limit.png timer.png noob.png and pro.png 
+and then also boot.js, config.js, events.js, global-listeners.js, start.js, persist-state.js and state.js are in the 'app' folder. 
+game-controller.js is in the 'controller' folder. 
+hide-highlight-watchers.js, keyboard-visibility.js, language.js, limits.js, pills-init.js, pills.js, restart.js, results.js, selects.js, timer-hud.js, enhancedSelect.js, stats-polish.js, smooth-caret.js, and typed-errors.js are in the 'ui' folder 
+And error-display.css, heroes.css, keyboard-diagram.css, keyboard-pill.css, limits.css, pills-core.css, pills-ghost.css, pills-hide-highlight.css, pills-typed-errors.css, progress-word-limit.css, results.css, select-pill.css, split-pill.css, timer.css, typing-core.css, and utilities.css Are in the features subfolder of folder 'css'

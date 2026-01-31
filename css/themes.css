@@ -1,30 +1,420 @@
 /* css/themes.css */
-/* Theme: Capy Paradise */
-body.theme-capyparadise {
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/capyparadise.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* ← lock the wallpaper in place */
-  --box-bg: #0a1f44; /* dark blue typing box */
-  --box-border: #66aaff; /* light‑blue border */
-  --header-color: #66aaff; /* title & theme text */
-  --stats-color: #aaddff; /* WPM & accuracy */
-  --correct-color: #ffffff;/* typed text */
-  --untyped-color: #cccccc;/* yet‑to‑type text */
-  --highlight-color: #39ff14;
+/* === NEW THEMES ========================================================= */
+/* All use a dark overlay so text is crisp, fill full screen, and scroll.  */
+/* Cursor color picks up --caret-color.                                     */
+
+/* Historic */
+body.theme-historic {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/roman2.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #04160c;          /* very deep evergreen */
+  --box-border: #0f2e1b;      /* forest edge */
+  --header-color: #58d69d;    /* muted jade */
+  --stats-color: #2f8d5c;
+  --correct-color: #eefcf4;
+  --untyped-color: #8ca795;
+  --highlight-color: #a1602b;  /* aged bronze */
+  --caret-color: #a1602b;
+  --timer-color: #6cd9ad;
 }
 
-/* Theme: Cyberpunk */
-body.theme-cyberpunk {
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../backgrounds/cyberpunk.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* ← lock it here too */
-  --box-bg: #000000; /* black typing box */
-  --box-border: #ff00ff; /* neon pink border */
-  --header-color: #ff00ff; /* title & theme text */
-  --stats-color: #39ff14; /* WPM & accuracy in neon green */
-  --correct-color: #39ff14;/* typed text */
-  --untyped-color: #888888;/* yet‑to‑type text */
-  --highlight-color: #00ffff;
+body.theme-historic .settings-hero {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(0,0,0,.45)) 0%,
+      color-mix(in srgb, var(--box-bg) 86%, rgba(0,0,0,.65)) 100%);
+  border-color: color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 16px 32px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* Vaporwave */
+body.theme-vaporwave {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/vaporwave.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #120621;          /* deep purple/black */
+  --box-border: #7df9ff;      /* neon cyan edge */
+  --header-color: #ff77e9;    /* neon pink */
+  --stats-color: #7df9ff;
+  --correct-color: #ffffff;
+  --untyped-color: #d2c6e9;
+  --highlight-color: #00f0ff; /* pops hard */
+  --caret-color: #00f0ff;
+}
+
+/* Nature */
+body.theme-nature {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/brazil.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #0d2417;          /* dark green */
+  --box-border: #009b3a;      /* flag green edge */
+  --header-color: #12c8a0;    /* greenish blue */
+  --stats-color: #b6ffb6;
+  --correct-color: #ffffff;
+  --untyped-color: #cfe5d6;
+  --highlight-color: #ffb347; /* a little reddish orange */
+  --caret-color: #ffb347;
+}
+
+/* Boba Capy */
+body.theme-boba-capy {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/boba_capy.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #241a14;          /* brownish dark */
+  --box-border: #c89f6c;      /* caramel edge */
+  --header-color: #ffe7c2;    /* warm white */
+  --stats-color: #ffe6a7;
+  --correct-color: #ffffff;
+  --untyped-color: #e7dccb;
+  --highlight-color: #ffd166; /* caramel pop */
+  --caret-color: #ffd166;
+}
+
+/* Creepy */
+body.theme-creepy {
+  background-image: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.78)), url('../backgrounds/creepy.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #010204;          /* void teal */
+  --box-border: #052226;      /* abyss teal edge */
+  --header-color: #7ff0e6;
+  --stats-color: #29c5b0;
+  --correct-color: #dbfff6;
+  --untyped-color: #7ca6a2;
+  --highlight-color: #20f5c3; /* ghostly glow */
+  --caret-color: #20f5c3;
+  --timer-color: #7ff0e6;
+}
+
+/* Coral Reef */
+body.theme-coral-reef {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/coral_reef.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #061c2b;
+  --box-border: #1fa2ff;      /* bright blue edge */
+  --header-color: #7fd8ff;
+  --stats-color: #aefcff;
+  --correct-color: #ffffff;
+  --untyped-color: #cfe8f3;
+  --highlight-color: #ff944d; /* coral/orange pop */
+  --caret-color: #ff944d;
+}
+
+/* Mountains */
+body.theme-mountains {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/mountains.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #1a1410;
+  --box-border: #8c6a4a;      /* brown ridge */
+  --header-color: #9ed1ff;    /* sky blue */
+  --stats-color: #fff3cf;
+  --correct-color: #ffffff;
+  --untyped-color: #e1d6cc;
+  --highlight-color: #7ecbff; /* icy pop */
+  --caret-color: #7ecbff;
+}
+
+/* Italy Coast */
+body.theme-italy-coast {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/italy_coast.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #0a1e34;          /* dark blue */
+  --box-border: #2d5a6b;      /* neutral dark green/blue */
+  --header-color: #fff3e0;    /* warm white ui */
+  --stats-color: #d6ffef;
+  --correct-color: #ffffff;
+  --untyped-color: #d6dde6;
+  --highlight-color: #00e0ff; /* aqua pop */
+  --caret-color: #00e0ff;
+  --timer-color: #fff3e0;
+}
+
+body.theme-italy-coast .settings-panel {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 96%, rgba(255,255,255,.04)) 0%,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(0,0,0,.4)) 55%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.6)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+body.theme-italy-coast .settings-group {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 90%, rgba(255,255,255,.03)) 0%,
+      color-mix(in srgb, var(--box-bg) 78%, rgba(0,0,0,.45)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+/* Wet Capy */
+body.theme-wet-capy {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/wet_capy.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #0b1830;
+  --box-border: #4aa9ff;
+  --header-color: #a8e1ff;
+  --stats-color: #e0f6ff;
+  --correct-color: #ffffff;
+  --untyped-color: #d1e1f2;
+  --highlight-color: #00d4ff;
+  --caret-color: #00d4ff;
+}
+
+/* Japan */
+body.theme-japan {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/japan.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #0e1a3b;
+  --box-border: #2d55aa;
+  --header-color: #ffc1dc;    /* sakura pink */
+  --stats-color: #a6d4ff;
+  --correct-color: #ffffff;
+  --untyped-color: #d7dced;
+  --highlight-color: #ff5fa2; /* hot pink */
+  --caret-color: #ff5fa2;
+}
+
+/* Middle East */
+body.theme-middle-east {
+  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/arab.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #281e0f;          /* sand-brown dark */
+  --box-border: #c7a96a;      /* sand edge */
+  --header-color: #ffe6b3;
+  --stats-color: #fff2cc;
+  --correct-color: #ffffff;
+  --untyped-color: #e9dcc7;
+  --highlight-color: #1dd3c5; /* turquoise pop */
+  --caret-color: #1dd3c5;
+}
+
+/* Lost */
+body.theme-lost {
+  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/lost.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #072628;
+  --box-border: #2bcac3;      /* turquoise */
+  --header-color: #d9ffff;    /* white/warm white mix */
+  --stats-color: #f7ffe1;
+  --correct-color: #ffffff;
+  --untyped-color: #cfe8e8;
+  --highlight-color: #ffe45e; /* bright warm */
+  --caret-color: #ffe45e;
+}
+
+/* Castle */
+body.theme-castle {
+  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/europe.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #0e2131;
+  --box-border: #2f7b66;      /* calm green */
+  --header-color: #d6eeff;    /* white-blue */
+  --stats-color: #c5ffd9;
+  --correct-color: #ffffff;
+  --untyped-color: #d5e4ea;
+  --highlight-color: #6dff87; /* green pop */
+  --caret-color: #6dff87;
+}
+
+/* City Night */
+body.theme-city-night {
+  background-image: linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.76)), url('../backgrounds/japan_night.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #030018;          /* darker purple */
+  --box-border: #1a0742;      /* violet edge */
+  --header-color: #c1a2ff;
+  --stats-color: #6ac2ff;
+  --correct-color: #f6f4ff;
+  --untyped-color: #9fa8d8;
+  --highlight-color: #ff2f8c; /* neon magenta */
+  --caret-color: #ff2f8c;
+  --timer-color: #6bc2ff;
+}
+
+/* Earth from Space */
+body.theme-earth-from-space {
+  background-image: linear-gradient(rgba(0,0,0,.8), rgba(0,0,0,.8)), url('../backgrounds/earth_from_space.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #030b18;
+  --box-border: #1e6bd6;      /* deep blue */
+  --header-color: #fff1d0;    /* warm white ui */
+  --stats-color: #bde0ff;
+  --correct-color: #ffffff;
+  --untyped-color: #cad7ea;
+  --highlight-color: #00e5ff; /* space cyan */
+  --caret-color: #00e5ff;
+}
+
+/* Cottage */
+body.theme-cottage {
+  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/cottage.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #142016;
+  --box-border: #6a8f7b;      /* neutral green */
+  --header-color: #d9f2ff;    /* gentle blue-white */
+  --stats-color: #e2ffd9;
+  --correct-color: #ffffff;
+  --untyped-color: #d7e6db;
+  --highlight-color: #6fe7ff; /* crisp aqua */
+  --caret-color: #6fe7ff;
+}
+
+/* Dark Academia */
+body.theme-dark-academia {
+  background-image: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.78)), url('../backgrounds/dark_academia.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #040404;          /* ink black */
+  --box-border: #20160d;      /* worn leather */
+  --header-color: #d4c8b6;    /* parchment */
+  --stats-color: #8b7159;     /* muted brown */
+  --correct-color: #f4eee3;
+  --untyped-color: #888079;
+  --highlight-color: #7a5130; /* warm brown accent */
+  --caret-color: #7a5130;
+}
+
+/* Space */
+body.theme-space {
+  background-image: linear-gradient(rgba(0,0,0,.8), rgba(0,0,0,.8)), url('../backgrounds/stars.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #080817;
+  --box-border: #3b33aa;
+  --header-color: #a78bfa;
+  --stats-color: #ffc9ff;
+  --correct-color: #ffffff;
+  --untyped-color: #d6d4ea;
+  --highlight-color: #ff47d1; /* magenta pop */
+  --caret-color: #ff47d1;
+}
+
+/* Coffee */
+body.theme-coffee {
+  background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('../backgrounds/coffee.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #1a2230;          /* neutral blue dark */
+  --box-border: #1f3359;      /* navy edge */
+  --header-color: #f3eadc;    /* warm white */
+  --stats-color: #bfeaff;
+  --correct-color: #ffffff;
+  --untyped-color: #d7dee8;
+  --highlight-color: #00d3ff; /* bright cyan */
+  --caret-color: #00d3ff;
+}
+
+/* City */
+/* Brutalist */
+body.theme-brutalist {
+  background-image: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72)), url('../backgrounds/brutalist_img.jpg');
+  background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll;
+  --box-bg: #1c1c1c;          /* heavy gray */
+  --box-border: #6e6e6e;      /* concrete edge */
+  --header-color: #e7f0e7;    /* greenish-white */
+  --stats-color: #dfffe0;
+  --correct-color: #ffffff;
+  --untyped-color: #d8d8d8;
+  --highlight-color: #93ff6f; /* lime pop */
+  --caret-color: #93ff6f;
+}
+
+body.theme-brutalist .settings-panel {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 97%, rgba(255,255,255,.02)) 0%,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(0,0,0,.4)) 55%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.65)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+body.theme-brutalist .settings-group {
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(255,255,255,.02)) 0%,
+      color-mix(in srgb, var(--box-bg) 80%, rgba(0,0,0,.45)) 100%);
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+/* Minimalist (solid background) */
+body.theme-minimalist {
+  background: linear-gradient(#0e0e0e, #0e0e0e); /* solid, fills screen */
+  --box-bg: #111111;
+  --box-border: #3a3a3a;
+  --header-color: #ffffff;
+  --stats-color: #eaeaea;
+  --correct-color: #ffffff;
+  --untyped-color: #cfcfcf;
+  --highlight-color: #00e5ff; /* crisp cyan pop */
+  --caret-color: #00e5ff;
+}
+
+/* Cream (solid background) */
+body.theme-cream {
+  background: linear-gradient(#0f0f0f, #42250b);
+  --box-bg: #1b1a17;
+  --box-border: #e3c36d;      /* gold cream edge */
+  --header-color: #fff4dc;    /* off white */
+  --stats-color: #ffe9a8;
+  --correct-color: #ffffff;
+  --untyped-color: #e7e0cf;
+  --highlight-color: #00c2c7; /* teal pop */
+  --caret-color: #00c2c7;
+}
+
+/* Neutral (solid background) */
+body.theme-neutral {
+  background: linear-gradient(#0f1113, #395876);
+  --box-bg: #142331;
+  --box-border: #364555;
+  --header-color: #e5e7eb;
+  --stats-color: #cde4ff;
+  --correct-color: #ffffff;
+  --untyped-color: #d2d6db;
+  --highlight-color: #4dccff; /* friendly blue */
+  --caret-color: #4dccff;
+}
+
+/* Midnight Glow */
+body.theme-midnight {
+  background: radial-gradient(circle at top, #12284c 0%, #050a1c 60%, #02030a 100%);
+  --box-bg: #060816;
+  --box-border: #243b6b;
+  --header-color: #9fc6ff;
+  --stats-color: #72f5ff;
+  --correct-color: #ffffff;
+  --untyped-color: #cfd7ef;
+  --highlight-color: #6ce5ff;
+  --caret-color: #6ce5ff;
+}
+
+/* Sage Mist */
+body.theme-sage {
+  background: linear-gradient(160deg, #071610 0%, #123224 40%, #284f3d 100%);
+  --box-bg: #0d1f18;
+  --box-border: #4a7c64;
+  --header-color: #d3f6e2;
+  --stats-color: #b2f1d2;
+  --correct-color: #ffffff;
+  --untyped-color: #cfe4d8;
+  --highlight-color: #7cf6c4;
+  --caret-color: #7cf6c4;
+}
+
+/* Theme-driven action accent (used by CERTIFICATE button + dialog) */
+:root,
+body[class*="theme-"] {
+  /* Prefer highlight → stats → header → border → neutral */
+  --action-accent: var(--highlight-color, var(--stats-color, var(--header-color, var(--box-border, #1f63ff))));
+  --action-contrast: #fff; /* text color on accent */
+  --action-ring: color-mix(in srgb, var(--action-accent) 45%, transparent);
 }

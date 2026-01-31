@@ -1,9 +1,10 @@
 // js/focusMode.js
 // Focus Mode controller
 // - Enters on first real typing key
-// - ESC: quit mid-game (no results), return to settings/ad layout and regenerate new text immediately
-// - TAB: restart same text, same settings, scroll to top instantly and show pre-game look
-// - Also: replaces "Start New Session" button in results screen with big ESC/TAB hints (CSS injected here)
+// - Ctrl/Cmd+I: quit to settings/ad layout and regenerate new text immediately
+// - Ctrl/Cmd+;: restart same text, same settings, scroll to top instantly and show pre-game look
+// - Ctrl/Cmd+J: regenerate new text with the current settings
+// - Also: replaces the "Start New Session" button in results with shortcut pills (CSS injected here)
 
 import { chars, setCurrentIndex, setStartTime, initializeTyping, sanitizeExistingText } from './engine.js';
 import { resetHistory } from './history.js';
@@ -17,6 +18,30 @@ let inFocusMode = false;
 /* snapshot of the starting DOM for the current run */
 let lastRunHTML = '';
 
+const SHORTCUTS = {
+  NEW_MODE: 'newMode',
+  RETRY: 'retry',
+  NEW_WORDS: 'newWords'
+};
+
+const SHORTCUT_KEYS = {
+  [SHORTCUTS.NEW_MODE]: 'i',
+  [SHORTCUTS.RETRY]: ';',
+  [SHORTCUTS.NEW_WORDS]: 'j'
+};
+
+const SHORTCUT_LABELS = {
+  [SHORTCUTS.NEW_MODE]: 'Settings (Ctrl/Cmd+I)',
+  [SHORTCUTS.RETRY]: '<span class="shortcut-symbol" aria-hidden="true">⟳</span>Same Words (Ctrl/Cmd+;)',
+  [SHORTCUTS.NEW_WORDS]: '<span class="shortcut-symbol" aria-hidden="true">⟳</span>New Words (Ctrl/Cmd+J)'
+};
+
+const RESULTS_SHORTCUT_ORDER = [
+  SHORTCUTS.NEW_MODE,
+  SHORTCUTS.RETRY,
+  SHORTCUTS.NEW_WORDS
+];
+
 /* small helpers */
 const textDisplayEl = () => document.getElementById('textDisplay');
 const resultsEl     = () => document.getElementById('resultsScreen');
@@ -29,6 +54,64 @@ const hideCtl = () =>
 const hlCtl = () =>
   document.getElementById('highlightAheadSelector') ||
   document.querySelectorAll('input[name="highlightAhead"]');
+
+function hasCtrlCmdOnly(e) {
+  if (!e) return false;
+  const hasCtrlOrMeta = e.metaKey || e.ctrlKey;
+  if (!hasCtrlOrMeta) return false;
+  if (e.altKey || e.shiftKey) return false;
+  return true;
+}
+
+function isShortcutCombo(e, action) {
+  if (!SHORTCUT_KEYS[action]) return false;
+  const key = e.key?.toLowerCase();
+  return hasCtrlCmdOnly(e) && key === SHORTCUT_KEYS[action];
+}
+
+function ensureResultsHintsButtons(container) {
+  if (!container) return;
+  for (const action of RESULTS_SHORTCUT_ORDER) {
+    let btn = container.querySelector(`[data-shortcut-action="${action}"]`);
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.dataset.shortcutAction = action;
+      btn.classList.add('hint');
+      container.appendChild(btn);
+    } else {
+      btn.dataset.shortcutAction = action;
+      btn.classList.add('hint');
+    }
+  }
+  wireShortcutButtons(container);
+}
+
+function wireShortcutButtons(root = document) {
+  if (!root) return;
+  const buttons = root.querySelectorAll('[data-shortcut-action]');
+  buttons.forEach((btn) => {
+    const action = btn.dataset.shortcutAction;
+    if (!action || !SHORTCUT_LABELS[action]) return;
+
+    if (btn.tagName === 'BUTTON') {
+      btn.type = 'button';
+    }
+    btn.classList.add('shortcut-button');
+    btn.innerHTML = SHORTCUT_LABELS[action];
+
+    if (btn.dataset.shortcutWired === '1') return;
+    btn.addEventListener('click', onShortcutButtonClick);
+    btn.dataset.shortcutWired = '1';
+  });
+}
+
+async function onShortcutButtonClick(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const action = e.currentTarget?.dataset?.shortcutAction;
+  if (!action) return;
+  await runShortcutAction(action);
+}
 
 function setTimerLabelToFull() {
   const tSel = document.getElementById('timerSelector');
@@ -231,6 +314,32 @@ async function softResetSameText() {
   unlockGame();
 }
 
+/** Ctrl/Cmd+J: same settings, brand-new text; remain in focus mode */
+async function restartNewTextSameSettings() {
+  stopGhost();
+  resetTimer();
+  showInitialProgress();
+  ensureResultsHidden();
+  resetHistory();
+
+  const el = textDisplayEl();
+  await initializeTyping(el, hideCtl());   // fresh text based on current controls
+  await nextFrame();
+
+  rebuildCharsFromDOM();
+  snapshotRunBaseline();                   // new baseline for future TAB retries
+  sanitizeExistingText(el);
+
+  resetStatsUI();
+  reapplyHideHighlightPreGame();
+  placeCaretAtStart();
+  scrollTextToTop();
+  forceTimerVisibleIfOn();
+  forceTextVisible();
+  forceStatsVisible();
+  unlockGame();
+}
+
 /** Quit to settings and immediately regenerate fresh text (based on current controls) */
 async function regenerateNewTextAndExitFocus() {
   // return to settings/ad first
@@ -275,6 +384,22 @@ async function restartSameGame() {
   await softResetSameText();
 }
 
+async function runShortcutAction(action) {
+  switch (action) {
+    case SHORTCUTS.NEW_MODE:
+      await exitFocusMode({ quit: true });
+      break;
+    case SHORTCUTS.NEW_WORDS:
+      await restartNewTextSameSettings();
+      break;
+    case SHORTCUTS.RETRY:
+      await restartSameGame();
+      break;
+    default:
+      break;
+  }
+}
+
 /* ---------------- Results Screen: replace button with keyboard hints ---------------- */
 
 function injectResultsShortcutsStyles() {
@@ -282,25 +407,42 @@ function injectResultsShortcutsStyles() {
   if (document.getElementById(id)) return;
 
   const css = `
+    /* always hide the legacy restart button */
     #resultsScreen .restart-button,
     .results-screen .restart-button,
     #resultsScreen #restartButton,
     .results-screen #restartButton { display: none !important; }
 
+    /* fallback block matches the standard results-hints layout */
     .results-shortcuts {
       display: flex;
-      flex-direction: column;
-      gap: .6rem;
+      justify-content: center;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
       margin-top: 1rem;
     }
-    .results-shortcuts .primary {
-      font-size: 1.25rem;
-      font-weight: 800;
+    .results-shortcuts .shortcut-button {
       color: var(--correct-color);
-    }
-    .results-shortcuts .secondary {
+      font-weight: 700;
       font-size: 1.05rem;
-      color: var(--untyped-color);
+      border: 1px solid var(--box-border);
+      border-radius: 9999px;
+      padding: .45rem 1rem;
+      background: color-mix(in srgb, var(--box-bg) 85%, transparent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+    .results-shortcuts .shortcut-button:hover,
+    .results-shortcuts .shortcut-button:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+      background: color-mix(in srgb, var(--box-bg) 92%, transparent);
     }
   `;
 
@@ -311,26 +453,37 @@ function injectResultsShortcutsStyles() {
 }
 
 
-
 function ensureResultsShortcuts() {
   const rs = resultsEl();
   if (!rs) return;
+
+  // If your static block exists, make sure the copy matches the new phrasing
+  const staticHints = rs.querySelector('#resultsHints');
+  if (staticHints) {
+    ensureResultsHintsButtons(staticHints);
+    return;
+  }
+
+  // Fallback: inject our own block with the same copy
   if (rs.querySelector('.results-shortcuts')) return;
 
   const wrap = document.createElement('div');
-  wrap.className = 'results-shortcuts';
+  wrap.className = 'results-shortcuts results-hints';
 
-  const primary = document.createElement('div');
-  primary.className = 'primary';
-  primary.textContent = 'ESC to go back to settings and change stuff';
+  for (const action of RESULTS_SHORTCUT_ORDER) {
+    const btn = document.createElement('button');
+    btn.dataset.shortcutAction = action;
+    btn.className = 'hint';
+    wrap.appendChild(btn);
+  }
 
-  const secondary = document.createElement('div');
-  secondary.className = 'secondary';
-  secondary.textContent = 'TAB to play the same game';
-
-  wrap.append(primary, secondary);
   rs.appendChild(wrap);
+  wireShortcutButtons(wrap);
 }
+
+
+
+
 
 function observeResultsScreen() {
   const rs = resultsEl();
@@ -342,33 +495,56 @@ function observeResultsScreen() {
 }
 
 /* ----------------- Key handling ----------------- */
-
+/* ----------------- Key handling ----------------- */
 async function onKeydown(e) {
   if (isEditingThreshold()) return;
-  // Enter focus mode on first meaningful typing key
-  if (!inFocusMode && isTypingKey(e)) {
-    enterFocusMode();
-    return; // let this keystroke flow to existing handlers
-  }
 
-  // Allow ESC even if not in focus mode (e.g., safety)
-  if (!inFocusMode && e.key !== 'Escape') return;
+  const wantsNewMode  = isShortcutCombo(e, SHORTCUTS.NEW_MODE);
+  const wantsRetry    = isShortcutCombo(e, SHORTCUTS.RETRY);
+  const wantsNewWords = isShortcutCombo(e, SHORTCUTS.NEW_WORDS);
 
-  // ESC: quit (or at results) -> settings + regenerate new text immediately
-  if (e.key === 'Escape') {
+  if (wantsNewMode) {
     e.preventDefault();
+    e.stopImmediatePropagation();
     await exitFocusMode({ quit: true });
     return;
   }
 
-  // TAB: restart same text; reset view to very top immediately
-  if (e.key === 'Tab') {
-    e.preventDefault();               // keep focus here
-    e.stopImmediatePropagation();     // <-- block main.js TAB handler
+  // Allow new words on the pre-game/settings screen
+  if (!inFocusMode && wantsNewWords) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    await restartNewTextSameSettings();
+    return;
+  }
+
+  // Enter focus mode on first meaningful typing key
+  if (!inFocusMode && isTypingKey(e)) {
+    enterFocusMode();
+    // let the keystroke flow
+  }
+
+  // Allow shortcuts if we're in focus mode OR the results screen is visible
+  const resultsVisible = !!(resultsEl() && !resultsEl().classList.contains('hidden'));
+  if (!inFocusMode && !resultsVisible) return;
+
+  if (wantsNewWords) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    await restartNewTextSameSettings();
+    return;
+  }
+
+  if (wantsRetry) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
     await restartSameGame();
     return;
   }
 }
+
+
+
 
 // Always wire the focus-mode key handler first.
 window.addEventListener('keydown', onKeydown, { capture: true, passive: false });
@@ -377,6 +553,7 @@ window.addEventListener('keydown', onKeydown, { capture: true, passive: false })
 window.addEventListener('DOMContentLoaded', () => {
   injectResultsShortcutsStyles();
   ensureResultsShortcuts();
+  wireShortcutButtons();
   observeResultsScreen();
 });
 

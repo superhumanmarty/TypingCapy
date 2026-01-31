@@ -1,21 +1,40 @@
 /* css/features/progress-word-limit.css */
 
 /* Word Progress Bar */
-.word-progress {
-  margin-bottom: 1rem;
-  width: 200px; /* Smaller width for "little bar" */
-  height: 20px; /* Thicker to avoid line look */
-  background: var(--box-bg);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 0 auto; /* Center it */
-  min-height: 20px; /* Reserve space */
+:root{
+  --wl-width: 460px;
+  --wl-height: 30px;
 }
+
+.word-progress {
+  position: relative;
+  z-index: 17;
+  width: min(var(--wl-width), 100%);
+  max-width: 100%;
+  height: clamp(12px, min(2.2vw, 2.4vh), var(--wl-height));
+  min-height: clamp(12px, min(2.2vw, 2.4vh), var(--wl-height));
+  background: var(--box-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.typing-hud #wordProgress{
+  width: 100%;
+  max-width: none;
+}
+
 .word-progress-fill {
   height: 100%;
   background: var(--stats-color);
   width: 0%;
   transition: width 0.3s ease;
+}
+.word-progress-fill::after{
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 .word-progress.hidden {
   visibility: hidden; /* Hide but reserve space */
@@ -33,4 +52,42 @@
 body.game-ended #wordProgress,
 body.game-ended #wordProgressFill {
   display: none !important;
+}
+
+/* keep fill full-height after we made it taller */
+#wordProgressFill,
+.word-progress-fill{
+  height: 100%;
+}
+
+@media (min-width: 1400px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(14px, min(1.6vw, 2.8vh), 36px);
+    min-height: clamp(14px, min(1.6vw, 2.8vh), 36px);
+  }
+}
+
+@media (max-width: 640px), (max-height: 560px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(10px, min(1.8vw, 1.8vh), 20px);
+    min-height: clamp(10px, min(1.8vw, 1.8vh), 20px);
+  }
+}
+
+@media (max-width: 480px), (max-height: 460px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(8px, min(1.6vw, 1.4vh), 16px);
+    min-height: clamp(8px, min(1.6vw, 1.4vh), 16px);
+  }
+}
+
+@media (max-width: 360px), (max-height: 400px){
+  .word-progress,
+  .typing-hud #wordProgress{
+    height: clamp(7px, min(1.4vw, 1.2vh), 14px);
+    min-height: clamp(7px, min(1.4vw, 1.2vh), 14px);
+  }
 }

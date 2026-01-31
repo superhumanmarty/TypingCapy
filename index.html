@@ -1,383 +1,458 @@
 <!--index.html-->
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CapyType</title>
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/features.css" />
-  <link rel="stylesheet" href="css/themes.css" />
-  <link rel="stylesheet" href="css/animations.css" />
-  <!-- NEW: focus-mode styles -->
-  <link rel="stylesheet" href="css/focus-mode.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Keybara</title>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-M8NL0LT13W"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-M8NL0LT13W');
+  </script>
+<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7874927413924922"></script>
+<link href="css/base.css" rel="stylesheet"/>
+<link href="css/components.css" rel="stylesheet"/>
+<link href="css/features.css" rel="stylesheet"/>
+<link href="css/themes.css" rel="stylesheet"/>
+<link href="css/edge-soft.css" rel="stylesheet"/>
+<link href="css/animations.css" rel="stylesheet"/>
+<!-- NEW: focus-mode styles -->
+<link href="css/focus-mode.css" rel="stylesheet"/>
+<!-- Favicon -->
+<link href="/capy.png?v=1" rel="icon" type="image/png"/>
+<link href="/capy.png?v=1" rel="apple-touch-icon"/>
 </head>
 <body tabindex="0"> <!-- make body focusable -->
-  <div class="container">
-    <aside id="ad-left">
-      <div class="ad-slot">ads</div>
-    </aside>
-    <div class="settings-panel">
-      <div class="settings-group no-card">
-        <div id="textGenHero" class="settings-hero">
-          <img src="settings_images/lang.png" alt="" class="hero-icon" loading="lazy">
-
-          <div class="hero-content">
-            <div class="hero-title">TEXT</div>
-
-            <div id="languageSettings">
-              <div class="select-pill">
-                <select id="languageSelector" class="ui-select"></select>
-              </div>
-            </div>
-
-
-            <div id="wordListSizeSettings" class="hidden">
-              <div class="select-pill">
-                <select id="wordListSizeSelector" class="ui-select"></select>
-              </div>
-            </div>
-            <!-- hidden state checkboxes that the split-pill buttons control -->
-            <input type="checkbox" id="numbersToggle" hidden>
-            <input type="checkbox" id="numbersExprToggle" hidden>
-            <input type="checkbox" id="punctuationToggle" hidden>
-            <input type="checkbox" id="symbolsToggle" hidden>
-            <div id="togglesSettings">
-              <div id="numbersSplit" class="split-pill" aria-label="Numbers toggles">
-                <button id="numMain"  class="split-half left"  type="button" tabindex="-1">123</button>
-                <button id="numExtra" class="split-half right" type="button" tabindex="-1" aria-disabled="true">+=</button>
-              </div>
-              <div id="punctSplit" class="split-pill" aria-label="Punctuation toggles">
-                <button id="punctMain"  class="split-half left"  type="button" tabindex="-1">!?</button>
-                <button id="punctExtra" class="split-half right" type="button" tabindex="-1" aria-disabled="true">@#&</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- GAME LIMITS hero — 3 buttons: Endless | Timer | Words -->
-      <div class="settings-group no-card">
-        <div id="limitsHero" class="settings-hero">
-          <div class="hero-content">
-            <div class="hero-title">GAME LIMITS</div>
-
-            <!-- 3-button grid -->
-            <div id="limitsButtons" class="limits-grid">
-              <!-- ENDLESS -->
-              <div class="limit-cell">
-                <button id="btnEndless" class="limit-btn active" type="button" aria-pressed="true">
-                  <img src="settings_images/endless.png" alt="Endless">
-                  <div class="btn-label">Endless</div>
-                </button>
-              </div>
-
-              <!-- TIMER -->
-              <div class="limit-cell">
-                <button id="btnTimer" class="limit-btn" type="button" aria-pressed="false">
-                  <img src="settings_images/timer.png" alt="Timer">
-                  <div class="btn-label">Timer</div>
-                </button>
-                <!-- moved OUTSIDE the button -->
-                <div id="timerInline" class="btn-dropdown hidden">
-                  <label for="timerInlineSelect" class="sr-only">Timer length</label>
-                  <div class="select-pill small">
-                    <select id="timerInlineSelect" class="ui-select" aria-label="Timer length">
-                      <option value="15">15s</option>
-                      <option value="30">30s</option>
-                      <option value="60">1 min</option>
-                      <option value="120">2 min</option>
-                      <option value="300">5 min</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <!-- WORD LIMIT -->
-              <div class="limit-cell">
-                <button id="btnWord" class="limit-btn" type="button" aria-pressed="false">
-                  <img src="settings_images/word_limit.png" alt="Word limit">
-                  <div class="btn-label">Words</div>
-                </button>
-                <!-- moved OUTSIDE the button -->
-                <div id="wordInline" class="btn-dropdown hidden">
-                  <label for="wordLimitInlineSelect" class="sr-only">Word limit</label>
-                  <div class="select-pill small">
-                    <select id="wordLimitInlineSelect" class="ui-select" aria-label="Word limit">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                      <option value="25">25</option>
-                      <option value="30">30</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                      <option value="200">200</option>
-                    </select>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-
-            <!-- Hidden mirrors for logic (keep IDs so existing code keeps working) -->
-            <div class="hidden">
-              <div id="timerSettings" class="settings inline-setting">
-                <label for="timerSelector">⏱️</label>
-                <select id="timerSelector">
-                  <option value="off" selected>Off</option>
-                  <option value="15">15s</option>
-                  <option value="30">30s</option>
-                  <option value="60">1 min</option>
-                  <option value="120">2 min</option>
-                  <option value="300">5 min</option>
-                </select>
-              </div>
-
-              <div id="wordLimitSettings" class="settings inline-setting">
-                <label for="wordLimitSelector">#️⃣</label>
-                <select id="wordLimitSelector">
-                  <option value="off" selected>Off</option>
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
-                  <option value="25">25</option>
-                  <option value="30">30</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                  <option value="200">200</option>
-                </select>
-              </div>
-            </div>
-            <!-- /Hidden mirrors -->
-          </div>
-        </div>
-      </div>
-      <!-- THEME pill -->
-      <div class="settings-group no-card">
-        <div id="themeHero" class="settings-hero">
-          <img src="settings_images/theme.png" alt="Theme" class="hero-icon" loading="lazy">
-
-          <div class="hero-content">
-            <div class="hero-title">THEME</div>
-
-            <div id="themeSettings">
-              <div class="select-pill">
-                <select id="themeSelector" class="ui-select">
-                  <option value="capyparadise" selected>Capy Paradise</option>
-                  <option value="cyberpunk">Cyberpunk</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- SOUND pill -->
-      <div class="settings-group no-card">
-        <div id="soundHero" class="settings-hero">
-          <img src="settings_images/sound.png" alt="Sound" class="hero-icon" loading="lazy">
-
-          <div class="hero-content">
-            <div class="hero-title">SOUND</div>
-
-            <div id="soundSettings" class="plain">
-              <div class="select-pill">
-                <select id="soundSelector" class="ui-select">
-                  <option value="off" selected>Off</option>
-                  <option value="pentatonic">Pentatonic</option>
-                  <option value="blip">Blip</option>
-                  <option value="click">Click</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="settings-group no-card">
-        <!-- NOOB hero -->
-        <div class="settings-group no-card">
-          <div id="noobHero" class="settings-hero">
-            <img src="settings_images/noob.png" alt="Noob" class="hero-icon" loading="lazy">
-
-            <div class="hero-content">
-              <div class="hero-title">NOOB</div>
-
-              <!-- keyboard diagram -->
-              <div id="keyboardDiagramSettings" class="settings pill pill-single keyboard-pill" role="button" tabindex="-1">
-                <input type="checkbox" id="keyboardDiagramToggle" class="pill-toggle" hidden>
-                <img src="keyboard_and_hand/default.png" alt="Keyboard guide" class="keyboard-pill-img">
-              </div>
-
-              <!-- “You typed: x” pill -->
-              <div id="typedErrorsPill" class="settings pill pill-preview" role="button" aria-pressed="false" tabindex="-1">
-                <input type="checkbox" id="showTypedErrorsToggle" hidden>
-                <div class="typed-preview" aria-hidden="true">
-                  <div class="te-label">You typed:</div>
-                  <div class="te-box">x</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PRO hero -->
-        <div class="settings-group no-card">
-          <div id="proHero" class="settings-hero">
-            <img src="settings_images/pro.png" alt="Pro" class="hero-icon" loading="lazy">
-
-            <div class="hero-content">
-              <div class="hero-title">PRO</div>
-
-              <!-- Hide -->
-              <div id="hidePillRow" class="pill-row">
-                <div id="hidePill" class="settings pill pill-wide transparent-text" role="button" tabindex="-1">
-                  <div class="pill-title"><span class="muted">Hide</span></div>
-                  <div id="hideChoiceLabel"></div>
-                </div>
-                <div id="hideOptions" class="pill-options replace hidden">
-                  <button class="pill option" id="hideOff" type="button" tabindex="-1">Off</button>
-                  <button class="pill option" id="hideCurrent" type="button" tabindex="-1">Current</button>
-                  <button class="pill option" id="hideCurrentNext" type="button" tabindex="-1">Current &amp; Next</button>
-                </div>
-              </div>
-
-              <!-- Highlight -->
-              <div id="highlightPillRow" class="pill-row">
-                <div id="highlightPill" class="settings pill pill-wide neon-green-text" role="button" tabindex="-1">
-                  <div class="pill-title"><span class="neon">Highlight</span></div>
-                  <div id="highlightChoiceLabel"></div>
-                </div>
-                <div id="highlightOptions" class="pill-options replace hidden">
-                  <button class="pill option" id="hlOff" type="button" tabindex="-1">Off</button>
-                  <button class="pill option" id="hlNext" type="button" tabindex="-1">Next</button>
-                  <button class="pill option" id="hlNext2" type="button" tabindex="-1">2nd</button>
-                </div>
-              </div>
-
-              <!-- Ghost -->
-              <div id="ghostCursorSettings" class="settings pill" role="button" aria-pressed="false" tabindex="-1">
-                <input type="checkbox" id="ghostModeToggle" hidden>
-                <div class="ghost-title">
-                  <span class="ghost-word">Ghost</span>
-                  <span class="cursor ghost-cursor" aria-hidden="true"></span>
-                  <span class="cursor real-cursor" aria-hidden="true"></span>
-                </div>
-                <div id="ghostWpmWrapper" class="pill-input below">
-                  <label for="customGhostWPM" class="sr-only">Ghost WPM</label>
-                  <input type="number" id="customGhostWPM" value="60" min="10" max="300" />
-                </div>
-              </div>
-
-              <!-- End-if pills -->
-              <div id="minWPMSettings" class="settings pill pill-split" role="button" aria-controls="endWpmWrapper">
-                <input type="checkbox" id="endWpmToggle" class="pill-toggle" hidden>
-                <div class="pill-name">End if WPM &lt;</div>
-                <div id="endWpmWrapper" class="pill-input hidden">
-                  <input type="number" id="endWpmValue" value="50" min="10" max="300" style="width: 4em;">
-                </div>
-              </div>
-
-              <!-- New: End at # errors -->
-              <div id="maxErrorsSettings" class="settings pill pill-split" role="button" aria-controls="endErrWrapper">
-                <input type="checkbox" id="endErrToggle" class="pill-toggle" hidden>
-                <div class="pill-name">End at # Errors</div>
-                <div id="endErrWrapper" class="pill-input hidden">
-                  <input id="endErrValue" type="number" min="1" step="1" placeholder="#" style="width: 4em;">
-                  <span class="suffix">errors</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Hidden mirrors for logic (do NOT show in UI) -->
-        <div id="hideWordsSettings" class="settings hidden">
-          <span>🙈</span>
-          <select id="hideWordsSelector">
-            <option value="off" selected>Off</option>
-            <option value="current">Current</option>
-            <option value="currentNext">Current & Next</option>
-          </select>
-        </div>
-
-        <div id="highlightAheadSettings" class="settings hidden">
-          <span>🔦</span>
-          <select id="highlightAheadSelector">
-            <option value="off" selected>Off</option>
-            <option value="next">Next Word</option>
-            <option value="next2">2nd Word</option>
-          </select>
-        </div>
-
-      </div>
-    </div>
-    <div class="typing-panel">
-      <!-- Error bubble (shown only on incorrect key when toggle is ON) -->
-      <div id="typedErrorDisplay" class="typed-error-display hidden" aria-live="polite">
-        <div class="typed-error-label">You typed:</div>
-        <div id="typedLetter" class="typed-error-letter"></div>
-      </div>
-
-      <!-- Timer Display -->
-      <div id="timerDisplay" class="timer-display hidden">
-        <span id="timeRemaining"></span>
-      </div>
-      <div id="wordProgress" class="word-progress hidden">
-        <div id="wordProgressFill" class="word-progress-fill"></div>
-      </div>
-      <div id="stats">
-        <span id="wpm">WPM: 0</span>
-        <span id="accuracy">Accuracy: 100%</span>
-      </div>
-      <!-- Typing box -->
-      <div class="text-error-wrapper">
-        <div id="textDisplay"></div>
-      </div>
-      <!-- Results Screen -->
-      <div id="resultsScreen" class="results-screen hidden">
-        <h2>Time's Up!</h2>
-        <div class="results-stats">
-          <div class="result-item">
-            <span class="result-label">Final WPM:</span>
-            <span id="finalWPM" class="result-value">0</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Accuracy:</span>
-            <span id="finalAccuracy" class="result-value">100%</span>
-          </div>
-        </div>
-        <button id="restartButton" class="restart-button">Start New Session</button>
-        <!-- Shortcut hints inside the results box -->
-        <div class="results-hints" id="resultsHints">
-          <div class="hint"><span class="keycap esc">ESC</span> for new game</div>
-          <div class="hint"><span class="keycap tab">TAB</span> to retry</div>
-        </div>
-        <div id="runGraph" class="run-graph"></div>
-      </div>
-      <!-- Keyboard Diagram -->
-      <div id="keyboardDiagram" class="keyboard-diagram hidden">
-        <img id="keyboardImage" src="keyboard_and_hand/default.png" alt="Keyboard and hand guide">
-      </div>
-    </div>
+<div aria-hidden="true" class="device-warning hidden" id="deviceWarning" role="dialog">
+  <div class="device-warning__box" role="document">
+    <h2>Heads up!</h2>
+    <p>Keybara.io only works on phones and tablets if you have a Bluetooth keyboard connected. If you don’t have one handy, play Keybara on your computer instead.</p>
+    <button class="device-warning__button" id="deviceWarningContinue" type="button">Okay, got it</button>
   </div>
+</div>
+<main class="page-main">
+<div class="container">
+<aside id="ad-left">
+<div class="ad-slot">ads</div>
+</aside>
+<div class="settings-panel">
+<div class="settings-group no-card">
+<div class="settings-hero" id="textGenHero">
 
-  <!-- Focus-mode hint labels (visible only in focus mode) -->
-  <div class="focus-hint left"  id="hintEsc"><span class="keycap esc">ESC</span> for new game</div>
-  <div class="focus-hint right" id="hintTab"><span class="keycap tab">TAB</span> to retry</div>
+<div class="hero-content">
+<div class="hero-title">TEXT</div>
+<div id="languageSettings">
+<div class="select-pill">
+<select class="ui-select" id="languageSelector"></select>
+</div>
+</div>
+<div class="hidden" id="wordListSizeSettings">
+<div class="select-pill">
+<select class="ui-select" id="wordListSizeSelector"></select>
+</div>
+</div>
+<!-- hidden state checkboxes that the split-pill buttons control -->
+<input hidden="" id="numbersToggle" type="checkbox"/>
+<input hidden="" id="numbersExprToggle" type="checkbox"/>
+<input hidden="" id="punctuationToggle" type="checkbox"/>
+<input hidden="" id="symbolsToggle" type="checkbox"/>
+<div id="togglesSettings">
+<div aria-label="Numbers toggles" class="split-pill" id="numbersSplit">
+<button class="split-half left" id="numMain" tabindex="-1" type="button">123</button>
+<button aria-disabled="true" class="split-half right" id="numExtra" tabindex="-1" type="button">+=</button>
+</div>
+<div aria-label="Punctuation toggles" class="split-pill" id="punctSplit">
+<button class="split-half left" id="punctMain" tabindex="-1" type="button">!?</button>
+<button aria-disabled="true" class="split-half right" id="punctExtra" tabindex="-1" type="button">@#&amp;</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- GAME LIMITS hero — 3 buttons: Endless | Timer | Words -->
+<div class="settings-group no-card">
+<div class="settings-hero" id="limitsHero">
+<div class="hero-content">
+<div class="hero-title">GAME LIMITS</div>
+<!-- 3-button grid -->
+<div class="limits-grid" id="limitsButtons">
+<!-- ENDLESS -->
+<div class="limit-cell">
+<button aria-pressed="true" class="limit-btn active" id="btnEndless" type="button">
+<div class="btn-label">Endless</div>
+</button>
+</div>
+<!-- TIMER -->
+<div class="limit-cell">
+<button aria-pressed="false" class="limit-btn" id="btnTimer" type="button">
+<div class="btn-label">Timer</div>
+</button>
+<!-- moved OUTSIDE the button -->
+<div class="btn-dropdown hidden" id="timerInline">
+<label class="sr-only" for="timerInlineSelect">Timer length</label>
+<div class="select-pill small">
+<select aria-label="Timer length" class="ui-select" id="timerInlineSelect">
+<option value="15">15s</option>
+<option value="30">30s</option>
+<option value="60">1 min</option>
+<option value="120">2 min</option>
+<option value="300">5 min</option>
+</select>
+</div>
+</div>
+</div>
+<!-- WORD LIMIT -->
+<div class="limit-cell">
+<button aria-pressed="false" class="limit-btn" id="btnWord" type="button">
+<div class="btn-label">Word #</div>
+</button>
+<!-- moved OUTSIDE the button -->
+<div class="btn-dropdown hidden" id="wordInline">
+<label class="sr-only" for="wordLimitInlineSelect">Word limit</label>
+<div class="select-pill small">
+<select aria-label="Word limit" class="ui-select" id="wordLimitInlineSelect">
+<option value="5">5</option>
+<option value="10">10</option>
+<option value="15">15</option>
+<option value="20">20</option>
+<option value="25">25</option>
+<option value="30">30</option>
+<option value="50">50</option>
+<option value="100">100</option>
+<option value="200">200</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Hidden mirrors for logic (keep IDs so existing code keeps working) -->
+<div class="hidden">
+<div class="settings inline-setting" id="timerSettings">
+<label for="timerSelector">⏱️</label>
+<select id="timerSelector">
+<option selected="" value="off">Off</option>
+<option value="15">15s</option>
+<option value="30">30s</option>
+<option value="60">1 min</option>
+<option value="120">2 min</option>
+<option value="300">5 min</option>
+</select>
+</div>
+<div class="settings inline-setting" id="wordLimitSettings">
+<label for="wordLimitSelector">#️⃣</label>
+<select id="wordLimitSelector">
+<option selected="" value="off">Off</option>
+<option value="5">5</option>
+<option value="10">10</option>
+<option value="15">15</option>
+<option value="20">20</option>
+<option value="25">25</option>
+<option value="30">30</option>
+<option value="50">50</option>
+<option value="100">100</option>
+<option value="200">200</option>
+</select>
+</div>
+</div>
+<!-- /Hidden mirrors -->
+</div>
+</div>
+</div>
+<!-- THEME pill -->
+<div class="settings-group no-card">
+<div class="settings-hero" id="themeHero">
 
+<div class="hero-content">
+<div class="hero-title">THEME</div>
+<div id="themeSettings">
+<div class="select-pill">
+<select class="ui-select" id="themeSelector">
+<option selected="" value="random">Random</option>
+<option value="minimalist">Minimalist</option>
+<option value="neutral">Neutral</option>
+<option value="cream">Cream</option>
+<option value="nature">Nature</option>
+<option value="historic">Historic</option>
+<option value="vaporwave">Vaporwave</option>
+<option value="boba-capy">Boba Capy</option>
+<option value="creepy">Creepy</option>
+<option value="coral-reef">Coral Reef</option>
+<option value="mountains">Mountains</option>
+<option value="italy-coast">Italy Coast</option>
+<option value="wet-capy">Wet Capy</option>
+<option value="japan">Japan</option>
+<option value="middle-east">Middle East</option>
+<option value="lost">Lost</option>
+<option value="castle">Castle</option>
+<option value="city-night">City Night</option>
+<option value="earth-from-space">Earth from Space</option>
+<option value="cottage">Cottage</option>
+<option value="dark-academia">Dark Academia</option>
+<option value="space">Space</option>
+<option value="coffee">Coffee</option>
+<option value="brutalist">Brutalist</option>
+<option value="midnight">Midnight Glow</option>
+<option value="sage">Sage Mist</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SOUND pill -->
+<div class="settings-group no-card">
+<div class="settings-hero" id="soundHero">
 
-  <script type="module" src="./js/focusMode.js"></script>
-  <script type="module" src="./js/main.js"></script>
-  <!-- PDF + DOM to image (UMD builds; expose window.jspdf and window.html2canvas) -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script type="module" src="./js/defaultSelects.js"></script>
-  <script src="./js/on-states.js" defer></script>
+<div class="hero-content">
+<div class="hero-title">SOUND</div>
+<!-- NEW: Music dropdown + volume -->
+<div class="plain" id="musicSettings">
+<label class="mini-label" for="musicSelector">Music</label>
+<div class="select-pill">
+<select aria-label="Music" class="ui-select" id="musicSelector">
+<option selected="" value="off">Off</option>
+<option value="holiday">Holiday</option>
+<option value="forest_sounds">Forest Sounds</option>
+<option value="eastern">Eastern</option>
+<option value="african">African</option>
+<option value="middle_eastern">Middle Eastern</option>
+<option value="classical">Classical</option>
+<option value="ocean_waves">Ocean Waves</option>
+<option value="piano">Piano</option>
+<option value="lofi">Lofi</option>
+<option value="guitar">Guitar</option>
+<option value="synthwave">Synthwave</option>
+<option value="spooky">Spooky</option>
+<option value="jazz">Jazz</option>
+<option value="zen">Zen</option>
+<option value="fantasy">Fantasy</option>
+<option value="ukelele">Ukelele</option>
+</select>
+</div>
+<!-- volume slider sits UNDER the music dropdown -->
+<div class="settings inline-setting" id="musicVolumeRow">
+<label for="musicVolume">Volume</label>
+<input id="musicVolume" max="100" min="0" step="1" tabindex="-1" type="range" value="50">
+</input></div>
+</div>
+<div class="plain" id="soundSettings">
+<label class="mini-label" for="soundSelector">Typing</label>
+<div class="select-pill">
+<select class="ui-select" id="soundSelector">
+<option selected="" value="off">Off</option>
+<option value="pentatonic">Pentatonic</option>
+<option value="blip">Blip</option>
+<option value="click">Click</option>
+</select>
+</div>
+<!-- NEW: volume slider sits UNDER the typing (sound) dropdown -->
+<div class="settings inline-setting" id="soundVolumeRow">
+<label for="soundVolume">Volume</label>
+<input id="soundVolume" max="100" min="0" step="1" tabindex="-1" type="range" value="50">
+</input></div>
+</div>
+</div>
+</div>
+</div>
+<div class="settings-group no-card">
+<!-- NOOB hero -->
+<div class="settings-group no-card">
+<div class="settings-hero" id="noobHero">
 
+<div class="hero-content">
+<div class="hero-title">NOOB</div>
+<!-- keyboard diagram -->
+                <div class="settings pill pill-single keyboard-pill" id="keyboardDiagramSettings" role="button" tabindex="-1" title="A diagram showing proper finger placement to type your fastest">
+<input class="pill-toggle" hidden="" id="keyboardDiagramToggle" type="checkbox"/>
+<img alt="Keyboard guide" class="keyboard-pill-img" src="keyboard_and_hand/default.png"/>
+</div>
+<!-- “You typed: x” pill -->
+                <div aria-pressed="false" class="settings pill pill-preview" id="typedErrorsPill" role="button" tabindex="-1" title="Shows the character you typed when you type incorrectly">
+<input hidden="" id="showTypedErrorsToggle" type="checkbox"/>
+<div aria-hidden="true" class="typed-preview">
+<div class="te-label">You typed:</div>
+<div class="te-box">x</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- PRO hero -->
+<div class="settings-group no-card">
+<div class="settings-hero" id="proHero">
 
-
+<div class="hero-content">
+<div class="hero-title">PRO</div>
+<!-- Hide -->
+<div class="pill-row" id="hidePillRow">
+                <div class="settings pill pill-wide transparent-text" id="hidePill" role="button" tabindex="-1" title="Hide word(s) you are typing to force you to look ahead while you type">
+<div class="pill-title"><span class="muted">Hide</span></div>
+<div id="hideChoiceLabel"></div>
+</div>
+<div class="pill-options replace hidden" id="hideOptions">
+<button class="pill option" id="hideOff" tabindex="-1" type="button">Off</button>
+<button class="pill option" id="hideCurrent" tabindex="-1" type="button">Current</button>
+<button class="pill option" id="hideCurrentNext" tabindex="-1" type="button">Current &amp; Next</button>
+</div>
+</div>
+<!-- Highlight -->
+<div class="pill-row" id="highlightPillRow">
+                <div class="settings pill pill-wide neon-green-text" id="highlightPill" role="button" tabindex="-1" title="Highlight word(s) ahead to help you look ahead while you type">
+<div class="pill-title"><span class="neon">Highlight</span></div>
+<div id="highlightChoiceLabel"></div>
+</div>
+<div class="pill-options replace hidden" id="highlightOptions">
+<button class="pill option" id="hlOff" tabindex="-1" type="button">Off</button>
+<button class="pill option" id="hlNext" tabindex="-1" type="button">Next</button>
+<button class="pill option" id="hlNext2" tabindex="-1" type="button">2nd</button>
+</div>
+</div>
+<!-- Ghost -->
+            <div aria-pressed="false" class="settings pill" id="ghostCursorSettings" role="button" tabindex="-1" title="A Ghost Caret that races you, going at the speed you enter">
+<input hidden="" id="ghostModeToggle" type="checkbox"/>
+<div class="ghost-title">
+<span class="ghost-word">Ghost</span>
+<span aria-hidden="true" class="cursor ghost-cursor"></span>
+<span aria-hidden="true" class="cursor real-cursor"></span>
+</div>
+<div class="pill-input below" id="ghostWpmWrapper">
+<label class="sr-only" for="customGhostWPM">Ghost WPM</label>
+<input id="customGhostWPM" max="300" min="10" type="number" value="60">
+</input></div>
+</div>
+<!-- End-if pills -->
+<div aria-controls="endWpmWrapper" class="settings pill pill-split" id="minWPMSettings" role="button">
+<input class="pill-toggle" hidden="" id="endWpmToggle" type="checkbox"/>
+<div class="pill-name">End if WPM &lt;</div>
+<div class="pill-input hidden" id="endWpmWrapper">
+<input id="endWpmValue" max="300" min="10" style="width: 4em;" type="number" value="50"/>
+</div>
+</div>
+<!-- New: End at # errors -->
+<div aria-controls="endErrWrapper" class="settings pill pill-split" id="maxErrorsSettings" role="button">
+<input class="pill-toggle" hidden="" id="endErrToggle" type="checkbox"/>
+<div class="pill-name">End at # Errors</div>
+<div class="pill-input hidden" id="endErrWrapper">
+<input id="endErrValue" min="1" placeholder="#" step="1" style="width: 4em;" type="number"/>
+<span class="suffix">errors</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Hidden mirrors for logic (do NOT show in UI) -->
+<div class="settings hidden" id="hideWordsSettings">
+<span>🙈</span>
+<select id="hideWordsSelector">
+<option selected="" value="off">Off</option>
+<option value="current">Current</option>
+<option value="currentNext">Current &amp; Next</option>
+</select>
+</div>
+<div class="settings hidden" id="highlightAheadSettings">
+<span>🔦</span>
+<select id="highlightAheadSelector">
+<option selected="" value="off">Off</option>
+<option value="next">Next Word</option>
+<option value="next2">2nd Word</option>
+</select>
+</div>
+<div aria-hidden="true" class="settings-panel__spacer"></div>
+</div>
+</div>
+<div class="typing-panel">
+<!-- Pre-game top-center hint (inside typing panel) -->
+<button class="pregame-hint" data-shortcut-action="newWords" id="preGameShortcutNewWords" type="button">
+        New words (Ctrl/Cmd+J)
+      </button>
+<!-- Error bubble (shown only on incorrect key when toggle is ON) -->
+<div aria-live="polite" class="typed-error-display hidden" id="typedErrorDisplay">
+<div class="typed-error-label">You typed:</div>
+<div class="typed-error-letter" id="typedLetter"></div>
+</div>
+<div class="typing-hud" id="typingHud">
+<div id="stats">
+<span id="wpm">WPM: 0</span>
+<span id="accuracy">Accuracy: 100%</span>
+</div>
+<div class="word-progress hidden" id="wordProgress">
+<div class="word-progress-fill" id="wordProgressFill"></div>
+</div>
+<div class="timer-display hidden" id="timerDisplay">
+<span id="timeRemaining"></span>
+</div>
+</div>
+<!-- Typing box -->
+<div class="text-error-wrapper">
+<div id="textDisplay"></div>
+</div>
+<!-- Results Screen -->
+<div class="results-screen hidden" id="resultsScreen">
+<!-- Hints FIRST -->
+<div class="results-hints" id="resultsHints">
+<button class="hint" data-shortcut-action="newMode" type="button">
+            Settings (Ctrl/Cmd+I)
+          </button>
+<button class="hint" data-shortcut-action="retry" type="button">
+<span aria-hidden="true" class="shortcut-symbol">⟳</span>Same Words (Ctrl/Cmd+;)
+          </button>
+<button class="hint" data-shortcut-action="newWords" type="button">
+<span aria-hidden="true" class="shortcut-symbol">⟳</span>New Words (Ctrl/Cmd+J)
+          </button>
+</div>
+<!-- Chips placeholder (the JS will populate this) -->
+<div class="run-settings" id="runSettings"></div>
+<!-- Final WPM / Accuracy -->
+<div class="results-stats">
+<div class="result-item">
+<span class="result-label">Final WPM:</span>
+<span class="result-value" id="finalWPM">0</span>
+</div>
+<div class="result-item">
+<span class="result-label">Accuracy:</span>
+<span class="result-value" id="finalAccuracy">100%</span>
+</div>
+</div>
+<div class="run-graph" id="runGraph"></div>
+<button class="restart-button" id="restartButton">Start New Session</button>
+</div>
+<!-- Keyboard Diagram -->
+<div class="keyboard-diagram hidden" id="keyboardDiagram">
+<img alt="Keyboard and hand guide" id="keyboardImage" src="keyboard_and_hand/default.png"/>
+</div>
+</div>
+</div>
+<!-- Focus-mode hint labels (visible only in focus mode) -->
+<button class="focus-hint left" data-shortcut-action="newMode" id="hintNewMode" type="button">
+    Settings (Ctrl/Cmd+I)
+  </button>
+<button class="focus-hint right" data-shortcut-action="retry" id="hintRetry" type="button">
+<span aria-hidden="true" class="shortcut-symbol">⟳</span>Same Words (Ctrl/Cmd+;)
+  </button>
+<button class="focus-hint right" data-shortcut-action="newWords" id="hintNewWords" type="button">
+<span aria-hidden="true" class="shortcut-symbol">⟳</span>New Words (Ctrl/Cmd+J)
+  </button>
+</main>
+<footer class="site-footer" aria-label="Footer navigation">
+  <nav class="site-footer__links">
+    <a href="./about.html">About</a>
+    <a href="./contact.html">Contact</a>
+    <a href="./privacy.html">Privacy</a>
+  </nav>
+</footer>
+<script src="./js/focusMode.js" type="module"></script>
+<script src="./js/main.js" type="module"></script>
+<!-- PDF + DOM to image (UMD builds; expose window.jspdf and window.html2canvas) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="./js/defaultSelects.js" type="module"></script>
+<script defer="" src="./js/on-states.js"></script>
+<script src="./js/ui/stats-polish.js" type="module"></script>
+<script src="./js/device-warning.js" type="module"></script>
 </body>
 </html>

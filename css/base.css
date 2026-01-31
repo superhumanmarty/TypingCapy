@@ -5,6 +5,7 @@
   --stats-color: #a6e3a1;
   --box-bg: #1e1e2e;
   --box-border: #7f1bfa;
+  --timer-color: #ffd966;
   --untyped-color: #aaa; /* lighter so you can see it */
   --correct-color: #fff;
   --incorrect-color: #f75f5f;
@@ -17,13 +18,57 @@ body {
   margin: 0;
   font-family: monospace;
   display: flex;
-  align-items: center; /* Centers vertically */
-  justify-content: center;
+  flex-direction: column;
   min-height: 100vh;
   background-color: var(--body-bg);
   color: var(--header-color);
   overflow-y: auto;
-  padding: 0; /* No padding for full centering */
+  padding: 0;
+}
+
+.page-main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 3.5rem; /* room for fixed footer */
+}
+
+.site-footer {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--body-bg) 80%, rgba(0,0,0,.8));
+  border-top: 1px solid color-mix(in srgb, var(--box-border) 70%, transparent);
+  padding: 0.45rem 1rem;
+  text-align: center;
+  z-index: 1000;
+  font-size: 0.78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.site-footer__links {
+  display: inline-flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.site-footer__links a {
+  color: var(--stats-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 0.1rem;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.site-footer__links a:hover,
+.site-footer__links a:focus-visible {
+  color: var(--highlight-color, var(--header-color));
+  border-color: currentColor;
 }
 
 .container {
@@ -126,39 +171,88 @@ body {
 .settings {
   display: flex;
   flex-direction: column; /* Stack labels vertically if needed */
-  gap: 0.25rem; /* Tighter internal spacing */
-  font-size: 0.85rem; /* Slightly smaller for simplicity */
+  gap: 0.16rem; /* Tighter internal spacing */
+  font-size: 0.72rem; /* Slightly smaller for simplicity */
 }
 
 .settings-panel {
-  overflow-y: auto; /* Make scrollable if too tall */
-  max-height: 100vh; /* Prevent overflowing the viewport */
-  padding: 1rem; /* Add some internal padding for sleekness */
-  background: var(--box-bg); /* Subtle background */
-  border-right: 1px solid var(--box-border); /* Visual separation from typing area */
-  border-radius: 8px; /* Rounded corners for modern look */
+  position: relative;
+  overflow: hidden;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 0.75rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--box-border) 65%, transparent);
+  background:
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--box-bg) 92%, rgba(255,255,255,.05)) 0%,
+      color-mix(in srgb, var(--box-bg) 78%, rgba(0,0,0,.55)) 100%);
+  box-shadow:
+    0 28px 60px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(14px);
+  flex: 0 0 clamp(100px, 8vw, 140px);
+  max-width: clamp(100px, 8vw, 140px);
+  min-width: clamp(90px, 6vw, 120px);
+  font-size: 0.82rem;
+}
+.settings-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% -10%,
+      color-mix(in srgb, var(--highlight-color, var(--stats-color, #6ae)) 32%, transparent) 0%,
+      transparent 55%);
+  opacity: .45;
+  pointer-events: none;
+}
+
+.settings-panel__spacer {
+  height: clamp(140px, 18vh, 220px);
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .settings-group {
-  margin-bottom: 1.5rem; /* More space between groups */
-  padding: 1rem; /* Internal padding */
-  background: rgba(255, 255, 255, 0.05); /* Very subtle highlight */
-  border-radius: 6px; /* Sleek rounding */
-  border: 1px solid var(--box-border); /* Light border for definition */
+  margin-bottom: 1rem; /* More space between groups */
+  padding: 0.68rem;
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--box-bg) 88%, rgba(255,255,255,.06)) 0%,
+      color-mix(in srgb, var(--box-bg) 72%, rgba(0,0,0,.6)) 100%);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--box-border) 55%, transparent);
+  box-shadow:
+    0 14px 32px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter: blur(8px);
+}
+.settings-group::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--highlight-color, var(--stats-color, #7de)) 18%, transparent);
+  opacity: .35;
+  pointer-events: none;
 }
 
 .settings-group h4 {
   margin: 0 0 0.75rem 0; /* Tight spacing under heading */
   font-size: 1rem; /* Not too large */
-  font-weight: bold;
-  color: var(--header-color); /* Match theme */
+  font-weight: 700;
+  color: color-mix(in srgb, var(--header-color) 90%, #fff);
   text-transform: uppercase; /* Sleek, modern feel */
   letter-spacing: 0.5px; /* Subtle spacing */
 }
 
 .settings label {
-  margin-right: 0.75rem; /* Reduce horizontal spacing */
-  white-space: nowrap; /* Prevent wrapping for sleekness */
+  margin-right: 0.75rem;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--correct-color) 90%, rgba(255,255,255,.75));
+  font-weight: 600;
 }
 
 .settings span { margin-right: 0.5rem; }
@@ -169,13 +263,21 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.settings-panel :is(button, .pill, .limit-btn, select, input) {
+  font-size: 0.85em;
+}
+
+.settings-panel :is(button, .pill, .limit-btn) {
+  padding: clamp(0.1rem, 0.08rem + 0.18vw, 0.32rem) clamp(0.3rem, 0.24rem + 0.3vw, 0.55rem);
+}
+
 /* Ensure custom inputs (like numbers) align nicely */
 .settings input[type="number"] {
   background: var(--body-bg);
   border: 1px solid var(--untyped-color);
   border-radius: 4px;
   color: var(--correct-color);
-  padding: 0.2rem 0.4rem;
+  padding: 0.12rem 0.24rem;
 }
 
 .typing-panel {
@@ -194,8 +296,9 @@ body {
   border: 1px solid var(--untyped-color);
   border-radius: 4px;
   color: var(--correct-color);
-  padding: 0.2rem 0.4rem;
+  padding: 0.12rem 0.24rem;
   font-family: monospace;
+  font-size: 0.85em;
 }
 
 .subtoggle.hidden { display: none; }
@@ -206,3 +309,4 @@ body {
     transition: none !important;
   }
 }
+

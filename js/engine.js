@@ -4,10 +4,102 @@ import { updateHide } from './hide.js';
 import { generateText } from './promptGenerator.js';
 import { getHideMode } from './settings.js';
 
+
 export let chars = [];
 export let currentIndex = 0;
 export let startTime = 0;
 export let originalLength = 0;
+
+// --- add just below your exports ---
+const DEFAULT_ROLLING_BUFFER = 120;   // how many words to pre-render when NO word limit
+const APPEND_CHUNK_WORDS     = 80;    // words per append in endless/timer
+const MAX_CHARS_IN_DOM       = 4500;  // prune when DOM exceeds this many .char nodes
+const KEEP_WORDS_BEFORE      = 80;    // keep this many words before the caret
+
+// --- char-based targets for a monospace line of 44 chars ---
+const CHARS_PER_LINE       = 44;
+const INITIAL_MIN_CHARS    = CHARS_PER_LINE * 3;   // 3 lines visible at start (132)
+const CHUNK_MIN_CHARS      = CHARS_PER_LINE * 1;   // ~1 line per append (44)
+
+// Modest over-request so we can trim by chars without splitting words.
+// (Keeps generation tiny while robust across short/long tokens)
+const INITIAL_REQUEST_WORDS = 50;
+const CHUNK_REQUEST_WORDS   = 30;
+
+const LINE_CHARS = 44;          // you measured this
+const TRIGGER_AHEAD_LINES = 2;  // append when 2 lines remain (off-screen)
+
+// Take as many tokens as needed to satisfy minChars (don’t split tokens).
+// Count spaces only when the language uses spaces.
+function sliceToMinChars(tokens, sep, minChars){
+  let chars = 0;
+  let i = 0;
+  while (i < tokens.length && chars < minChars) {
+    chars += tokens[i].length;
+    if (sep && i > 0) chars += 1;  // space between words
+    i++;
+  }
+  return tokens.slice(0, i);
+}
+
+
+export function pruneLeadingText(textDisplay, keepWordsBefore = KEEP_WORDS_BEFORE) {
+  // figure out the current word id
+  const curWord = getCurrentWord(chars, currentIndex);
+  const cutoffWord = Math.max(0, curWord - keepWordsBefore);
+  if (cutoffWord <= 0) return;
+
+  // find the first index we want to keep
+  let firstKeep = 0;
+  while (firstKeep < chars.length) {
+    if (firstKeep === currentIndex) break;
+    const w = Number(chars[firstKeep].dataset.word);
+    if (Number.isFinite(w) && w >= cutoffWord) break;
+    firstKeep++;
+  }
+  if (firstKeep <= 0) return;
+
+  // remove [0..firstKeep-1] from DOM and from chars
+  let removedBeforeCursor = 0;
+  for (let i = 0; i < firstKeep; i++) {
+    const n = chars[i];
+    if (i < currentIndex) removedBeforeCursor++;
+
+    const parent = n.parentNode;
+
+    // ✅ also remove the paired <br> we append after a newline span
+    if (n.classList && n.classList.contains('newline')) {
+      const br = n.nextSibling;
+      if (br && br.nodeName === 'BR') br.remove();
+    }
+
+    if (parent) parent.removeChild(n);
+
+    // clean up empty word wrappers
+    if (parent &&
+        parent.classList &&
+        parent.classList.contains('word-wrapper') &&
+        parent.childNodes.length === 0 &&
+        parent.parentNode) {
+      parent.parentNode.removeChild(parent);
+    }
+  }
+  chars.splice(0, firstKeep);
+
+  // fix cursor index & .current
+  currentIndex = Math.max(0, currentIndex - removedBeforeCursor);
+  document.querySelectorAll('.char.current').forEach(el => el.classList.remove('current'));
+  if (chars[currentIndex]) chars[currentIndex].classList.add('current');
+
+  originalLength = chars.length;
+}
+
+
+export function maybePrune(textDisplay, keepWordsBefore = KEEP_WORDS_BEFORE) {
+  if (chars.length > MAX_CHARS_IN_DOM) {
+    pruneLeadingText(textDisplay, keepWordsBefore);
+  }
+}
 
 export function setCurrentIndex(value) {
   currentIndex = value;
@@ -39,6 +131,7 @@ export function getParts(text) {
   
   return parts;
 }
+
 
 /* ---------- SAFE CONTROL READER ---------- */
 function readGenerationControls() {
@@ -112,7 +205,7 @@ export async function initializeTyping(textDisplay, hideControl) {
   // clear any old content
   textDisplay.innerHTML = '';
   chars = [];
-  
+
   // NEW: tell metrics a fresh run is starting
   window.dispatchEvent(new Event('capy:runReset'));
 
@@ -125,71 +218,72 @@ export async function initializeTyping(textDisplay, hideControl) {
   const preferredParagraphKey =
     (mode === 'paragraphs' && lang === 'eng') ? pickEnglishParagraphKey() : null;
 
-  const text = await generateText(
-    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn, wordLimit, preferredParagraphKey
+  const sep = (Array.isArray(window.noSpaceLangs) && window.noSpaceLangs.includes(lang)) ? '' : ' ';
+
+  // Word-limit mode respects exact words; endless/timer uses minimal 3 lines by chars
+  const isWordLimitMode = (Number.isFinite(wordLimit) && wordLimit !== 1000);
+  const requestCount = isWordLimitMode ? wordLimit : INITIAL_REQUEST_WORDS;
+
+  const rawText = await generateText(
+    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn,
+    requestCount, preferredParagraphKey
   );
 
+  // Tokenize once (for spaced langs); for no-space langs we treat the whole string as one token.
+  let tokens = sep ? rawText.split(sep).filter(Boolean) : [rawText];
+  if (!isWordLimitMode) {
+    tokens = sliceToMinChars(tokens, sep, INITIAL_MIN_CHARS); // ≥132 chars
+  }
 
-  
-  // Generate parts
-  const parts = getParts(text);
-  
-  // Build the DOM structure
+  // Build DOM as one continuous paragraph (no '\n' or <br>)
+  const frag = document.createDocumentFragment();
   let widx = 0;
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
-    if (part.type === 'word') {
-      const wordSpan = document.createElement('span');
-      wordSpan.className = 'word-wrapper';
-      for (const ch of part.text) {
-        const span = document.createElement('span');
-        span.textContent = ch;
-        span.className = 'char';
-        span.dataset.word = widx;
-        span.dataset.required = '1';
-        wordSpan.appendChild(span);
-        chars.push(span);
-      }
-      textDisplay.appendChild(wordSpan);
-      widx++;
-    } else {
-      if (part.text === '\n') {
-        const span = document.createElement('span');
-        span.textContent = part.text;
-        span.className = 'char newline';
-        span.dataset.word = -1;
-        chars.push(span);
-        textDisplay.appendChild(span);
-        
-        const br = document.createElement('br');
-        textDisplay.appendChild(br);
-      } else if (part.text === ' ') {
-        const span = document.createElement('span');
-        span.textContent = part.text;
-        span.className = 'char space';
-        span.dataset.word = -1;
-        chars.push(span);
-        textDisplay.appendChild(span);
-      }
+
+  const pushWord = (word) => {
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'word-wrapper';
+    for (const ch of word) {
+      const span = document.createElement('span');
+      span.textContent = ch;
+      span.className = 'char';
+      span.dataset.word = widx;
+      span.dataset.required = '1';
+      wordSpan.appendChild(span);
+      chars.push(span);
+    }
+    frag.appendChild(wordSpan);
+  };
+
+  for (let i = 0; i < tokens.length; i++) {
+    pushWord(tokens[i]);
+    widx++;
+    if (sep && i < tokens.length - 1) {
+      const sp = document.createElement('span');
+      sp.textContent = ' ';
+      sp.className = 'char space';
+      sp.dataset.word = -1;
+      chars.push(sp);
+      frag.appendChild(sp);
     }
   }
-  
+
+  textDisplay.appendChild(frag);
+
   originalLength = chars.length;
-  
+
   // reset cursor & timer
   currentIndex = 0;
   startTime = 0;
   chars[0]?.classList.add('current');
-  
-  // perform initial hide-words pass
+
+  // initial hide-words pass
   const hideMode = getHideMode(hideControl);
   const w = getCurrentWord(chars, 0);
   updateHide(hideMode, w, chars, textDisplay);
 
-
-  // notify listeners (e.g., main.js) that fresh text is ready
   window.dispatchEvent(new Event('capy:textReady'));
 }
+
 
 /* ---------- APPEND MORE TEXT ---------- */
 export async function appendTyping(textDisplay, hideControl) {
@@ -199,73 +293,79 @@ export async function appendTyping(textDisplay, hideControl) {
   let wordSize = wordSizeOrMode;
   if (wordSizeOrMode === 'paragraphs') { mode = 'paragraphs'; wordSize = null; }
 
-  const appendWordCount = 50;
   const preferredParagraphKey =
     (mode === 'paragraphs' && lang === 'eng') ? pickEnglishParagraphKey() : null;
 
-  const newText = await generateText(
-    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn, appendWordCount, preferredParagraphKey
+  const sep = (Array.isArray(window.noSpaceLangs) && window.noSpaceLangs.includes(lang)) ? '' : ' ';
+
+  // Fetch small chunk, then trim to ≥44 chars (≈ one line)
+  const rawText = await generateText(
+    mode, lang, wordSize, punctOn, numbersOn, numbersExp, symbolsOn,
+    CHUNK_REQUEST_WORDS, preferredParagraphKey
   );
 
-  const newParts = getParts(newText);
-  
-  let widx = Math.max(...chars.map(c => Number(c.dataset.word) || 0)) + 1;
-  
-  // Append a typeable newline to separate paragraphs
-  const newlineSpan = document.createElement('span');
-  newlineSpan.textContent = '\n';
-  newlineSpan.className = 'char newline';
-  newlineSpan.dataset.word = -1;
-  chars.push(newlineSpan);
-  textDisplay.appendChild(newlineSpan);
-  
-  const br = document.createElement('br');
-  textDisplay.appendChild(br);
-  
-  // Now append the new paragraph's parts
-  for (let part of newParts) {
-    if (part.type === 'word') {
-      const wordSpan = document.createElement('span');
-      wordSpan.className = 'word-wrapper';
-      for (const ch of part.text) {
-        const span = document.createElement('span');
-        span.textContent = ch;
-        span.className = 'char';
-        span.dataset.word = widx;
-        span.dataset.required = '1';
-        wordSpan.appendChild(span);
-        chars.push(span);
-      }
-      textDisplay.appendChild(wordSpan);
-      widx++;
-    } else {
-      if (part.text === '\n') {
-        const span = document.createElement('span');
-        span.textContent = part.text;
-        span.className = 'char newline';
-        span.dataset.word = -1;
-        chars.push(span);
-        textDisplay.appendChild(span);
-        
-        const br2 = document.createElement('br');
-        textDisplay.appendChild(br2);
-      } else if (part.text === ' ') {
-        const span = document.createElement('span');
-        span.textContent = part.text;
-        span.className = 'char space';
-        span.dataset.word = -1;
-        chars.push(span);
-        textDisplay.appendChild(span);
-      }
+  let tokens = sep ? rawText.split(sep).filter(Boolean) : [rawText];
+  tokens = sliceToMinChars(tokens, sep, CHUNK_MIN_CHARS); // ≥44 chars
+
+  // Compute next word index by scanning from tail (FAST)
+  let tail = chars.length - 1;
+  let lastWordId = -1;
+  while (tail >= 0) {
+    const v = Number(chars[tail].dataset.word);
+    if (Number.isFinite(v) && v >= 0) { lastWordId = v; break; }
+    tail--;
+  }
+  let widx = lastWordId + 1;
+
+  const frag = document.createDocumentFragment();
+
+  // Ensure exactly ONE space between old and new (for spaced langs)
+  if (sep && chars.length) {
+    const last = chars[chars.length - 1]?.textContent;
+    if (last !== ' ' && last !== '\n') {
+      const joiner = document.createElement('span');
+      joiner.textContent = ' ';
+      joiner.className = 'char space';
+      joiner.dataset.word = -1;
+      chars.push(joiner);
+      frag.appendChild(joiner);
     }
   }
-  
+
+  const pushWord = (word) => {
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'word-wrapper';
+    for (const ch of word) {
+      const span = document.createElement('span');
+      span.textContent = ch;
+      span.className = 'char';
+      span.dataset.word = widx;
+      span.dataset.required = '1';
+      wordSpan.appendChild(span);
+      chars.push(span);
+    }
+    frag.appendChild(wordSpan);
+    widx++;
+  };
+
+  for (let i = 0; i < tokens.length; i++) {
+    pushWord(tokens[i]);
+    if (sep && i < tokens.length - 1) {
+      const sp = document.createElement('span');
+      sp.textContent = ' ';
+      sp.className = 'char space';
+      sp.dataset.word = -1;
+      chars.push(sp);
+      frag.appendChild(sp);
+    }
+  }
+
+  textDisplay.appendChild(frag);
   originalLength = chars.length;
-  
+
   // Update hide after append
   const hideMode = getHideMode(hideControl);
   const w = getCurrentWord(chars, currentIndex);
   updateHide(hideMode, w, chars, textDisplay);
-
-  // highlight is updated in main.js after append
 }
+

@@ -1,7 +1,11 @@
 // js/theme.js: select + color‑picker listener that sets CSS custom‑properties / themes
 export function bindThemeSelectors(themeSelector, colorPickers) {
   themeSelector.addEventListener('change', e => {
-    const t = e.target.value;
+    const sel = e.target;
+    const resolved = (sel.value === 'random' && sel.dataset.randomResolved)
+      ? sel.dataset.randomResolved
+      : sel.value;
+    const t = resolved || 'minimalist';
     document.body.className = `theme-${t}`;
     if (t !== 'choosecolors') document.body.style.backgroundImage = '';
     const st = getComputedStyle(document.body);

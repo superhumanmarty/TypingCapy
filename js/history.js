@@ -135,6 +135,58 @@ function ensureStyles() {
   text-shadow: 0 1px 0 rgba(0,0,0,.35);
 }
 #typingHistory .t-corr  { color: #f7faff; } /* ensure correct chars stay bright */
+
+/* Results screen: show raw text (no pill) for Typed/Target */
+.results-screen #typingHistory .box,
+.results-screen #supposedText .box{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Make the text a little bigger & brighter against the page background */
+.results-screen #typingHistory .box,
+.results-screen #supposedText .box{
+  font-size: clamp(1rem, 1.2vw, 1.15rem) !important;
+  line-height: 1.5;
+  color: #f7faff !important;
+  text-shadow: none;
+}
+
+/* Keep per-char colors vivid without the pill */
+.results-screen #typingHistory .t-corr  { color: #f7faff !important; }
+.results-screen #typingHistory .t-err,
+.results-screen #typingHistory .t-extra { color: #ff6b6b !important; }
+.results-screen #typingHistory .t-skip  { color: #ff6b6b !important; opacity: .55 !important; }
+
+/* Titles (“Typed” / “Target”) stay Inter & bold (you already set this elsewhere) */
+.results-screen #typingHistory .title,
+.results-screen #supposedText .title{
+  font-weight: 800 !important;
+  margin-bottom: .4rem;
+}
+
+/* RESULTS: cap to 3 lines + scroll, and show ↕️ indicator when overflowing */
+.results-screen #typingHistory .box,
+#resultsScreen    #typingHistory .box,
+.results-screen #supposedText .box,
+#resultsScreen    #supposedText .box{
+  /* 3 lines (line-height is already 1.5 above) */
+  max-height: calc(1.5em * 3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Inline indicator next to the title text */
+.results-screen .title .scroll-indicator,
+#resultsScreen    .title .scroll-indicator{
+  margin-left: .4rem;
+  opacity: .9;
+  font-size: .95em;
+}
+
 `;
   document.head.appendChild(style);
 }
@@ -256,6 +308,23 @@ function getLastAttemptedWordIndex() {
   return last;
 }
 
+function markIfOverflow(titleEl, boxEl) {
+  if (!titleEl || !boxEl) return;
+
+  // Remove any prior indicator (if we re-render)
+  titleEl.querySelector('.scroll-indicator')?.remove();
+
+  // Wait a tick so layout is settled before measuring
+  requestAnimationFrame(() => {
+    const needs = boxEl.scrollHeight > Math.ceil(boxEl.clientHeight + 1);
+    if (needs) {
+      const i = document.createElement('span');
+      i.className = 'scroll-indicator';
+      i.textContent = '↕️';
+      titleEl.appendChild(i);
+    }
+  });
+}
 
 
 export function renderTypingHistory() {
@@ -278,7 +347,7 @@ export function renderTypingHistory() {
   wrap.innerHTML = '';
   const title = document.createElement('div');
   title.className = 'title';
-  title.textContent = 'Keystroke history';
+  title.textContent = 'Typed';
 
   const box = document.createElement('div');
   box.className = 'box';
@@ -368,7 +437,7 @@ export function renderTypingHistory() {
   sup.innerHTML = '';
   const supTitle = document.createElement('div');
   supTitle.className = 'title';
-  supTitle.textContent = 'What the player was supposed to type';
+  supTitle.textContent = 'Target';
   const supBox = document.createElement('div');
   supBox.className = 'box';
 
@@ -444,5 +513,19 @@ export function renderTypingHistory() {
 
   sup.appendChild(supTitle);
   sup.appendChild(supBox);
+
+  // Ensure the Target box starts scrolled to the bottom as well
+  supBox.scrollTop = supBox.scrollHeight;
+
+  // After both sections are in the DOM, add indicators if they overflow
+  requestAnimationFrame(() => {
+    markIfOverflow(title,    box);
+    markIfOverflow(supTitle, supBox);
+
+    // Re-assert bottom alignment after fonts/layout settle
+    box.scrollTop    = box.scrollHeight;
+    supBox.scrollTop = supBox.scrollHeight;
+  });
+
 
 }

@@ -14,16 +14,42 @@ export function getCurrentWord(chars, currentIndex) {
   return idx;
 }
 
-// scrolls the display so the current span is visible
-export function scrollToCurrent(textDisplay, chars, currentIndex) {
-  const box = textDisplay, c = chars[currentIndex];
-  if (!c) return;
-  const lh = parseFloat(getComputedStyle(box).lineHeight);
-  // Add a small delay to allow browser reflow time
-  setTimeout(() => {
-    const top = c.offsetTop;
-    box.scrollTop = Math.max(0, top - lh);
-  }, 50); // 50ms delay for reflow
+export function scrollToCurrent(textDisplay, chars, index){
+  if (!textDisplay || !chars || !chars.length) return;
+
+  const i = Math.max(0, Math.min(index, chars.length - 1));
+  const cur  = chars[i];
+  const prev = i > 0 ? chars[i - 1] : null;
+
+  // Did we just commit something that can move us to a new line?
+  const justTypedSpace = !!(prev && prev.textContent === ' ');
+  const justTypedEnter = !!(prev && prev.textContent === '\n');
+  const justTypedExtra = !!(prev && prev.classList && prev.classList.contains('extra'));
+  if (!justTypedSpace && !justTypedEnter && !justTypedExtra) return;
+
+  const pRect = textDisplay.getBoundingClientRect();
+  const cRect = (cur.getClientRects()[0] || cur.getBoundingClientRect());
+  const pr    = prev ? (prev.getClientRects()[0] || prev.getBoundingClientRect()) : null;
+
+  // If it was an EXTRA, always re-center (wrap detection can be timing-sensitive)
+  let crossedLine = justTypedExtra;
+
+  if (!crossedLine && pr) {
+    const lh = Math.max(
+      cRect.height || 0,
+      pr.height    || 0,
+      parseFloat(getComputedStyle(cur).lineHeight) || 0
+    );
+    crossedLine = Math.abs(cRect.top - pr.top) > lh * 0.6;
+  }
+
+  if (!crossedLine) return;
+
+  // Center current line (line 2 of 3) with smooth animation
+  const caretY  = (cRect.top - pRect.top) + textDisplay.scrollTop;
+  const desired = Math.max(0, caretY - (textDisplay.clientHeight / 2 - cRect.height / 2));
+  const maxTop  = Math.max(0, textDisplay.scrollHeight - textDisplay.clientHeight);
+  textDisplay.scrollTo({ top: Math.min(desired, maxTop), behavior: 'smooth' });
 }
 
 // WPM = (correctChars / 5) / minutes
@@ -39,7 +65,49 @@ export function calculateAccuracy(totalAttempted, correctChars) {
   return totalAttempted > 0 ? Math.round((correctChars / totalAttempted) * 100) : 100;
 }
 
+/* ================== Typed Error Bubble controls ====================== */
+/* Behavior:
+   - showTypedErrorBubble(ch): show/update the bubble, CANCEL any pending hide.
+   - scheduleTypedErrorHide(1000): start a ~1s hide countdown (no reset if already running).
+   - clearTypedErrorBubble(): hide immediately and cancel timer (used for “extra”, or deleting the wrong char).
+*/
+let _typedErrorHideTimer = null;
+
+export function showTypedErrorBubble(ch) {
+  const ted = document.getElementById('typedErrorDisplay');
+  const tl  = document.getElementById('typedLetter');
+  if (!ted || !tl) return;
+
+  tl.textContent = ch;
+  ted.classList.remove('hidden');
+
+  // Cancel any pending hide so it STAYS until we decide otherwise
+  if (_typedErrorHideTimer) {
+    clearTimeout(_typedErrorHideTimer);
+    _typedErrorHideTimer = null;
+  }
+}
+
+export function scheduleTypedErrorHide(ms = 1000) {
+  const ted = document.getElementById('typedErrorDisplay');
+  const tl  = document.getElementById('typedLetter');
+  if (!ted || ted.classList.contains('hidden')) return;
+
+  // Do NOT restart if a countdown is already running
+  if (_typedErrorHideTimer) return;
+
+  _typedErrorHideTimer = setTimeout(() => {
+    ted.classList.add('hidden');
+    if (tl) tl.textContent = '';
+    _typedErrorHideTimer = null;
+  }, ms);
+}
+
 export function clearTypedErrorBubble() {
+  if (_typedErrorHideTimer) {
+    clearTimeout(_typedErrorHideTimer);
+    _typedErrorHideTimer = null;
+  }
   const ted = document.getElementById('typedErrorDisplay');
   const tl  = document.getElementById('typedLetter');
   if (ted) ted.classList.add('hidden');

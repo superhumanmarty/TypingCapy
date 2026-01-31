@@ -104,13 +104,16 @@ function enhanceOne(select){
     const gutter   = 8;
 
     // Position within the panel’s own coordinate space (account for scroll)
-    const itemLeft   = panel.scrollLeft + (rect.left - rootRect.left);
-    const itemTop    = panel.scrollTop  + (rect.top  - rootRect.top);
+    const scrollLeft = panel === document.body ? window.scrollX : panel.scrollLeft;
+    const scrollTop  = panel === document.body ? window.scrollY : panel.scrollTop;
+    const itemLeft   = scrollLeft + (rect.left - rootRect.left);
+    const itemTop    = scrollTop  + (rect.top  - rootRect.top);
     const itemBottom = itemTop + rect.height;
 
     // Visible region of the panel
-    const visibleTop    = panel.scrollTop;
-    const visibleBottom = panel.scrollTop + panel.clientHeight;
+    const clientH       = panel === document.body ? window.innerHeight : panel.clientHeight;
+    const visibleTop    = scrollTop;
+    const visibleBottom = scrollTop + clientH;
 
     // Space that’s actually visible above/below the button
     const spaceAbove = (itemTop    - visibleTop)    - gutter;
@@ -153,17 +156,22 @@ function enhanceOne(select){
     portalRoot.appendChild(menu);
     menu.style.position = 'absolute';
 
-
     wrap.classList.add('open');
-    menu.classList.add('is-open');
     btn.setAttribute('aria-expanded','true');
 
-    // 1) position first (so the menu has a real size)
+    // 1) position first (so the menu has a real size AND side hint)
     placeMenu();
+
+    // 1.5) commit the closed CSS state before we flip to open
+    // (forces a style/layout flush so the transition will play)
+    void menu.offsetWidth; // <— keep this exact line
 
     // 2) now set/center the active item WITHOUT scrolling the panel
     activeIndex = Math.max(0, select.selectedIndex);
     setActiveVisual(activeIndex, /*center=*/true);
+
+    // finally open (CSS will animate opacity/transform)
+    menu.classList.add('is-open');
 
     // keep position updated while user scrolls/resizes
     onWinMove = () => placeMenu(menu.dataset.side === 'up');
@@ -176,13 +184,28 @@ function enhanceOne(select){
   }
 
 
-  function close(){
+
+  function close({ refocus = false } = {}) {
     wrap.classList.remove('open');
-    menu.classList.remove('is-open');
     btn.setAttribute('aria-expanded','false');
 
-    // put the menu back inside its wrapper for cleanliness
-    wrap.appendChild(menu);
+    // start reverse animation
+    menu.classList.remove('is-open');
+
+    // after the transition, put the menu back inside its wrapper
+    const onDone = (ev) => {
+      if (ev && ev.target !== menu) return;  // ignore bubbled transitions
+      menu.removeEventListener('transitionend', onDone);
+      if (menu.parentNode !== wrap) wrap.appendChild(menu);
+    };
+
+    // If there's no transition (e.g., reduced motion), re-parent immediately
+    const dur = getComputedStyle(menu).transitionDuration;
+    if (!dur || dur === '0s' || dur === '0ms') {
+      if (menu.parentNode !== wrap) wrap.appendChild(menu);
+    } else {
+      menu.addEventListener('transitionend', onDone);
+    }
 
     document.removeEventListener('pointerdown', onDocDown, true);
     document.removeEventListener('keydown', onKeyDown, true);
@@ -192,9 +215,24 @@ function enhanceOne(select){
       portalRoot.removeEventListener('scroll', onWinMove, true);
       onWinMove = null;
     }
+
+    // return focus to the game if we closed via pill/ESC
+    if (refocus) {
+      setTimeout(() => {
+        if (!document.body.classList.contains('editing-threshold')) {
+          btn.blur?.();
+          document.body.focus({ preventScroll: true });
+        }
+      }, 0);
+    }
   }
 
-  function toggle(){ wrap.classList.contains('open') ? close() : open(); }
+
+
+  function toggle(){
+    wrap.classList.contains('open') ? close({ refocus: true }) : open();
+  }
+
 
   function choose(i){
     if (i < 0 || i >= select.options.length) return;
@@ -298,7 +336,7 @@ function enhanceOne(select){
       if (e.key === 'Home')      activeIndex = 0;
       if (e.key === 'End')       activeIndex = options.length - 1;
       if (e.key === 'Enter' || e.key === ' ') choose(activeIndex);
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') close({ refocus: true });
       setActiveVisual(activeIndex);
     }
   }

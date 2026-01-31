@@ -39,26 +39,33 @@ body {
 .settings span { margin-right: 0.5rem; }
 .settings label { margin-right: 1rem; cursor: pointer; }
 
-/* Typing Box */
+/* Typing Box — exactly 3 full lines, no half lines */
 #textDisplay {
   box-sizing: border-box;
   width: 100%;
   background: var(--box-bg);
-  padding: 1rem;
+  /* keep side padding if you want, but kill top/bottom padding */
+  padding: 0 1rem;
   border: 2px solid var(--box-border);
   border-radius: 4px;
-  line-height: 1.5em;
-  height: calc(1.5em * 3);
-  font-size: 1.5rem;
+
+  /* fixed line height + exact triple height */
+  --lh: 1.4em;
+  line-height: var(--lh);
+  height: calc(var(--lh) * 3);
+
+  font-size: clamp(1.1rem, 0.88rem + 1.4vh, 1.8rem);
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   margin-bottom: 1rem;
+
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
 }
+
 
 /* Force each character span to stay together with its word */
 .char {
@@ -111,13 +118,6 @@ body {
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   border: 1px solid var(--incorrect-color);
-}
-
-/* Make cursor visible even on hidden characters */
-.char.current {
-  position: relative;
-  border-left: 2px solid var(--header-color);
-  animation: blink 1s steps(1) infinite;
 }
 
 .hidden-word.current {
@@ -236,34 +236,6 @@ body {
   color: var(--incorrect-color);
 }
 
-/* Theme: Capy Paradise */
-body.theme-capyparadise {
-  background-image: url('../backgrounds/capyparadise.png');
-  background-size: cover;
-  background-position: center;
-  --box-bg: #0a1f44;       /* dark blue typing box */
-  --box-border: #66aaff;   /* light‑blue border */
-  --header-color: #66aaff; /* title & theme text */
-  --stats-color: #aaddff;  /* WPM & accuracy */
-  --correct-color: #ffffff;/* typed text */
-  --untyped-color: #cccccc;/* yet‑to‑type text */
-  --highlight-color: #39ff14;
-}
-
-/* Theme: Cyberpunk */
-body.theme-cyberpunk {
-  background-image: url('../backgrounds/cyberpunk.png');
-  background-size: cover;
-  background-position: center;
-  --box-bg: #000000;       /* black typing box */
-  --box-border: #ff00ff;   /* neon pink border */
-  --header-color: #ff00ff; /* title & theme text */
-  --stats-color: #39ff14;  /* WPM & accuracy in neon green */
-  --correct-color: #39ff14;/* typed text */
-  --untyped-color: #888888;/* yet‑to‑type text */
-  --highlight-color: #00ffff;
-}
-
 /* — look-ahead "color" only, no background box — */
 .ahead1,
 .ahead2 {
@@ -290,10 +262,9 @@ body.theme-cyberpunk {
   white-space: nowrap;
 }
 
-/* Ensure spaces are preserved */
-.char.space {
-  white-space: pre;
-}
+/* collapse spaces (pre would force a visible leading space) */
+.char.space { white-space: normal; }
+
 
 /* Ensure hidden newline characters don't interfere with cursor */
 .char[style*="display: none"].current {
@@ -301,4 +272,56 @@ body.theme-cyberpunk {
   width: 2px;
   visibility: visible;
   color: transparent;
+}
+
+/* Footer */
+.site-footer {
+  margin: 2rem auto 1.5rem;
+  padding: 1.5rem 1rem;
+  max-width: 900px;
+  text-align: center;
+  border-top: 1px solid var(--box-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--box-border) 30%, transparent);
+}
+
+.site-footer__tagline {
+  margin: 0 0 0.8rem;
+  font-size: 0.95rem;
+  color: var(--untyped-color);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.site-footer nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.site-footer nav a {
+  color: var(--highlight-color, var(--header-color));
+  text-decoration: none;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.site-footer nav a:hover,
+.site-footer nav a:focus-visible {
+  color: var(--stats-color);
+  border-color: currentColor;
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    padding: 1.25rem 0.75rem;
+  }
+  .site-footer nav {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
 }

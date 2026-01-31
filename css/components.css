@@ -1,35 +1,43 @@
 /* css/components.css */
 
-/* Typing Box - balanced sizing for 3 lines */
+/* Typing Box — exactly 3 full lines, no half lines */
 #textDisplay {
   box-sizing: border-box;
   width: 100%;
-  background: transparent; /* Removed background */
-  padding: 0.75rem 1rem; /* Balanced padding */
-  border: none; /* Removed border */
+  background: transparent;
+  /* keep side padding if you want, but kill top/bottom padding */
+  padding: 0 1rem;
+  border: none;
   border-radius: 4px;
-  line-height: 1.4em; /* More comfortable line height */
-  height: calc(3 * 1.4em + 1.5rem); /* 3 lines + 0.75rem top + 0.75rem bottom padding */
-  font-size: 1.75rem; /* Smaller, more readable size */
+
+  /* fixed line height + exact triple height */
+  --lh: 1.4em;
+  line-height: var(--lh);
+  height: calc(var(--lh) * 3);
+
+  font-size: clamp(1.1rem, 0.88rem + 1.4vh, 1.8rem);
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   margin-bottom: 1rem;
+
   white-space: normal;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-  text-rendering: optimizeSpeed; /* Disable advanced rendering for consistent widths */
-  font-kerning: none; /* Disable kerning to prevent width changes */
-  letter-spacing: 0; /* Ensure no extra spacing */
-  font-feature-settings: "kern" 0; /* Explicitly disable kerning */
-  -webkit-font-smoothing: none; /* Disable subpixel antialiasing */
-  -moz-osx-font-smoothing: unset; /* For Firefox on macOS */
-  font-smooth: never; /* Disable font smoothing for integer pixel widths */
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE 10+ */
+
+  text-rendering: optimizeSpeed;
+  font-kerning: none;
+  letter-spacing: 0;
+  font-feature-settings: "kern" 0;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+
+  contain: layout paint;
 }
-#textDisplay::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
+#textDisplay::-webkit-scrollbar { display: none; }
+
 
 /* always show the theme dropdown, but hide the color‑picker row by default */
 .customizer {
@@ -37,18 +45,11 @@
 }
 
 /* Character states */
-.char { 
-  color: var(--untyped-color); 
-  position: relative;
-  display: inline-block;
-  width: 1ch;
-  text-rendering: optimizeSpeed; /* Apply to chars too for consistency */
-  font-kerning: none;
-  letter-spacing: 0;
-  font-feature-settings: "kern" 0;
-  font-smooth: never; /* Disable smoothing on characters */
+.char {
+  color: var(--untyped-color);
+  display: inline;    /* natural glyph width */
+  position: static;   /* cheaper than relative on thousands of nodes */
 }
-
 .char.correct  { color: var(--correct-color); }
 .char.incorrect{ color: var(--incorrect-color); }
 .char.skipped  { color: var(--skipped-color); }
@@ -73,6 +74,52 @@
 #stats { color: var(--stats-color); font-size: 0.9rem; }
 #stats span { margin-right: 1rem; }
 
+.shortcut-pills{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.4rem;
+  font-size: 0.85em;
+  line-height: 1;
+  vertical-align: middle;
+  font-family: var(--ui-font, inherit);
+}
+
+.shortcut-pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.05em;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+.shortcut-pill.symbol{
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+.shortcut-symbol{
+  font-size: 1.4em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.15rem;
+}
+
+.focus-hint .shortcut-pills,
+.pregame-hint .shortcut-pills,
+.results-hints .shortcut-pills{
+  margin-left: 0.6rem;
+}
+
 .char.extra {
   color: var(--incorrect-color);
 }
@@ -89,73 +136,17 @@
   margin-right: 0;
 }
 
-/* Spaces - add margin after space for proper word spacing */
-.char.space {
-  width: 1ch;
-  display: inline-block;
-  position: relative;
-  margin-right: 0; /* Remove margin, use fixed width */
+/* collapse spaces so a wrapped line never shows a leading space */
+.char.space,
+.char.space.current{
+  display: inline;       /* no box */
+  width: auto;           /* no fixed 1ch */
+  white-space: normal;   /* allow collapsing at line start */
+  margin: 0;
+  padding: 0;
+  position: static;
 }
 
-/* Spaces - remove custom ::before and vertical-align (use unified) */
-.char.space.current {
-  width: 1ch;               /* Keep fixed width */
-  height: 1em;
-  display: inline-block;
-  position: relative;
-  border-left: none !important;  /* Already none */
-  /* Remove vertical-align: text-bottom to prevent dip/shift */
-  /* vertical-align: text-bottom; */ /* Commented out */
-}
-
-/* Unified caret for ALL current chars (letters, spaces, newlines) */
-.char.current::before {
-  content: '';
-  position: absolute;
-  left: -2px;               /* Offset slightly left to avoid overlapping letter edges */
-  top: 0;
-  width: 2px;
-  height: 1em;
-  background: var(--header-color);
-  animation: blink 1s steps(1) infinite;
-  z-index: 1;               /* Ensure caret is above text if needed */
-}
-
-/* For spaces and newlines, adjust left back to 0 (no offset needed) */
-.char.space.current::before,
-.char.newline.current::before {
-  left: 0;
-}
-
-/* Ensure hidden newline characters don't interfere with cursor */
-.char[style*="display: none"].current {
-  display: inline-block !important;
-  width: 2px;
-  visibility: visible;
-  color: transparent;
-}
-
-/* Ensure newline characters are typeable positions */
-.char[style*="display: none"] {
-  position: relative;
-  width: 0;
-  display: inline-block !important;
-}
-
-/* Fix newline cursor (use unified ::before instead of box-shadow) */
-.char.newline.current,
-.char[style*="display: none"].current {
-  width: 2px;
-  height: 1em;               /* Match text height */
-  display: inline-block;
-  /* Remove vertical-align to prevent any potential shift (consistent with spaces) */
-  /* vertical-align: text-bottom; */ /* Commented out */
-  visibility: visible;
-  border-left: none !important;
-  /* Remove box-shadow, rely on ::before */
-  box-shadow: none !important;
-  /* No custom animation here; uses .char.current::before */
-}
 
 /* Handle newlines properly */
 .char.newline {
@@ -164,6 +155,60 @@
 
 .char.newline + br {
   display: block;
+}
+
+/* Device warning overlay */
+.device-warning{
+  position: fixed;
+  inset: 0;
+  background: rgba(5,10,22,0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 9999;
+}
+.device-warning.hidden{
+  display: none !important;
+}
+.device-warning__box{
+  max-width: min(420px, 90vw);
+  background: #0f172a;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 18px;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 1.75rem;
+  text-align: center;
+  color: #f8fafc;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.device-warning__box h2{
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+}
+.device-warning__box p{
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+  color: rgba(248,250,252,0.92);
+}
+.device-warning__button{
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #34d399, #10b981);
+  color: #031014;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.85rem 2.5rem;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(16,185,129,0.4);
+}
+.device-warning__button:focus-visible{
+  outline: 2px solid #f0fdfa;
+  outline-offset: 3px;
 }
 
 /* Always show the break after a newline, even when it’s current */

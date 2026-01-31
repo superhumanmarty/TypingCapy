@@ -4,6 +4,8 @@ import { getCurrentWord, scrollToCurrent, clearTypedErrorBubble } from '../utils
 import { updateHide } from '../hide.js';
 import { playErrorBuzz, getSoundMode } from '../sound.js';
 import { getHideMode } from '../settings.js';
+import { setState } from '../app/state.js';
+import { noteMetrics } from '../metrics.js';
 
 
 function getCurrent() {
@@ -38,8 +40,13 @@ export async function handleExtra(k, textDisplay, hideControl) {
     setCurrentIndex(chars.length - 1);
   }
 
-  chars.forEach(c => c.classList.remove('current'));
+  setState(extraSpan, 'extra');
+  noteMetrics(Date.now(), 0, true);
+
+  const prevCur = document.querySelector('.char.current');
+  if (prevCur) prevCur.classList.remove('current');
   chars[await getCurrent()]?.classList.add('current');
+
 
   const updatedIndex = await getCurrent();
   const mode = getHideMode(hideControl);

@@ -2,10 +2,7 @@
 
 /* --- Text Generation hero pill ---------------------------------- */
 .settings-hero {
-  display: grid;
-  grid-template-columns: 72px 1fr;  /* icon | content */
-  align-items: center;
-  gap: .9rem;
+  display: block;
   padding: .9rem 1rem;
   min-height: 84px;
   border: 1px solid var(--box-border);
@@ -16,103 +13,12 @@
   margin: .6rem auto 0;
 }
 
-.settings-hero .hero-icon {
-  width: 64px;
-  height: 64px;
-  object-fit: contain;
-  margin-left: .2rem;
-  pointer-events: none;
-  opacity: .95;
-}
-
 .settings-hero .split-half { padding: .6rem .8rem; font-size: .96rem; }
 
 /* === TEXT hero: put lang.png next to the "TEXT" title only === */
-#textGenHero {
-  display: grid;                  /* already grid, but restate safely */
-  grid-template-columns: 72px 1fr;/* icon | title/controls */
-  grid-auto-rows: auto;
-  align-items: center;
-  gap: .9rem;
-}
-
-/* Let the children of .hero-content participate in #textGenHero's grid */
-#textGenHero .hero-content { display: contents; }
-
-/* Row 1: icon | title */
-#textGenHero .hero-icon  { grid-column: 1; grid-row: 1; }
-#textGenHero .hero-title { grid-column: 2; grid-row: 1; align-self: center; }
-
-/* Rows 2..: controls span full width below the title row */
-#textGenHero #languageSettings,
-#textGenHero #wordListSizeSettings,
-#textGenHero #togglesSettings {
-  grid-column: 1 / -1;
-}
-
-/* Optional explicit ordering */
-#textGenHero #languageSettings     { grid-row: 2; }
-#textGenHero #wordListSizeSettings { grid-row: 3; }
-#textGenHero #togglesSettings      { grid-row: 4; }
-
-
-/* === Make 123 and !? clickable (beat any overlapping select) === */
-#textGenHero .select-pill { position: relative; z-index: 0; }
-#textGenHero .select-pill select.ui-select { z-index: 1; }
-
-#textGenHero #togglesSettings,
-#textGenHero .split-pill,
-#textGenHero .split-half {
-  position: relative;
-  z-index: 3;              /* sits above the selects */
-  pointer-events: auto;    /* belt + suspenders */
-}
-
-/* (Accessibility) Allow keyboard focus if you want: remove tabindex="-1" from the buttons */
-
-/* --- Make sure the split pills sit ABOVE the select pills in the TEXT hero --- */
-#textGenHero { position: relative; }
-
-#textGenHero #togglesSettings {
-  position: relative;
-  z-index: 5;            /* new stacking context for the buttons */
-  isolation: isolate;    /* guarantees children paint above earlier rows */
-}
-
-#textGenHero .split-pill,
-#textGenHero .split-half { position: relative; z-index: 5; }
-
-/* Lower the language/word selects just within this hero */
-#textGenHero .select-pill { position: relative; z-index: 0; }
-#textGenHero .select-pill select.ui-select { z-index: 0 !important; } /* beats the global z-index:4 */
-
-
-/* Center the TEXT title between the icon and the pill's right edge */
-#textGenHero .hero-title {
-  grid-column: 2;     /* stays in the right column */
-  grid-row: 1;
-  align-self: center; /* you already had this */
-  justify-self: center;  /* <- this is the key */
-  text-align: center;    /* keeps the text centered inside itself */
-}
+/* Removed icon-specific grid layout now that hero icons are gone */
 
 /* THEME hero: icon left of title; dropdown spans full width below */
-#themeHero {
-  display: grid;
-  grid-template-columns: 72px 1fr;  /* icon | title/controls */
-  grid-auto-rows: auto;
-  align-items: center;
-  gap: .9rem;
-}
-
-#themeHero .hero-content { display: contents; }
-
-#themeHero .hero-icon  { grid-column: 1; grid-row: 1; }
-#themeHero .hero-title { grid-column: 2; grid-row: 1; align-self: center; }
-
-/* Controls row spans entire pill below the title */
-#themeHero #themeSettings { grid-column: 1 / -1; grid-row: 2; }
-
 /* Make select-pill fill the pill width when inside any hero */
 .settings-hero .select-pill {
   width: 100%;
@@ -120,70 +26,6 @@
   margin: 0; /* remove inner pill margin */
 }
 /* Revert TEXT title to sit near the icon (like THEME) */
-#textGenHero .hero-title {
-  justify-self: start;   /* was centered */
-  margin-left: 0;        /* kill any previous offset */
-  text-align: left;
-}
-
-/* SOUND hero: icon | title on the first row, dropdown below spanning full width */
-#soundHero {
-  display: grid;
-  grid-template-columns: 72px 1fr;  /* icon | title/controls */
-  grid-auto-rows: auto;
-  align-items: center;
-  gap: .9rem;
-}
-
-#soundHero .hero-content { display: contents; }
-
-#soundHero .hero-icon  { grid-column: 1; grid-row: 1; }
-#soundHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; text-align: left; }
-
-#soundHero #soundSettings { grid-column: 1 / -1; grid-row: 2; }
-
-/* ==== NOOB hero (icon + title on row 1, controls below) ==== */
-#noobHero {
-  display: grid;
-  grid-template-columns: 72px 1fr;
-  grid-auto-rows: auto;
-  align-items: center;
-  gap: .9rem;
-}
-#noobHero .hero-content { display: contents; }
-#noobHero .hero-icon  { grid-column: 1; grid-row: 1; }
-#noobHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; }
-#noobHero #keyboardDiagramSettings { grid-column: 1 / -1; grid-row: 2; }
-#noobHero #typedErrorsPill        { grid-column: 1 / -1; grid-row: 3; }
-
-/* ==== PRO hero ==== */
-#proHero {
-  display: grid;
-  grid-template-columns: 72px 1fr;
-  grid-auto-rows: auto;
-  align-items: center;
-  gap: .9rem;
-}
-#proHero .hero-content { display: contents; }
-#proHero .hero-icon  { grid-column: 1; grid-row: 1; }
-#proHero .hero-title { grid-column: 2; grid-row: 1; justify-self: start; }
-
-/* stack all PRO controls under the title, full width */
-#proHero #hidePillRow          { grid-column: 1 / -1; grid-row: 2; }
-#proHero #highlightPillRow     { grid-column: 1 / -1; grid-row: 3; }
-#proHero #ghostCursorSettings  { grid-column: 1 / -1; grid-row: 4; }
-#proHero #minWPMSettings       { grid-column: 1 / -1; grid-row: 5; }
-#proHero #minAccuracySettings  { grid-column: 1 / -1; grid-row: 6; }
-#proHero #strictModeSettings   { grid-column: 1 / -1; grid-row: 7; }
-
-/* Full-width split pills in the PRO hero */
-#proHero #minWPMSettings,
-#proHero #maxErrorsSettings {
-  width: calc(100% - 2rem);
-  max-width: 540px;
-  margin: .6rem auto 0;
-  box-sizing: border-box;
-}
 
 
 /* === Settings column sizing ========================================= */
@@ -271,10 +113,14 @@
 
 .settings-hero .hero-title {
   font-weight: 800;
-  font-size: 1.05rem;
-  line-height: 1.15;
+  font-size: clamp(2.2rem, 1.6rem + 1.2vw, 3rem);
+  line-height: 1.35;
   color: var(--correct-color);
-  margin: 0 0 .25rem 0;
+  margin: 0 0 .4rem 0;
+  text-align: center;
+  justify-self: center;
+  width: 100%;
+  font-family: 'Inter', var(--ui-font, system-ui, -apple-system, "Segoe UI", sans-serif);
 }
 
 /* inside the big pill, make controls fill its width */
@@ -368,9 +214,11 @@
 #soundHero  .hero-title,
 #noobHero   .hero-title,
 #proHero    .hero-title {
-  font-size: 1.4rem;   /* was 1.05rem; ~1.8× for balance with the 3× icon */
-  line-height: 1.1;
-  margin: 0 0 .4rem 0;
+  font-size: clamp(0.95rem, 0.75rem + 0.45vw, 1.25rem);
+  line-height: 1.05;
+  margin: 0 0 .35rem 0;
+  letter-spacing: .08em;
+  white-space: nowrap;
 }
 
 /* Keep form controls readable; no change to their size */
@@ -392,7 +240,7 @@
   #soundHero  .hero-title,
   #noobHero   .hero-title,
   #proHero    .hero-title {
-    font-size: 1.5rem;
+    font-size: clamp(0.95rem, 0.75rem + 0.45vw, 1.15rem);
   }
 }
 
@@ -445,3 +293,44 @@
 #proHero #highlightOptions {
   margin-top: .25rem !important;     /* was .6rem */
 }
+
+/* Place the Music row above the Sound row inside the SOUND hero */
+#soundHero #musicSettings { grid-column: 1 / -1; grid-row: 2; }
+#soundHero #soundSettings { grid-column: 1 / -1; grid-row: 3; }
+
+/* Highlight the pill when Music ≠ Off (matches your “on” styling) */
+.select-pill:has(select#musicSelector option:not([value="off"]):checked){
+  background: var(--on-fill) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+  transform: translateZ(0) scale(1.015);
+}
+
+/* Volume row look + disabled dim */
+#musicVolumeRow input[type="range"] {
+  width: 220px;
+  accent-color: var(--header-color);
+}
+#musicVolumeRow.disabled {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* Typing (SFX) volume slider */
+#soundVolumeRow input[type="range"] {
+  width: 220px;
+  accent-color: var(--header-color);
+}
+#soundVolumeRow.disabled {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* Make the label next to both sliders use the Inter UI font */
+#musicVolumeRow label,
+#soundVolumeRow label {
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+

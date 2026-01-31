@@ -1,0 +1,110 @@
+/* css/edge-soft.css
+   Goal: make borders close to the pill/hero fill, like the Coffee theme.
+   This leaves your theme colors intact and softly blends the border tone
+   toward the background, across ALL themes.
+*/
+
+/* How strong the border should “peek through” (lower = subtler edge) */
+:root { --pill-border-mix: 18%; }  /* try 12%–22% to taste */
+
+/* Derived, softer border color for UI elements */
+:root,
+body[class*="theme-"] {
+  --ui-border: color-mix(
+    in srgb,
+    var(--box-bg) calc(100% - var(--pill-border-mix)),
+    var(--box-border) var(--pill-border-mix)
+  );
+}
+
+/* Apply the softer border to all pill/hero-ish components */
+.settings-hero,
+.select-pill,
+.split-pill,
+.pill,
+.limit-btn,
+.settings.inline-setting {
+  border-color: var(--ui-border) !important;
+}
+
+/* Inputs/selects that draw their own edges */
+.select-pill select.ui-select,
+.settings-hero .select-pill select.ui-select,
+.settings.inline-setting input,
+.settings.inline-setting select,
+#languageSettings select,
+#wordListSizeSettings select {
+  border-color: var(--ui-border) !important;
+}
+
+/* Optional: when something is focused, make the ring match the softer edge */
+.select-pill:focus-within,
+.split-pill:focus-within,
+.pill:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-border) 45%, transparent);
+}
+
+/* Keep hero cards visually consistent (they had an explicit border before) */
+.settings-hero {
+  box-shadow: none; /* just in case older styles added shadows */
+}
+
+/* If any component used box-shadow as a faux border, gently harmonize it */
+.select-pill,
+.split-pill,
+.pill {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ui-border) 60%, transparent) inset;
+}
+
+/* === Panels & Limits: soften outer edges to match pills ================= */
+
+/* Panel edge strength (defaults to same as pills; tweak if you want) */
+:root { --panel-border-mix: var(--pill-border-mix); }
+
+/* Derived, softer border for big container seams (settings panel, ad rail) */
+:root,
+body[class*="theme-"] {
+  --panel-border: color-mix(
+    in srgb,
+    var(--box-bg) calc(100% - var(--panel-border-mix)),
+    var(--box-border) var(--panel-border-mix)
+  );
+}
+
+/* Settings column: use the softer panel edge */
+.settings-panel {
+  border-color: var(--panel-border) !important;       /* if a full border exists */
+  border-right-color: var(--panel-border) !important; /* your current case */
+}
+
+/* Left ad rail seam (when it’s visible) */
+#ad-left {
+  border-right-color: var(--panel-border) !important;
+}
+
+/* Settings groups/cards inside the column */
+.settings-group {
+  border-color: var(--ui-border) !important;  /* same softness as pills/heroes */
+}
+
+/* Limits cards (the 3 cells that contain the buttons) */
+#limitsHero .limit-cell {
+  border-color: var(--ui-border) !important;
+  /* if a faux edge was used via shadow, blend that too */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ui-border) 60%, transparent) inset;
+}
+
+/* Keep the active/expanded “on” look loud; only the idle edge is softened */
+#limitsHero .limit-cell:has(.limit-btn.active),
+#limitsHero .limit-cell:has(.limit-btn.show-dropdown) {
+  border-color: var(--on-ring) !important;
+  box-shadow: 0 0 0 2.5px var(--on-ring), 0 10px 26px var(--on-glow) !important;
+}
+
+/* Thin left rail = same tone as settings edge */
+@media (min-width: 1101px){
+  #ad-left{
+    background: var(--panel-border) !important;      /* match settings edge */
+    border-right-color: var(--panel-border) !important;
+  }
+}

@@ -31,22 +31,21 @@
   50% { opacity: 0; }
 }
 
-/* Ghost caret */
-.char.ghost::before {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: 0;
-  width: 2px;
-  height: 1em;
-  background: var(--stats-color); /* Change to different color for distinction, e.g. green */
-  opacity: 0.7; /* Slightly higher opacity */
-  animation: blink 1s steps(1) infinite;
-  z-index: 1;
+/* Pre-typing blink for hidden words: true visible/invisible via opacity */
+@keyframes prehide-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
 }
 
-/* Adjust for spaces/newlines */
-.char.space.ghost::before,
-.char.newline.ghost::before {
-  left: 0;
+/* marker for pre-typing targets (no visual by itself) */
+.pre-hide-target { will-change: opacity; }
+
+/* actual blink; keeps layout but hides glyphs */
+.blink-invis {
+  animation: prehide-blink 1s steps(1) infinite !important;
+}
+
+/* people who prefer reduced motion shouldn’t see flashes */
+@media (prefers-reduced-motion: reduce) {
+  .blink-invis { animation: none !important; }
 }

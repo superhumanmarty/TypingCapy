@@ -124,6 +124,17 @@ export function setupGameLimitsButtons({
   timerInlineSelect.addEventListener('change', () => setActive('timer'));
   wordInlineSelect.addEventListener('change', () => setActive('word'));
 
-  // default to Endless on load
-  setActive('endless');
+  // default to 15s Timer on load
+  if (timerInlineSelect) {
+    // Prefer an option with value="15"; otherwise match label containing “15”
+    const opt15 = [...timerInlineSelect.options].find(
+      o => String(o.value).trim() === '15' || /(^|\D)15(\D|$)/i.test(o.textContent)
+    );
+    if (opt15) {
+      opt15.selected = true;        // set the inline dropdown to 15s
+      timerSel.value = opt15.value; // mirror into the hidden selector immediately
+    }
+  }
+  setActive('timer');               // activate Timer mode
+
 }

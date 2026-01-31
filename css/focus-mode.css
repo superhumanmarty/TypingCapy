@@ -4,6 +4,14 @@
 :root {
   /* tweakable timing */
   --focus-transition: 320ms;
+
+  /* focus-hint sizing tokens */
+  --focus-hint-font-base: clamp(0.7rem, 0.55rem + 0.35vw, 1.05rem);
+  --focus-hint-pad-y: clamp(0.28rem, 0.18rem + 0.35vw, 0.48rem);
+  --focus-hint-pad-x: clamp(0.42rem, 0.3rem + 0.5vw, 0.75rem);
+  --focus-hint-radius-base: clamp(14px, 9px + 1vw, 26px);
+  --focus-hint-border-base: clamp(1.6px, 1px + 0.25vw, 2.8px);
+  --focus-hint-context-scale: 0.8;      /* 20% smaller shortcut buttons */
 }
 
 /* Smooth transitions for the three columns */
@@ -45,10 +53,12 @@ body.focus-mode .settings-panel {
 
 /* Let the typing area expand and animate into the center */
 .typing-panel {
+  position: relative; /* ← makes the pre-game hint anchor to the panel */
   transition:
     transform var(--focus-transition) ease,
     max-width var(--focus-transition) ease;
 }
+
 
 /* Center/limit the game; keep it animatable */
 body.focus-mode .typing-panel {
@@ -59,22 +69,59 @@ body.focus-mode .typing-panel {
   transform: none !important;     /* cancel any previous transforms */
 }
 
+/* Shared styling for clickable shortcut pills */
+.shortcut-button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  position: relative;
+  isolation: isolate;
+}
+
+.shortcut-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--correct-color) 75%, white);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--correct-color) 20%, transparent);
+}
+
 /* Focus mode hints (top-left/top-right) */
 .focus-hint {
   position: fixed;
   top: 12px;
   z-index: 50;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  border: 1px solid var(--box-border);
-  background: color-mix(in srgb, var(--box-bg) 85%, transparent);
-  color: var(--correct-color);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--correct-color) 65%, white);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--correct-color) 70%, transparent) 0%,
+      color-mix(in srgb, var(--stats-color, #67d) 80%, transparent) 60%,
+      color-mix(in srgb, var(--highlight-color, #ffc857) 70%, transparent) 100%);
+  color: #050a16;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    0 0 18px color-mix(in srgb, var(--stats-color, #6ae) 45%, transparent);
   opacity: 0;
   transform: translateY(-6px);
   transition: opacity 220ms ease, transform 220ms ease;
-  pointer-events: none; /* purely informational */
+  pointer-events: none;
+  white-space: normal;
+  text-align: center;
+  max-width: min(42vw, calc(360px * var(--focus-hint-width-scale)));
+  line-height: 1.15;
 }
 .focus-hint.left  { left: 12px; }
 .focus-hint.right { right: 12px; }
@@ -82,6 +129,7 @@ body.focus-mode .typing-panel {
 body.focus-mode .focus-hint {
   opacity: 0.92;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Respect reduced motion */
@@ -89,10 +137,12 @@ body.focus-mode .focus-hint {
   #ad-left,
   .settings-panel,
   .typing-panel,
-  .focus-hint {
+  .focus-hint,
+  .pregame-pill {                  /* NEW */
     transition: none !important;
   }
 }
+
 
 /* Hide the top ESC/TAB hints when the results overlay is up */
 body.game-ended .focus-hint {
@@ -103,3 +153,256 @@ body.game-ended .focus-hint {
 @supports not (zoom: 1) {
   .typing-panel > * { transform-origin: top center; }
 }
+
+:root{
+  --ui-font: "Inter", ui-sans-serif, system-ui, -apple-system,
+             "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Force the focus-mode corner hints to use the settings/UI font */
+.typing-panel .focus-hint,
+body.focus-mode .focus-hint,
+body.focus-mode #hintNewMode,
+body.focus-mode #hintRetry,
+body.focus-mode #hintNewWords {
+  font-family: var(--ui-font) !important;
+  font-weight: 800;          /* matches the settings pill look */
+  letter-spacing: .02em;
+  font-variant-ligatures: common-ligatures contextual;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* === Corner focus-hint responsive shrink ================================= */
+:root {
+  --focus-hint-scale: 1;
+  --focus-hint-width-scale: 1;
+  --focus-hint-tall-scale: 1;
+}
+
+/* Step down as viewport height gets shorter */
+@media (max-height: 900px) { :root { --focus-hint-scale: .95; } }
+@media (max-height: 820px) { :root { --focus-hint-scale: .90; } }
+@media (max-height: 740px) { :root { --focus-hint-scale: .85; } }
+@media (max-height: 680px) { :root { --focus-hint-scale: .80; } }
+@media (max-height: 620px) { :root { --focus-hint-scale: .75; } }
+@media (max-height: 560px) { :root { --focus-hint-scale: .70; } }
+@media (max-height: 500px) { :root { --focus-hint-scale: .66; } }
+@media (max-height: 460px) { :root { --focus-hint-scale: .62; } }
+@media (max-height: 420px) { :root { --focus-hint-scale: .58; } }
+@media (max-height: 380px) { :root { --focus-hint-scale: .55; } }
+@media (max-height: 340px) { :root { --focus-hint-scale: .52; } }
+@media (max-height: 300px) { :root { --focus-hint-scale: .48; } }
+
+/* Slightly shrink when the window is extra tall */
+@media (min-height: 920px)  { :root { --focus-hint-tall-scale: .96; } }
+@media (min-height: 1080px) { :root { --focus-hint-tall-scale: .92; } }
+@media (min-height: 1240px) { :root { --focus-hint-tall-scale: .88; } }
+@media (min-height: 1400px) { :root { --focus-hint-tall-scale: .84; } }
+
+/* Width-based scale */
+@media (min-width: 1400px) { :root { --focus-hint-width-scale: 1.05; } }
+@media (min-width: 1600px) { :root { --focus-hint-width-scale: 1.1; } }
+
+@media (max-width: 1080px) { :root { --focus-hint-width-scale: 0.97; } }
+@media (max-width: 920px)  { :root { --focus-hint-width-scale: 0.93; } }
+@media (max-width: 780px)  { :root { --focus-hint-width-scale: 0.9; } }
+@media (max-width: 660px)  { :root { --focus-hint-width-scale: 0.96; } }
+@media (max-width: 560px)  { :root { --focus-hint-width-scale: 1.1; } }
+@media (max-width: 500px)  { :root { --focus-hint-width-scale: 1.28; } }
+@media (max-width: 440px)  { :root { --focus-hint-width-scale: 1.48; } }
+@media (max-width: 380px)  { :root { --focus-hint-width-scale: 1.7; } }
+@media (max-width: 340px)  { :root { --focus-hint-width-scale: 1.9; } }
+
+/* Tall + narrow: trim size a touch when height maxed but width tiny */
+@media (min-height: 1080px) and (max-width: 620px) {
+  :root {
+    --focus-hint-width-scale: 0.86;
+    --focus-hint-pad-y: clamp(0.2rem, 0.14rem + 0.18vw, 0.34rem);
+  }
+}
+@media (min-height: 1080px) and (max-width: 520px) {
+  :root {
+    --focus-hint-width-scale: 0.79;
+    --focus-hint-pad-y: clamp(0.18rem, 0.12rem + 0.16vw, 0.3rem);
+  }
+}
+@media (min-height: 1080px) and (max-width: 440px) {
+  :root {
+    --focus-hint-width-scale: 0.7;
+    --focus-hint-pad-y: clamp(0.16rem, 0.11rem + 0.14vw, 0.28rem);
+  }
+}
+
+/* Apply the scale without moving them from the corners */
+.focus-hint{
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  /* keep them in the corners; don't change top/left/right */
+}
+
+/* If your hint has a kbd-like chip inside, keep it scaled too */
+.focus-hint kbd,
+.focus-hint .key {
+  font-size: 0.95em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.4em;
+}
+
+/* Stack the “new words” hint under the retry hint */
+:root { --focus-hint-stack-gap: 16px; }
+/* Approx height of one hint row; respects your scaling var */
+:root {
+  --focus-hint-row: calc(
+    42px
+    * var(--focus-hint-scale)
+    * var(--focus-hint-tall-scale)
+    * var(--focus-hint-width-scale)
+    * var(--focus-hint-context-scale)
+  );
+}
+
+#hintNewWords {
+  right: 12px;
+  top: calc(12px + var(--focus-hint-row) + var(--focus-hint-stack-gap));
+}
+
+/* ===== Pre-game top-center hint INSIDE the typing panel ===== */
+
+.typing-panel .pregame-hint{
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  z-index: 20; /* under the global fixed corner hints (z 50) */
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--correct-color) 65%, white);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--correct-color) 70%, white) 0%, transparent 55%),
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--correct-color) 70%, transparent) 0%,
+      color-mix(in srgb, var(--stats-color, #67d) 80%, transparent) 60%,
+      color-mix(in srgb, var(--highlight-color, #ffc857) 70%, transparent) 100%);
+  color: #050a16;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.5),
+    0 0 18px color-mix(in srgb, var(--stats-color, #6ae) 45%, transparent);
+  font-family: var(--ui-font) !important;
+  font-weight: 800;
+  letter-spacing: .02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  opacity: 1;
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: auto;
+  white-space: normal;
+  max-width: min(60vw, calc(420px * var(--focus-hint-width-scale)));
+  text-align: center;
+}
+
+/* Scale with your existing focus-hint responsiveness */
+.typing-panel .pregame-hint{
+  font-size: calc(var(--focus-hint-font-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  padding:
+    calc(var(--focus-hint-pad-y) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale))
+    calc(var(--focus-hint-pad-x) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-radius: calc(var(--focus-hint-radius-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+  border-width: calc(var(--focus-hint-border-base) * var(--focus-hint-width-scale) * var(--focus-hint-scale) * var(--focus-hint-tall-scale) * var(--focus-hint-context-scale)) !important;
+}
+
+/* Fade it away when a run starts (focus mode) or results are up */
+body.focus-mode .typing-panel .pregame-hint,
+body.game-ended .typing-panel .pregame-hint{
+  opacity: 0;
+  transform: translate(-50%, -12px);
+  pointer-events: none;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .typing-panel .pregame-hint{ transition: none !important; }
+}
+
+/* --- Pre-game pills ---------------------------------------------------- */
+.typing-panel { position: relative; }
+
+/* Base pill look (matches the pregame shortcut hint) */
+.pregame-pill {
+  position: absolute;
+  top: 8px;
+  z-index: 1000;
+  height: 32px;                     /* compact like the shortcut hint */
+  padding: 6px 10px;                /* small, pill-like */
+  border-radius: 9999px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-decoration: none;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  display: inline-flex;                        /* NEW: keep in DOM for anim */
+  opacity: 0;                                  /* NEW: hidden by default */
+  transform: translateY(-6px);                 /* NEW: slide up like hint */
+  pointer-events: none;                        /* NEW: non-interactive hidden */
+  visibility: hidden;                          /* NEW: avoid focus/hover */
+  transition: opacity 220ms ease,
+              transform 220ms ease;            /* NEW: same feel as hint */
+}
+
+/* Animate in only during pre-game (not focus mode, not results) */
+body:not(.focus-mode):not(.game-ended) .pregame-pill {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+
+/* Placement */
+.pill-left  { left: 12px; }
+.pill-right { right: 12px; }
+
+/* Images inside the pills */
+.pregame-pill img {
+  display: block;
+  height: 100%;
+  border-radius: 10px; /* gently rounded to match overall style */
+}
+
+/* Special case: image-only pill — bottom of the image touches the bottom of the pill */
+.pill-imgonly { padding-bottom: 0; }           /* remove bottom padding so image can touch */
+.pill-imgonly img { align-self: flex-end; }    /* anchor to the bottom edge */
+
+/* Label text */
+.pregame-pill .pill-text {
+  white-space: nowrap;
+  letter-spacing: .01em;
+}
+
+/* 1) Clip anything that spills outside the pill */
+.pregame-pill {
+  overflow: hidden;            /* <-- key for hiding overflow */
+}
+
+
+

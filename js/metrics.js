@@ -76,14 +76,17 @@ export function renderRunGraph(hostEl, durationMs) {
   hostEl.innerHTML = '';
   const title = document.createElement('div');
   title.className = 'title';
-  title.textContent = 'Speed over time (WPM)';
+  title.textContent = 'WPM over time';
   const canvas = document.createElement('canvas');
   hostEl.appendChild(title);
   hostEl.appendChild(canvas);
 
   // size canvas with devicePixelRatio for crisp lines
   const dpr = Math.max(1, window.devicePixelRatio || 1);
-  const cssWidth = hostEl.clientWidth - 16;  // minus container padding-ish
+  const cs   = getComputedStyle(hostEl);
+  const padL = parseFloat(cs.paddingLeft)  || 0;
+  const padR = parseFloat(cs.paddingRight) || 0;
+  const cssWidth = hostEl.clientWidth - padL - padR; // exact inner content width
   const cssHeight = 160;
   canvas.style.width = cssWidth + 'px';
   canvas.style.height = cssHeight + 'px';
@@ -93,14 +96,12 @@ export function renderRunGraph(hostEl, durationMs) {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // theme colors
-  const grid  = getCss('--box-border', '#7f1bfa');
-  const line  = getCss('--stats-color', '#a6e3a1');
-  const text  = getCss('--correct-color', '#ffffff');
-  const error = getCss('--incorrect-color', '#f75f5f');
+  // theme-aware palette with graceful fallbacks
+  const { grid, line, text, error } = getThemeColors();
+
 
   // pad inside canvas (extra left so labels don't clip)
-  const P = { l: 52, r: 12, t: 14, b: 22 };
+  const P = { l: 52, r: 18, t: 14, b: 24 };
 
   // compute domain
   const T = Math.max(1000, durationMs || (samples.at(-1)?.t ?? 0)); // >= 1s
@@ -139,7 +140,7 @@ export function renderRunGraph(hostEl, durationMs) {
 
   // ---- Numeric y label: average WPM (white), positioned at its Y ----
   ctx.fillStyle = withAlpha(text, 0.9);
-  ctx.font = '12px monospace';
+  ctx.font = '14px monospace';
   ctx.textAlign = 'right';
 
   // time-weighted average WPM across the run (handles uneven sample spacing)
@@ -204,7 +205,7 @@ export function renderRunGraph(hostEl, durationMs) {
   if (avgWpm > 0) {
     // label on the left at the average WPM
     ctx.fillStyle = withAlpha(text, 0.9);
-    ctx.font = '12px monospace';
+    ctx.font = '14px monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`${Math.round(avgWpm)}`, P.l - 12, yAvgPx);
 
@@ -247,27 +248,44 @@ export function renderRunGraph(hostEl, durationMs) {
 
   // ----- Error ticks at the bottom (no red horizontal rail) -----
   const railY = H - P.b - 2.5; // near bottom of plot area
-  ctx.strokeStyle = withAlpha(error, 0.9);
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = withAlpha(error, 0.95);
+  ctx.lineWidth = 2; // a touch bolder
   for (const et of errorTimes) {
     const ex = Math.max(P.l, Math.min(W - P.r, x(et)));
+    // tick
     ctx.beginPath();
-    ctx.moveTo(ex, railY - 8); // tick upward from baseline
+    ctx.moveTo(ex, railY - 9);
     ctx.lineTo(ex, railY);
     ctx.stroke();
+    // dot cap
+    ctx.beginPath();
+    ctx.arc(ex, railY - 9, 2, 0, Math.PI * 2);
+    ctx.fillStyle = withAlpha(error, 0.85);
+    ctx.fill();
   }
 
+
   if (forceFlatTopLine) {
-    // Draw one solid, flat green line at the top; skip warm-up entirely
+    const yTop = Math.round(y(avgWpm)) + 0.5;
+
+    // glow underlay
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = withAlpha(line, 0.25);
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(P.l, yTop);
+    ctx.lineTo(W - P.r, yTop);
+    ctx.stroke();
+
+    // crisp main line
     ctx.lineWidth = 2;
     ctx.strokeStyle = line;
-    ctx.setLineDash([]);
-    const yTop = Math.round(y(avgWpm)) + 0.5;
     ctx.beginPath();
     ctx.moveTo(P.l, yTop);
     ctx.lineTo(W - P.r, yTop);
     ctx.stroke();
   } else {
+
     // ----- Warm-up dotted line (connect into solid line) -----
     const warmupMs = (typeof WARMUP_MS === 'number' && WARMUP_MS >= 0) ? WARMUP_MS : 2000;
     const idxAfterOrAt = samples.findIndex(s => s.t >= warmupMs);
@@ -291,15 +309,22 @@ export function renderRunGraph(hostEl, durationMs) {
     ctx.stroke();
     ctx.restore();
 
-    ctx.fillStyle = withAlpha(text, 0.7);
-    ctx.font = '10px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('warm-up', (x0 + joinX) / 2, yWarm - 6);
-
     // ----- Main speed line (solid), only from >= warmup -----
     if (samples.length > 0) {
       const startIdx = samples.findIndex(s => s.t >= warmupMs);
       if (startIdx !== -1) {
+        // glow underlay
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = withAlpha(line, 0.25);
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(x(samples[startIdx].t), y(samples[startIdx].wpm));
+        for (let i = startIdx + 1; i < samples.length; i++) {
+          ctx.lineTo(x(samples[i].t), y(samples[i].wpm));
+        }
+        ctx.stroke();
+
+        // crisp main line
         ctx.lineWidth = 2;
         ctx.strokeStyle = line;
         ctx.setLineDash([]);
@@ -329,7 +354,7 @@ export function renderRunGraph(hostEl, durationMs) {
     }
 
     ctx.fillStyle = withAlpha(text, 0.95);
-    ctx.font = '12px monospace';
+    ctx.font = '14px monospace';
     ctx.textAlign = 'right';
     ctx.fillText(`${Math.round(maxReached)}`, P.l - 10, yMaxPx);
   }
@@ -361,13 +386,31 @@ export function renderRunGraph(hostEl, durationMs) {
   ctx.lineTo(right, bottom);
   ctx.stroke();
 
+  function getThemeColors() {
+    // Prefer explicit chart tokens if your CSS defines them,
+    // else fall back to theme tokens, else to neutral palette.
+    const grid  = getCss('--chart-grid-color',
+                  getCss('--box-border',  '#596174'));   // neutral grey
+    const line  = getCss('--chart-line-color',
+                  getCss('--highlight-color',
+                  getCss('--stats-color', '#7fd1ff')));  // accent > stats > cyan
+    const text  = getCss('--chart-text-color',
+                  getCss('--correct-color','#eaf0f7'));  // soft white
+    const error = getCss('--chart-error-color',
+                  getCss('--incorrect-color', '#ff6b6b')); // friendly red
+    return { grid, line, text, error };
+  }
 
 
   // helpers
   function getCss(varName, fallback) {
-    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    // Read vars from the element that actually inherits the theme (body/host),
+    // not from <html>.
+    const refEl = hostEl || document.body || document.documentElement;
+    const v = getComputedStyle(refEl).getPropertyValue(varName).trim();
     return v || fallback;
   }
+
   function withAlpha(rgbOrHex, a) {
     if (/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(rgbOrHex)) {
       const c = rgbToRgb(rgbOrHex);
